@@ -1,0 +1,1992 @@
+# Combined gcc / cross-armv*-gcc(-accel) specfile
+Name: cross-armv7nhl-gcc-accel
+# Keep Name on top !
+
+# crossbuild / accelerator section
+# \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+%define crossbuild 0
+%define accelerator_crossbuild 0
+%if "%{name}" != "gcc"
+# this is the ix86 -> arm cross compiler (cross-armv*-gcc)
+#
+# cross arch retrieval
+%define crossarch %(echo %{name} | sed -e "s/cross-\\(.*\\)-gcc/\\1/")
+# We set requires/provides by hand and disable post-build-checks.
+# Captain Trunk: Sledge, you cannot disarm that nuclear bomb!
+# Sledge Hammer: Trust me, I know what I'm doing. 
+AutoReqProv: 0
+AutoReq: false
+BuildRequires: -rpmlint-Moblin -rpmlint-mini -post-build-checks
+# cross platform
+%define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnueabi
+# gcc_target_platform holds the host (executing the compiler)
+# cross_gcc_target_platform holds the target (for which the compiler is producing binaries)
+# prefix for cross compiler
+%define _prefix /opt/cross
+# strip of 'foreign arch' symbols fails
+%define __strip /bin/true
+# sysroot for cross-compiler
+%define crosssysroot %{_prefix}/%{cross_gcc_target_platform}/sys-root
+# flag
+%define crossbuild 1
+# macros in buildrequires is hard to expand for the scheduler (e.g. crossarch) which would make this easier.
+#BuildRequires: cross-%{crossarch}-glibc cross-%{crossarch}-glibc-devel cross-%{crossarch}-glibc-headers
+#BuildRequires: cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
+# Fixme: find way to make this without listing every package
+%if "%{name}" == "cross-armv5tel-gcc"
+BuildRequires: cross-armv5tel-glibc cross-armv5tel-glibc-devel cross-armv5tel-glibc-headers
+BuildRequires: cross-armv5tel-kernel-headers cross-armv5tel-binutils
+%define crossextraconfig %{nil}
+%endif
+%if "%{name}" == "cross-armv6l-gcc"
+BuildRequires: cross-armv6l-glibc cross-armv6l-glibc-devel cross-armv6l-glibc-headers
+BuildRequires: cross-armv6l-kernel-headers cross-armv6l-binutils
+%define crossextraconfig --with-fpu=vfp --with-arch=armv6
+%endif
+%if "%{name}" == "cross-armv7l-gcc"
+BuildRequires: cross-armv7l-glibc cross-armv7l-glibc-devel cross-armv7l-glibc-headers
+BuildRequires: cross-armv7l-kernel-headers cross-armv7l-binutils
+%define crossextraconfig --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%endif
+%if "%{name}" == "cross-armv7hl-gcc"
+BuildRequires: cross-armv7hl-glibc cross-armv7hl-glibc-devel cross-armv7hl-glibc-headers
+BuildRequires: cross-armv7hl-kernel-headers cross-armv7hl-binutils
+%define crossextraconfig --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%endif
+%if "%{name}" == "cross-armv7nhl-gcc"
+BuildRequires: cross-armv7nhl-glibc cross-armv7nhl-glibc-devel cross-armv7nhl-glibc-headers
+BuildRequires: cross-armv7nhl-kernel-headers cross-armv7nhl-binutils
+%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
+%endif
+# Fixme: see above
+%if "%{name}" == "cross-armv5tel-gcc-accel"
+BuildRequires: cross-armv5tel-glibc cross-armv5tel-glibc-devel cross-armv5tel-glibc-headers
+BuildRequires: cross-armv5tel-kernel-headers cross-armv5tel-binutils
+%define crossextraconfig %{nil}
+%endif
+%if "%{name}" == "cross-armv6l-gcc-accel"
+BuildRequires: cross-armv6l-glibc cross-armv6l-glibc-devel cross-armv6l-glibc-headers
+BuildRequires: cross-armv6l-kernel-headers cross-armv6l-binutils
+%define crossextraconfig --with-fpu=vfp --with-arch=armv6
+%endif
+%if "%{name}" == "cross-armv7l-gcc-accel"
+BuildRequires: cross-armv7l-glibc cross-armv7l-glibc-devel cross-armv7l-glibc-headers
+BuildRequires: cross-armv7l-kernel-headers cross-armv7l-binutils
+%define crossextraconfig --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%endif
+%if "%{name}" == "cross-armv7hl-gcc-accel"
+BuildRequires: cross-armv7hl-glibc cross-armv7hl-glibc-devel cross-armv7hl-glibc-headers
+BuildRequires: cross-armv7hl-kernel-headers cross-armv7hl-binutils
+%define crossextraconfig --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%endif
+%if "%{name}" == "cross-armv7nhl-gcc-accel"
+BuildRequires: cross-armv7nhl-glibc cross-armv7nhl-glibc-devel cross-armv7nhl-glibc-headers
+BuildRequires: cross-armv7nhl-kernel-headers cross-armv7nhl-binutils
+%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
+%endif
+# single target atm.
+ExclusiveArch: %ix86
+#
+# special handling for MeeGo ARM build acceleration
+# cross-armv*-gcc-accel
+%if "%(echo %{name} | sed -e "s/cross-.*-gcc-\\(.*\\)/\\1/")" == "accel"
+# cross architecture
+%define crossarch %(echo %{name} | sed -e "s/cross-\\(.*\\)-gcc-accel/\\1/")
+# cross target platform
+%define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnueabi
+# prefix - as it's going to "replace" the original compiler ...
+%define _prefix /usr
+# cross-build sets sysroot as default , we need to override this a bit
+%define crosssysroot /
+# where to find the libs during the build
+%define crossbuildsysroot /opt/cross/%{cross_gcc_target_platform}/sys-root
+# flags
+%define crossbuild 1
+%define accelerator_crossbuild 1
+# where to find the libs at runtime
+%define newrpath /emul/ia32-linux/lib:/emul/ia32-linux/usr/lib
+%define _build_name_fmt    %%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.dontuse.rpm
+%endif
+# end special accel
+%endif
+# /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+# end crossbuild / accelerator section
+
+%global gcc_version 4.6.1
+%global gcc_release 1
+%global _unpackaged_files_terminate_build 0
+%global include_gappletviewer 0
+%global build_ada 0
+%global build_java 0
+%if !%{crossbuild} 
+%global build_cloog 1
+%else
+%global build_cloog 0
+%endif
+%global build_libstdcxx_docs 0
+%global bootstrap_java %{?_with_java_bootstrap:%{build_java}}%{!?_with_java_bootstrap:0}
+%global build_java_tar %{?_with_java_tar:%{build_java}}%{!?_with_java_tar:0}
+%global multilib_64_archs x86_64
+%ifarch x86_64
+%global multilib_32_arch i686
+%endif
+%global build_64bit_multilib 0
+%ifarch %{ix86} x86_64
+%global build_libquadmath 1
+%else
+%global build_libquadmath 0
+%endif
+
+Summary: Various compilers (C, C++, Objective-C, Java, ...)
+Version: %{gcc_version}
+Release: %{gcc_release}
+License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
+Group: Development/Languages
+URL: http://gcc.gnu.org
+Source0: gcc-%{version}.tar.bz2
+Source1: libgcc_post_upgrade.c
+Source2: README.libgcjwebplugin.so
+%global fastjar_ver 0.97
+Source4: http://download.savannah.nongnu.org/releases/fastjar/fastjar-%{fastjar_ver}.tar.gz
+Source100: gcc-rpmlintrc
+Source200: baselibs.conf
+Source300: precheckin.sh
+Source301: aaa_README.PACKAGER
+
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires: binutils >= 2.20.51.0.2-12
+BuildRequires: glibc-static
+BuildRequires: zlib-devel, gettext,  bison, flex, texinfo
+BuildRequires: mpc-devel
+BuildRequires: glibc-devel >= 2.4.90-13
+BuildRequires: elfutils-devel >= 0.72
+
+%if %{build_java}
+BuildRequires: /usr/share/java/eclipse-ecj.jar, zip, unzip
+%if %{bootstrap_java}
+Source10: libjava-classes-%{version}-%{release}.tar.bz2
+%else
+BuildRequires: gcc-java, libgcj
+%endif
+%endif
+
+%if %{build_ada}
+# Ada requires Ada to build
+BuildRequires: gcc-gnat >= 3.1, libgnat >= 3.1
+%endif
+
+%if %{build_cloog}
+BuildRequires: ppl >= 0.10, ppl-devel >= 0.10, cloog-ppl >= 0.15, cloog-ppl-devel >= 0.15
+%endif
+
+%if %{build_libstdcxx_docs}
+BuildRequires: doxygen
+BuildRequires: graphviz
+%endif
+
+Requires: cpp = %{version}-%{release}
+Requires: libgcc >= %{version}-%{release}
+Requires: libgomp = %{version}-%{release}
+Requires: glibc-devel
+Requires: binutils >= 2.20.51.0.2-12
+
+%if !%{crossbuild} 
+%if !%{build_ada}
+Obsoletes: gcc-gnat < %{version}-%{release}
+Obsoletes: libgnat < %{version}-%{release}
+%endif
+
+%if %{build_cloog}
+Requires: cloog-ppl >= 0.15
+%endif
+
+%if %{build_64bit_multilib}
+Requires: glibc64bit-helper
+%endif
+
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+Obsoletes: gcc < %{version}-%{release}
+Obsoletes: gcc43
+AutoReq: true
+# /!crossbuild
+%endif
+
+Patch0: gcc46-hack.patch
+Patch2: gcc46-c++-builtin-redecl.patch
+Patch4: gcc46-java-nomulti.patch
+Patch6: gcc46-pr33763.patch
+Patch7: gcc46-rh330771.patch
+Patch8: gcc46-i386-libgomp.patch
+Patch10: gcc46-libgomp-omp_h-multilib.patch
+Patch11: gcc46-libtool-no-rpath.patch
+Patch12: gcc46-cloog-dl.patch
+Patch14: gcc46-pr38757.patch
+Patch15: gcc46-libstdc++-docs.patch
+Patch18: gcc46-ppl-0.10.patch
+Patch19: gcc46-pr47858.patch
+
+Patch40: gcc46-use-atom.patch
+Patch41: libgcc_post_upgrade.c.arm.patch
+Patch42: gcc46-libiberty-conftest.patch
+Patch43: gcc46-arm-volatile.patch
+
+Patch1000: fastjar-0.97-segfault.patch
+Patch1001: fastjar-0.97-len1.patch
+Patch1002: fastjar-0.97-filename0.patch
+Patch1003: fastjar-CVE-2010-0831.patch
+Patch1004: fastjar-man.patch
+
+Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
+
+#We need -gnueabi indicator for ARM
+%ifnarch %{arm}
+%global _gnu %{nil}
+%endif
+%global gcc_target_platform %{_target_platform}
+
+%description
+The gcc package contains the GNU Compiler Collection version 4.6.
+You'll need this package in order to compile C code.
+
+%package -n libgcc
+Summary: GCC version 4.6 shared support library
+Group: System Environment/Libraries
+Obsoletes: libgcc < %{version}-%{release}
+Obsoletes: libgcc43
+Autoreq: false
+
+%description -n libgcc
+This package contains GCC shared support library which is needed
+e.g. for exception handling support.
+
+%package c++
+Summary: C++ support for GCC
+Group: Development/Languages
+Requires: gcc = %{version}-%{release}
+Requires: libstdc++ = %{version}-%{release}
+Requires: libstdc++-devel = %{version}-%{release}
+Obsoletes: gcc-c++ < %{version}-%{release}
+Obsoletes: gcc43-c++
+Autoreq: true
+
+%description c++
+This package adds C++ support to the GNU Compiler Collection.
+It includes support for most of the current C++ specification,
+including templates and exception handling.
+
+%package -n libstdc++
+Summary: GNU Standard C++ Library
+Group: System Environment/Libraries
+Obsoletes: libstdc++ < %{version}-%{release}
+Obsoletes: libstdc++43
+Obsoletes: libstdc++6 < %{version}-%{release}
+Autoreq: true
+Requires: glibc 
+
+%description -n libstdc++
+The libstdc++ package contains a rewritten standard compliant GCC Standard
+C++ Library.
+
+%package -n libstdc++-devel
+Summary: Header files and libraries for C++ development
+Group: Development/Libraries
+Requires: libstdc++ = %{version}-%{release}
+Obsoletes: libstdc++-devel < %{version}-%{release}
+Obsoletes: libstdc++43-devel
+Autoreq: true
+
+%description -n libstdc++-devel
+This is the GNU implementation of the standard C++ libraries.  This
+package includes the header files and libraries needed for C++
+development. This includes rewritten implementation of STL.
+
+%package -n libstdc++-docs
+Summary: Documentation for the GNU standard C++ library
+Group: Development/Libraries
+Obsoletes: libstdc++-docs < %{version}-%{release}
+Obsoletes: libstdc++43-doc
+Autoreq: true
+
+%description -n libstdc++-docs
+Manual, doxygen generated API information and Frequently Asked Questions
+for the GNU standard C++ library.
+
+%package objc
+Summary: Objective-C support for GCC
+Group: Development/Languages
+Requires: gcc = %{version}-%{release}
+Requires: libobjc = %{version}-%{release}
+Obsoletes: gcc-objc < %{version}-%{release}
+Obsoletes: gcc43-objc
+Autoreq: true
+
+%description objc
+gcc-objc provides Objective-C support for the GCC.
+Mainly used on systems running NeXTSTEP, Objective-C is an
+object-oriented derivative of the C language.
+
+%package objc++
+Summary: Objective-C++ support for GCC
+Group: Development/Languages
+Requires: gcc-c++ = %{version}-%{release}, gcc-objc = %{version}-%{release}
+Obsoletes: gcc-objc++ < %{version}-%{release}
+Obsoletes: gcc43-obj-c++ gcc43-objc++
+Autoreq: true
+
+%description objc++
+gcc-objc++ package provides Objective-C++ support for the GCC.
+
+%package -n libobjc
+Summary: Objective-C runtime
+Group: System Environment/Libraries
+Obsoletes: libobjc < %{version}-%{release}
+Obsoletes: libobjc43
+Autoreq: true
+
+%description -n libobjc
+This package contains Objective-C shared library which is needed to run
+Objective-C dynamically linked programs.
+
+%package gfortran
+Summary: Fortran support
+Group: Development/Languages
+BuildRequires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1
+Requires: gcc = %{version}-%{release}
+Requires: libgfortran = %{version}-%{release}
+%if %{build_libquadmath}
+Requires: libquadmath = %{version}-%{release}
+Requires: libquadmath-devel = %{version}-%{release}
+%endif
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+Obsoletes: gcc-fortran < %{version}-%{release}
+Obsoletes: gcc43-fortran
+Autoreq: true
+Provides: gcc-fortran
+
+%description gfortran
+The gcc-gfortran package provides support for compiling Fortran
+programs with the GNU Compiler Collection.
+
+%package -n libgfortran
+Summary: Fortran runtime
+Group: System Environment/Libraries
+Obsoletes: libgfortran < %{version}-%{release}
+Obsoletes: libgfortran43
+Autoreq: true
+%if %{build_libquadmath}
+Requires: libquadmath = %{version}-%{release}
+%endif
+
+%description -n libgfortran
+This package contains Fortran shared library which is needed to run
+Fortran dynamically linked programs.
+
+%package -n libgfortran-static
+Summary: Static Fortran libraries
+Group: Development/Libraries
+Requires: libgfortran = %{version}-%{release}
+Requires: gcc = %{version}-%{release}
+%if %{build_libquadmath}
+Requires: libquadmath-static = %{version}-%{release}
+%endif
+
+%description -n libgfortran-static
+This package contains static Fortran libraries.
+
+%package -n libgomp
+Summary: GCC OpenMP v3.0 shared support library
+Group: System Environment/Libraries
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+Obsoletes: libgomp < %{version}-%{release}
+Obsoletes: libgomp43
+
+%description -n libgomp
+This package contains GCC shared support library which is needed
+for OpenMP v3.0 support.
+
+%package -n libmudflap
+Summary: GCC mudflap shared support library
+Group: System Environment/Libraries
+
+%description -n libmudflap
+This package contains GCC shared support library which is needed
+for mudflap support.
+
+%package -n libmudflap-devel
+Summary: GCC mudflap support
+Group: Development/Libraries
+Requires: libmudflap = %{version}-%{release}
+Requires: gcc = %{version}-%{release}
+
+%description -n libmudflap-devel
+This package contains headers and static libraries for building
+mudflap-instrumented programs.
+
+To instrument a non-threaded program, add -fmudflap
+option to GCC and when linking add -lmudflap, for threaded programs
+also add -fmudflapth and -lmudflapth.
+
+%package -n libquadmath
+Summary: GCC __float128 shared support library
+Group: System Environment/Libraries
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+
+%description -n libquadmath
+This package contains GCC shared support library which is needed
+for __float128 math support and for Fortran REAL*16 support.
+
+%package -n libquadmath-devel
+Summary: GCC __float128 support
+Group: Development/Libraries
+Requires: libquadmath = %{version}-%{release}
+Requires: gcc = %{version}-%{release}
+
+%description -n libquadmath-devel
+This package contains headers for building Fortran programs using
+REAL*16 and programs using __float128 math.
+
+%package -n libquadmath-static
+Summary: Static libraries for __float128 support
+Group: Development/Libraries
+Requires: libquadmath-devel = %{version}-%{release}
+
+%description -n libquadmath-static
+This package contains static libraries for building Fortran programs
+using REAL*16 and programs using __float128 math.
+
+%package java
+Summary: Java support for GCC
+Group: Development/Languages
+Requires: gcc = %{version}-%{release}
+Requires: libgcj = %{version}-%{release}
+Requires: libgcj-devel = %{version}-%{release}
+Requires: /usr/share/java/eclipse-ecj.jar
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+Obsoletes: gcc-java < %{version}-%{release}
+Obsoletes: gcc43-java
+Autoreq: true
+
+%description java
+This package adds support for compiling Java(tm) programs and
+bytecode into native code.
+
+%package -n libgcj
+Summary: Java runtime library for gcc
+Group: System Environment/Libraries
+%if %{build_java}
+BuildRequires: gtk2-devel >= 2.4.0
+BuildRequires: glib2-devel >= 2.4.0
+BuildRequires: xulrunner-devel
+BuildRequires: libart_lgpl-devel >= 2.1.0
+BuildRequires: alsa-lib-devel
+BuildRequires: libXtst-devel
+BuildRequires: libXt-devel
+%endif
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+Requires: zip >= 2.1
+Requires: gtk2 >= 2.4.0
+Requires: glib2 >= 2.4.0
+Requires: libart_lgpl >= 2.1.0
+Obsoletes: libgcj < %{version}-%{release}
+Obsoletes: libgcj43
+Autoreq: true
+
+%description -n libgcj
+The Java(tm) runtime library. You will need this package to run your Java
+programs compiled using the Java compiler from GNU Compiler Collection (gcj).
+
+%package -n libgcj-devel
+Summary: Libraries for Java development using GCC
+Group: Development/Languages
+Requires: libgcj = %{version}-%{release}, %{_prefix}/%{_lib}/libgcj.so.10
+Requires: zlib-devel, %{_prefix}/%{_lib}/libz.so
+Requires: /bin/awk
+Obsoletes: libgcj-devel < %{version}-%{release}
+Obsoletes: libgcj43-devel
+Autoreq: false
+Autoprov: false
+
+%description -n libgcj-devel
+The Java(tm) static libraries and C header files. You will need this
+package to compile your Java programs using the GCC Java compiler (gcj).
+
+%package -n libgcj-src
+Summary: Java library sources from GCC4 preview
+Group: System Environment/Libraries
+Requires: libgcj = %{version}-%{release}
+Autoreq: true
+
+%description -n libgcj-src
+The Java(tm) runtime library sources for use in Eclipse.
+
+%package -n cpp
+Summary: The C Preprocessor
+Group: Development/Languages
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+Requires: mpc
+Obsoletes: cpp < %{version}-%{release}
+Obsoletes: cpp43
+Autoreq: true
+
+%description -n cpp
+Cpp is the GNU C-Compatible Compiler Preprocessor.
+Cpp is a macro processor which is used automatically
+by the C compiler to transform your program before actual
+compilation. It is called a macro processor because it allows
+you to define macros, abbreviations for longer
+constructs.
+
+The C preprocessor provides four separate functionalities: the
+inclusion of header files (files of declarations that can be
+substituted into your program); macro expansion (you can define macros,
+and the C preprocessor will replace the macros with their definitions
+throughout the program); conditional compilation (using special
+preprocessing directives, you can include or exclude parts of the
+program according to various conditions); and line control (if you use
+a program to combine or rearrange source files into an intermediate
+file which is then compiled, you can use line control to inform the
+compiler about where each source line originated).
+
+You should install this package if you are a C programmer and you use
+macros.
+
+%package gnat
+Summary: Ada 95 support for GCC
+Group: Development/Languages
+Requires: gcc = %{version}-%{release}
+Requires: libgnat = %{version}-%{release}, libgnat-devel = %{version}-%{release}
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+Autoreq: true
+
+%description gnat
+GNAT is a GNU Ada 95 front-end to GCC. This package includes development tools,
+the documents and Ada 95 compiler.
+
+%package -n libgnat
+Summary: GNU Ada 95 runtime shared libraries
+Group: System Environment/Libraries
+Autoreq: true
+
+%description -n libgnat
+GNAT is a GNU Ada 95 front-end to GCC. This package includes shared libraries,
+which are required to run programs compiled with the GNAT.
+
+%package -n libgnat-devel
+Summary: GNU Ada 95 libraries
+Group: System Environment/Libraries
+Autoreq: true
+
+%description -n libgnat-devel
+GNAT is a GNU Ada 95 front-end to GCC. This package includes libraries,
+which are required to compile with the GNAT.
+
+%package -n gcc-multilib
+Summary: for 64bit multilib support
+Group: System Environment/Libraries
+Autoreq: true
+
+%description -n gcc-multilib
+This is one set of libraries which support 64bit multilib on top of
+32bit enviroment from compiler side.
+
+%prep
+%setup -q -n gcc-%{version}
+%patch0 -p0 -b .hack~
+%patch2 -p0 -b .c++-builtin-redecl~
+%patch4 -p0 -b .java-nomulti~
+%patch6 -p0 -b .pr33763~
+%patch7 -p0 -b .rh341221~
+%patch8 -p0 -b .i386-libgomp~
+%patch10 -p0 -b .libgomp-omp_h-multilib~
+%patch11 -p0 -b .libtool-no-rpath~
+%if %{build_cloog}
+%patch12 -p0 -b .cloog-dl~
+%endif
+%patch14 -p0 -b .pr38757~
+%if %{build_libstdcxx_docs}
+%patch15 -p0 -b .libstdc++-docs~
+%endif
+%patch18 -p0 -b .ppl-0.10~
+%patch19 -p0 -b .pr47858~
+
+%patch40 -p0 -b .atom
+
+%ifarch %arm
+%patch42 -p1
+%endif
+
+%patch43 -p1
+
+# This testcase doesn't compile.
+rm libjava/testsuite/libjava.lang/PR35020*
+
+tar xzf %{SOURCE4}
+
+%patch1000 -p0 -b .fastjar-0.97-segfault~
+%patch1001 -p0 -b .fastjar-0.97-len1~
+%patch1002 -p0 -b .fastjar-0.97-filename0~
+%patch1003 -p0 -b .fastjar-CVE-2010-0831~
+%patch1004 -p0 -b .fastjar-man~
+
+%patch9999 -p1 -b .arm-boehm-gc~
+
+%if %{bootstrap_java}
+tar xjf %{SOURCE10}
+%endif
+
+echo 'MeeGo %{version}-%{gcc_release}' > gcc/DEV-PHASE
+
+# Default to -gdwarf-3 rather than -gdwarf-2
+sed -i '/UInteger Var(dwarf_version)/s/Init(2)/Init(3)/' gcc/common.opt
+sed -i 's/\(may be either 2 or 3; the default version is \)2\./\13./' gcc/doc/invoke.texi
+
+cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
+
+# Hack to avoid building multilib libjava
+perl -pi -e 's/^all: all-redirect/ifeq (\$(MULTISUBDIR),)\nall: all-redirect\nelse\nall:\n\techo Multilib libjava build disabled\nendif/' libjava/Makefile.in
+perl -pi -e 's/^install: install-redirect/ifeq (\$(MULTISUBDIR),)\ninstall: install-redirect\nelse\ninstall:\n\techo Multilib libjava install disabled\nendif/' libjava/Makefile.in
+perl -pi -e 's/^check: check-redirect/ifeq (\$(MULTISUBDIR),)\ncheck: check-redirect\nelse\ncheck:\n\techo Multilib libjava check disabled\nendif/' libjava/Makefile.in
+perl -pi -e 's/^all: all-recursive/ifeq (\$(MULTISUBDIR),)\nall: all-recursive\nelse\nall:\n\techo Multilib libjava build disabled\nendif/' libjava/Makefile.in
+perl -pi -e 's/^install: install-recursive/ifeq (\$(MULTISUBDIR),)\ninstall: install-recursive\nelse\ninstall:\n\techo Multilib libjava install disabled\nendif/' libjava/Makefile.in
+perl -pi -e 's/^check: check-recursive/ifeq (\$(MULTISUBDIR),)\ncheck: check-recursive\nelse\ncheck:\n\techo Multilib libjava check disabled\nendif/' libjava/Makefile.in
+
+./contrib/gcc_update --touch
+
+LC_ALL=C sed -i -e 's/\xa0/ /' gcc/doc/options.texi
+
+%build
+
+%if %{build_java}
+mkdir fastjar-%{fastjar_ver}/obj-%{gcc_target_platform}
+cd fastjar-%{fastjar_ver}/obj-%{gcc_target_platform}
+../configure CFLAGS="%{optflags}" --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir}
+make %{?_smp_mflags}
+export PATH=`pwd`${PATH:+:$PATH}
+cd ../../
+%endif
+
+rm -fr obj-%{gcc_target_platform}
+mkdir obj-%{gcc_target_platform}
+cd obj-%{gcc_target_platform}
+
+%if %{build_java}
+%if !%{bootstrap_java}
+mkdir java_hacks
+cd java_hacks
+cp -a ../../libjava/classpath/tools/external external
+mkdir -p gnu/classpath/tools
+cp -a ../../libjava/classpath/tools/gnu/classpath/tools/{common,javah,getopt} gnu/classpath/tools/
+cp -a ../../libjava/classpath/tools/resource/gnu/classpath/tools/common/Messages.properties gnu/classpath/tools/common
+cp -a ../../libjava/classpath/tools/resource/gnu/classpath/tools/getopt/Messages.properties gnu/classpath/tools/getopt
+cd external/asm; for i in `find . -name \*.java`; do gcj --encoding ISO-8859-1 -C $i -I.; done; cd ../..
+for i in `find gnu -name \*.java`; do gcj -C $i -I. -Iexternal/asm/; done
+gcj -findirect-dispatch -O2 -fmain=gnu.classpath.tools.javah.Main -I. -Iexternal/asm/ `find . -name \*.class` -o gjavah.real
+cat > gjavah <<EOF
+#!/bin/sh
+export CLASSPATH=`pwd`${CLASSPATH:+:$CLASSPATH}
+exec `pwd`/gjavah.real "\$@"
+EOF
+chmod +x `pwd`/gjavah
+cat > ecj1 <<EOF
+#!/bin/sh
+exec gij -cp /usr/share/java/eclipse-ecj.jar org.eclipse.jdt.internal.compiler.batch.GCCMain "\$@"
+EOF
+chmod +x `pwd`/ecj1
+export PATH=`pwd`${PATH:+:$PATH}
+cd ..
+%endif
+%endif
+
+CC=gcc
+OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
+OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-m64//g;s/-m32//g;s/-m31//g'`
+%ifarch %{ix86}
+OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-march=i.86//g'`
+%endif
+OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e 's/[[:blank:]]\+/ /g'`
+case "$OPT_FLAGS" in
+  *-fasynchronous-unwind-tables*)
+    sed -i -e 's/-fno-exceptions /-fno-exceptions -fno-asynchronous-unwind-tables/' \
+      ../gcc/Makefile.in
+    ;;
+esac
+
+%ifarch %arm
+# gcc 45 fails to bootstrap itself otherwise on insn-attrtab.o
+# issue is bad interaction between ggc and qemu
+export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
+# gcc 45 segfaults on O2g.gch generation. (cc1plus)
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch
+# for armv7hl reset the gcc specs
+%ifarch armv6l
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-fpu=vfp --with-arch=armv6
+%endif
+%ifarch armv7l
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%endif
+%ifarch armv7hl
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%endif
+# for armv7nhl reset the gcc specs
+%ifarch armv7nhl
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a
+%endif
+%endif
+
+%if %{crossbuild}
+# cross build
+export PATH=/opt/cross/bin:$PATH
+# strip all after -march . no arch specific options in cross-compiler build .
+# -march=core2 -mssse3 -mtune=atom -mfpmath=sse -fasynchronous-unwi
+export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s#\-march=.*##g"`
+%if %{accelerator_crossbuild}
+# adding -rpath to the special crosscompiler
+export OPT_FLAGS="$OPT_FLAGS -Wl,-rpath,/emul/ia32-linux/usr/lib:/emul/ia32-linux/lib:/usr/lib:/lib"
+%endif
+%endif
+
+CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
+	GCJFLAGS="$OPT_FLAGS" \
+	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
+%ifarch %{arm}
+	--with-bugurl=http://bugzilla.meego.com/ --disable-bootstrap \
+	--enable-shared --enable-threads=posix --disable-checking \
+	%ARM_EXTRA_CONFIGURE \
+%else
+%if %{crossbuild}
+	--build=%{gcc_target_platform} \
+	--host=%{gcc_target_platform} \
+	--target=%{cross_gcc_target_platform} \
+	--with-bugurl=http://bugzilla.meego.com/ --disable-bootstrap \
+	--enable-shared --enable-threads=posix --disable-checking \
+%else
+	--with-bugurl=http://bugzilla.meego.com/ --enable-bootstrap \
+	--enable-shared --enable-threads=posix --enable-checking=release \
+%endif
+%if %{build_64bit_multilib}
+	--enable-targets=all \
+	--enable-multilib \
+%endif
+%endif
+	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
+	--enable-gnu-unique-object --enable-lto \
+	--enable-linker-build-id \
+%if !%{build_ada}
+%if !%{build_java}
+	--enable-languages=c,c++,objc,obj-c++,fortran \
+%else
+	--enable-languages=c,c++,objc,obj-c++,java,fortran \
+%endif
+%else
+%if !%{build_java}
+	--enable-languages=c,c++,objc,obj-c++,fortran,ada \
+%else
+	--enable-languages=c,c++,objc,obj-c++,java,fortran,ada \
+%endif
+%endif
+%if !%{build_java}
+	--disable-libgcj \
+%else
+	--enable-java-awt=gtk --disable-dssi --enable-plugin \
+	--with-java-home=%{_prefix}/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre \
+	--enable-libgcj-multifile \
+%if !%{bootstrap_java}
+	--enable-java-maintainer-mode \
+%endif
+	--with-ecj-jar=/usr/share/java/eclipse-ecj.jar \
+	--disable-libjava-multilib \
+%endif
+%ifarch %{arm}
+	--disable-sjlj-exceptions \
+%endif
+%if !%{crossbuild}
+%ifarch %{ix86} x86_64
+	--with-tune=generic \
+%endif
+%ifarch %{ix86}
+	--with-arch=i686 \
+%endif
+%ifarch x86_64
+	--with-arch_32=i686 \
+%endif
+	--build=%{gcc_target_platform}  || ( cat config.log ; exit 1 )
+#end for x86
+%else
+%if !%{accelerator_crossbuild}
+	%{crossextraconfig} \
+	--with-sysroot=%{crosssysroot}
+#end for cross-compiler
+%else
+	%{crossextraconfig} \
+	--program-transform-name='s/%{cross_gcc_target_platform}-//' \
+	--with-gxx-include-dir=%{_prefix}/include/c++/%{gcc_version} \
+	--with-build-sysroot=%{crossbuildsysroot} \
+	--with-sysroot=%{crosssysroot} 
+#end for special cross-compiler
+%endif
+%endif
+
+
+#GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" bootstrap
+%ifarch %{arm}
+GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS"
+# native ARM
+%else
+%if !%{crossbuild}
+GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" profiledbootstrap
+# native x86
+%else
+GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS"
+# crosscompiler
+%endif
+%endif
+
+# Make
+#make -C gcc CC="./xgcc -B ./ -O2" all
+
+# Make generated man pages even if Pod::Man is not new enough
+perl -pi -e 's/head3/head2/' ../contrib/texi2pod.pl
+for i in ../gcc/doc/*.texi; do
+  cp -a $i $i.orig; sed 's/ftable/table/' $i.orig > $i
+done
+make -C gcc generated-manpages
+for i in ../gcc/doc/*.texi; do mv -f $i.orig $i; done
+
+# Make generated doxygen pages.
+%if %{build_libstdcxx_docs}
+cd %{gcc_target_platform}/libstdc++-v3
+make doc-html-doxygen
+make doc-man-doxygen
+cd ../..
+%endif
+
+# Copy various doc files here and there
+cd ..
+mkdir -p rpm.doc/gfortran rpm.doc/objc rpm.doc/libquadmath
+mkdir -p rpm.doc/boehm-gc rpm.doc/fastjar rpm.doc/libffi rpm.doc/libjava
+mkdir -p rpm.doc/changelogs/{gcc/cp,gcc/java,gcc/ada,libstdc++-v3,libobjc,libmudflap,libgomp}
+sed -e 's,@VERSION@,%{gcc_version},' %{SOURCE2} > rpm.doc/README.libgcjwebplugin.so
+
+for i in {gcc,gcc/cp,gcc/java,gcc/ada,libstdc++-v3,libobjc,libmudflap,libgomp}/ChangeLog*; do
+	cp -p $i rpm.doc/changelogs/$i
+done
+
+(cd gcc/fortran; for i in ChangeLog*; do
+	cp -p $i ../../rpm.doc/gfortran/$i
+done)
+(cd libgfortran; for i in ChangeLog*; do
+	cp -p $i ../rpm.doc/gfortran/$i.libgfortran
+done)
+(cd gcc/objc; for i in README*; do
+	cp -p $i ../../rpm.doc/objc/$i.objc
+done)
+(cd libobjc; for i in README*; do
+	cp -p $i ../rpm.doc/objc/$i.libobjc
+done)
+(cd boehm-gc; for i in ChangeLog*; do
+	cp -p $i ../rpm.doc/boehm-gc/$i.gc
+done)
+(cd fastjar-%{fastjar_ver}; for i in ChangeLog* README*; do
+	cp -p $i ../rpm.doc/fastjar/$i.fastjar
+done)
+(cd libffi; for i in ChangeLog* README* LICENSE; do
+	cp -p $i ../rpm.doc/libffi/$i.libffi
+done)
+(cd libjava; for i in ChangeLog* README*; do
+	cp -p $i ../rpm.doc/libjava/$i.libjava
+done)
+cp -p libjava/LIBGCJ_LICENSE rpm.doc/libjava/
+%if %{build_libquadmath}
+(cd libquadmath; for i in ChangeLog* COPYING.LIB; do
+        cp -p $i ../rpm.doc/libquadmath/$i.libquadmath
+done)
+%endif
+
+rm -f rpm.doc/changelogs/gcc/ChangeLog.[1-9]
+find rpm.doc -name \*ChangeLog\* | xargs bzip2 -9
+
+%if %{build_java_tar}
+find libjava -name \*.h -type f | xargs grep -l '// DO NOT EDIT THIS FILE - it is machine generated' > libjava-classes.list
+find libjava -name \*.class -type f >> libjava-classes.list
+find libjava/testsuite -name \*.jar -type f >> libjava-classes.list
+tar cf - -T libjava-classes.list | bzip2 -9 > $RPM_SOURCE_DIR/libjava-classes-%{version}-%{release}.tar.bz2
+%endif
+
+
+%install
+rm -fr %{buildroot}
+
+cd obj-%{gcc_target_platform}
+
+%if %{build_java}
+export PATH=`pwd`/../fastjar-%{fastjar_ver}/obj-%{gcc_target_platform}${PATH:+:$PATH}
+%if !%{bootstrap_java}
+export PATH=`pwd`/java_hacks${PATH:+:$PATH}
+%endif
+%endif
+
+%if !%{crossbuild}
+# native
+TARGET_PLATFORM=%{gcc_target_platform}
+# There are some MP bugs in libstdc++ Makefiles
+make -C %{gcc_target_platform}/libstdc++-v3
+%else
+# cross build
+export PATH=/opt/cross/bin:$PATH
+# strip all after -march . no arch specific options in cross-compiler build .
+# -march=core2 -mssse3 -mtune=atom -mfpmath=sse -fasynchronous-unwi
+export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s#\-march=.*##g"`
+#echo "$OPT_FLAGS"
+#TARGET_PLATFORM=%{cross_gcc_target_platform}
+# There are some MP bugs in libstdc++ Makefiles
+#make -C %{cross_gcc_target_platform}/libstdc++-v3
+%endif
+
+make DESTDIR=%{buildroot} install
+#prefix=%{buildroot}%{_prefix} mandir=%{buildroot}%{_mandir} \
+#  infodir=%{buildroot}%{_infodir} install
+
+%if !%{crossbuild}
+# native
+# \/\/\/
+%if %{build_java}
+make DESTDIR=%{buildroot} -C %{gcc_target_platform}/libjava install-src.zip
+%endif
+%if %{build_ada}
+chmod 644 %{buildroot}%{_infodir}/gnat*
+%endif
+
+FULLPATH=%{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+FULLEPATH=%{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+
+ln -sf gcc %{buildroot}%{_prefix}/bin/cc
+mkdir -p %{buildroot}/lib
+ln -sf ..%{_prefix}/bin/cpp %{buildroot}/lib/cpp
+ln -sf gfortran %{buildroot}%{_prefix}/bin/f95
+rm -f %{buildroot}%{_infodir}/dir
+gzip -9 %{buildroot}%{_infodir}/*.info*
+
+cxxconfig="`find %{gcc_target_platform}/libstdc++-v3/include -name c++config.h`"
+for i in `find %{gcc_target_platform}/[36]*/libstdc++-v3/include -name c++config.h 2>/dev/null`; do
+  if ! diff -up $cxxconfig $i; then
+    cat > %{buildroot}%{_prefix}/include/c++/%{gcc_version}/%{gcc_target_platform}/bits/c++config.h <<EOF
+#ifndef _CPP_CPPCONFIG_WRAPPER
+#define _CPP_CPPCONFIG_WRAPPER 1
+#include <bits/wordsize.h>
+#if __WORDSIZE == 32
+%ifarch %{multilib_64_archs}
+`cat $(find %{gcc_target_platform}/32/libstdc++-v3/include -name c++config.h)`
+%else
+`cat $(find %{gcc_target_platform}/libstdc++-v3/include -name c++config.h)`
+%endif
+#else
+%ifarch %{multilib_64_archs}
+`cat $(find %{gcc_target_platform}/libstdc++-v3/include -name c++config.h)`
+%else
+`cat $(find %{gcc_target_platform}/64/libstdc++-v3/include -name c++config.h)`
+%endif
+#endif
+#endif
+EOF
+    break
+  fi
+done
+
+for f in `find %{buildroot}%{_prefix}/include/c++/%{gcc_version}/%{gcc_target_platform}/ -name c++config.h`; do
+  for i in 1 2 4 8; do
+    sed -i -e 's/#define _GLIBCXX_ATOMIC_BUILTINS_'$i' 1/#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_'$i'\
+&\
+#endif/' $f
+  done
+done
+
+# Nuke bits/stdc++.h.gch dirs
+# 1) there is no bits/stdc++.h header installed, so when gch file can't be
+#    used, compilation fails
+# 2) sometimes it is hard to match the exact options used for building
+#    libstdc++-v3 or they aren't desirable
+# 3) there are multilib issues, conflicts etc. with this
+# 4) it is huge
+# People can always precompile on their own whatever they want, but
+# shipping this for everybody is unnecessary.
+rm -rf %{buildroot}%{_prefix}/include/c++/%{gcc_version}/%{gcc_target_platform}/bits/stdc++.h.gch
+
+%if %{build_libstdcxx_docs}
+libstdcxx_doc_builddir=%{gcc_target_platform}/libstdc++-v3/doc/doxygen
+mkdir -p ../rpm.doc/libstdc++-v3
+cp -r -p ../libstdc++-v3/doc/html ../rpm.doc/libstdc++-v3/html
+mv $libstdcxx_doc_builddir/html ../rpm.doc/libstdc++-v3/html/api
+mkdir -p %{buildroot}%{_mandir}
+mv $libstdcxx_doc_builddir/man/man3 %{buildroot}%{_mandir}/man3/
+find ../rpm.doc/libstdc++-v3 -name \*~ | xargs rm
+%endif
+
+if [ -n "$FULLLPATH" ]; then
+  mkdir -p $FULLLPATH
+else
+  FULLLPATH=$FULLPATH
+fi
+
+find %{buildroot} -name \*.la | xargs rm -f
+%if %{build_java}
+find %{buildroot} -name libgcj.a -o -name libgtkpeer.a \
+		     -o -name libgjsmalsa.a -o -name libgcj-tools.a -o -name libjvm.a \
+		     -o -name libgij.a -o -name libgcj_bc.a -o -name libjavamath.a \
+  | xargs rm -f
+
+mv %{buildroot}%{_prefix}/lib/libgcj.spec $FULLPATH/
+sed -i -e 's/lib: /&%%{static:%%eJava programs cannot be linked statically}/' \
+  $FULLPATH/libgcj.spec
+%endif
+
+mkdir -p %{buildroot}/%{_lib}
+mv -f %{buildroot}%{_prefix}/%{_lib}/libgcc_s.so.1 %{buildroot}/%{_lib}/libgcc_s-%{gcc_version}.so.1
+chmod 755 %{buildroot}/%{_lib}/libgcc_s-%{gcc_version}.so.1
+ln -sf libgcc_s-%{gcc_version}.so.1 %{buildroot}/%{_lib}/libgcc_s.so.1
+ln -sf /%{_lib}/libgcc_s.so.1 %{buildroot}/%{_libdir}/libgcc_s.so
+ln -sf /%{_lib}/libgcc_s.so.1 $FULLPATH/libgcc_s.so
+%ifarch %{multilib_64_archs}
+ln -sf /lib/libgcc_s.so.1 $FULLPATH/32/libgcc_s.so
+%endif
+
+mv -f %{buildroot}%{_prefix}/%{_lib}/libgomp.spec $FULLPATH/
+
+%if %{build_ada}
+mv -f $FULLPATH/adalib/libgnarl-*.so %{buildroot}%{_prefix}/%{_lib}/
+mv -f $FULLPATH/adalib/libgnat-*.so %{buildroot}%{_prefix}/%{_lib}/
+rm -f $FULLPATH/adalib/libgnarl.so* $FULLPATH/adalib/libgnat.so*
+%endif
+
+mkdir -p %{buildroot}%{_prefix}/libexec/getconf
+if gcc/xgcc -B gcc/ -E -dD -xc /dev/null | grep __LONG_MAX__.*2147483647; then
+  ln -sf POSIX_V6_ILP32_OFF32 %{buildroot}%{_prefix}/libexec/getconf/default
+else
+  ln -sf POSIX_V6_LP64_OFF64 %{buildroot}%{_prefix}/libexec/getconf/default
+fi
+
+%if %{build_java}
+pushd ../fastjar-%{fastjar_ver}/obj-%{gcc_target_platform}
+make install DESTDIR=%{buildroot}
+popd
+
+if [ "%{_lib}" != "lib" ]; then
+  mkdir -p %{buildroot}%{_prefix}/%{_lib}/pkgconfig
+  sed '/^libdir/s/lib$/%{_lib}/' %{buildroot}%{_prefix}/lib/pkgconfig/libgcj-*.pc \
+    > %{buildroot}%{_prefix}/%{_lib}/pkgconfig/`basename %{buildroot}%{_prefix}/lib/pkgconfig/libgcj-*.pc`
+fi
+%endif
+
+mkdir -p %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}
+mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++*gdb.py* \
+      %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
+
+pushd $FULLPATH
+if [ "%{_lib}" = "lib" ]; then
+ln -sf ../../../libobjc.so.3 libobjc.so
+ln -sf ../../../libstdc++.so.6.* libstdc++.so
+ln -sf ../../../libgfortran.so.3.* libgfortran.so
+ln -sf ../../../libgomp.so.1.* libgomp.so
+ln -sf ../../../libmudflap.so.0.* libmudflap.so
+ln -sf ../../../libmudflapth.so.0.* libmudflapth.so
+%if %{build_libquadmath}
+ln -sf ../../../libquadmath.so.0.* libquadmath.so
+%endif
+%if %{build_java}
+ln -sf ../../../libgcj.so.10.* libgcj.so
+ln -sf ../../../libgcj-tools.so.10.* libgcj-tools.so
+ln -sf ../../../libgij.so.10.* libgij.so
+%endif
+else
+ln -sf ../../../../%{_lib}/libobjc.so.3 libobjc.so
+ln -sf ../../../../%{_lib}/libstdc++.so.6.* libstdc++.so
+ln -sf ../../../../%{_lib}/libgfortran.so.3.* libgfortran.so
+ln -sf ../../../../%{_lib}/libgomp.so.1.* libgomp.so
+ln -sf ../../../../%{_lib}/libmudflap.so.0.* libmudflap.so
+ln -sf ../../../../%{_lib}/libmudflapth.so.0.* libmudflapth.so
+%if %{build_libquadmath}
+ln -sf ../../../../%{_lib}/libquadmath.so.0.* libquadmath.so
+%endif
+%if %{build_java}
+ln -sf ../../../../%{_lib}/libgcj.so.10.* libgcj.so
+ln -sf ../../../../%{_lib}/libgcj-tools.so.10.* libgcj-tools.so
+ln -sf ../../../../%{_lib}/libgij.so.10.* libgij.so
+%endif
+fi
+%if %{build_java}
+mv -f %{buildroot}%{_prefix}/%{_lib}/libgcj_bc.so $FULLLPATH/
+%endif
+mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++.*a $FULLLPATH/
+mv -f %{buildroot}%{_prefix}/%{_lib}/libsupc++.*a .
+mv -f %{buildroot}%{_prefix}/%{_lib}/libgfortran.*a .
+mv -f %{buildroot}%{_prefix}/%{_lib}/libobjc.*a .
+mv -f %{buildroot}%{_prefix}/%{_lib}/libgomp.*a .
+mv -f %{buildroot}%{_prefix}/%{_lib}/libmudflap{,th}.*a $FULLLPATH/
+%if %{build_libquadmath}
+mv -f %{buildroot}%{_prefix}/%{_lib}/libquadmath.*a $FULLLPATH/
+%endif
+
+
+%if %{build_ada}
+%ifarch %{multilib_64_archs}
+rm -rf $FULLPATH/32/ada{include,lib}
+%endif
+if [ "$FULLPATH" != "$FULLLPATH" ]; then
+mv -f $FULLPATH/ada{include,lib} $FULLLPATH/
+pushd $FULLLPATH/adalib
+if [ "%{_lib}" = "lib" ]; then
+ln -sf ../../../../../libgnarl-*.so libgnarl.so
+ln -sf ../../../../../libgnarl-*.so libgnarl-4.4.so
+ln -sf ../../../../../libgnat-*.so libgnat.so
+ln -sf ../../../../../libgnat-*.so libgnat-4.4.so
+else
+ln -sf ../../../../../../%{_lib}/libgnarl-*.so libgnarl.so
+ln -sf ../../../../../../%{_lib}/libgnarl-*.so libgnarl-4.4.so
+ln -sf ../../../../../../%{_lib}/libgnat-*.so libgnat.so
+ln -sf ../../../../../../%{_lib}/libgnat-*.so libgnat-4.4.so
+fi
+popd
+else
+pushd $FULLPATH/adalib
+if [ "%{_lib}" = "lib" ]; then
+ln -sf ../../../../libgnarl-*.so libgnarl.so
+ln -sf ../../../../libgnarl-*.so libgnarl-4.4.so
+ln -sf ../../../../libgnat-*.so libgnat.so
+ln -sf ../../../../libgnat-*.so libgnat-4.4.so
+else
+ln -sf ../../../../../%{_lib}/libgnarl-*.so libgnarl.so
+ln -sf ../../../../../%{_lib}/libgnarl-*.so libgnarl-4.4.so
+ln -sf ../../../../../%{_lib}/libgnat-*.so libgnat.so
+ln -sf ../../../../../%{_lib}/libgnat-*.so libgnat-4.4.so
+fi
+popd
+fi
+%endif
+
+%ifarch %{multilib_64_archs}
+mkdir -p 32
+ln -sf ../../../../libobjc.so.3 32/libobjc.so
+ln -sf ../`echo ../../../../lib64/libstdc++.so.6.* | sed s~/../lib64/~/~` 32/libstdc++.so
+ln -sf ../`echo ../../../../lib64/libgfortran.so.3.* | sed s~/../lib64/~/~` 32/libgfortran.so
+ln -sf ../`echo ../../../../lib64/libgomp.so.1.* | sed s~/../lib64/~/~` 32/libgomp.so
+rm -f libmudflap.so libmudflapth.so
+echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libmudflap.so.0.* | sed 's,^.*libm,libm,'`' )' > libmudflap.so
+echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libmudflapth.so.0.* | sed 's,^.*libm,libm,'`' )' > libmudflapth.so
+echo 'INPUT ( %{_prefix}/lib/'`echo ../../../../lib64/libmudflap.so.0.* | sed 's,^.*libm,libm,'`' )' > 32/libmudflap.so
+echo 'INPUT ( %{_prefix}/lib/'`echo ../../../../lib64/libmudflapth.so.0.* | sed 's,^.*libm,libm,'`' )' > 32/libmudflapth.so
+%if %{build_libquadmath}
+rm -f libquadmath.so
+echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libquadmath.so.0.* | sed 's,^.*libq,libq,'`' )' > libquadmath.so
+echo 'INPUT ( %{_prefix}/lib/'`echo ../../../../lib64/libquadmath.so.0.* | sed 's,^.*libq,libq,'`' )' > 32/libquadmath.so
+%endif
+%if %{build_java}
+ln -sf ../`echo ../../../../lib64/libgcj.so.10.* | sed s~/../lib64/~/~` 32/libgcj.so
+ln -sf ../`echo ../../../../lib64/libgcj-tools.so.10.* | sed s~/../lib64/~/~` 32/libgcj-tools.so
+ln -sf ../`echo ../../../../lib64/libgij.so.10.* | sed s~/../lib64/~/~` 32/libgij.so
+%endif
+mv -f %{buildroot}%{_prefix}/lib/libsupc++.*a 32/
+mv -f %{buildroot}%{_prefix}/lib/libgfortran.*a 32/
+mv -f %{buildroot}%{_prefix}/lib/libobjc.*a 32/
+mv -f %{buildroot}%{_prefix}/lib/libgomp.*a 32/
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libstdc++.a 32/libstdc++.a
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libmudflap.a 32/libmudflap.a
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libmudflapth.a 32/libmudflapth.a
+%if %{build_libquadmath}
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libquadmath.a 32/libquadmath.a
+%endif
+%if %{build_java}
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libgcj_bc.so 32/libgcj_bc.so
+%endif
+%if %{build_ada}
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/adainclude 32/adainclude
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/adalib 32/adalib
+%endif
+%endif
+
+# Strip debug info from Fortran/ObjC/Java static libraries
+strip -g `find . \( -name libgfortran.a -o -name libobjc.a -o -name libgomp.a \
+		    -o -name libmudflap.a -o -name libmudflapth.a \
+		    -o -name libgcc.a -o -name libgcov.a -name libquadmath.a \) -a -type f`
+popd
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgfortran.so.3.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgomp.so.1.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libmudflap{,th}.so.0.*
+%if %{build_libquadmath}
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libquadmath.so.0.*
+%endif
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libobjc.so.3.*
+
+%if %{build_ada}
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgnarl*so*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgnat*so*
+%endif
+
+mv $FULLPATH/include-fixed/syslimits.h $FULLPATH/include/syslimits.h
+mv $FULLPATH/include-fixed/limits.h $FULLPATH/include/limits.h
+for h in `find $FULLPATH/include -name \*.h`; do
+  if grep -q 'It has been auto-edited by fixincludes from' $h; then
+    rh=`grep -A2 'It has been auto-edited by fixincludes from' $h | tail -1 | sed 's|^.*"\(.*\)".*$|\1|'`
+    diff -up $rh $h || :
+    rm -f $h
+  fi
+done
+
+cat > %{buildroot}%{_prefix}/bin/c89 <<"EOF"
+#!/bin/sh
+fl="-std=c89"
+for opt; do
+  case "$opt" in
+    -ansi|-std=c89|-std=iso9899:1990) fl="";;
+    -std=*) echo "`basename $0` called with non ANSI/ISO C option $opt" >&2
+	    exit 1;;
+  esac
+done
+exec gcc $fl ${1+"$@"}
+EOF
+cat > %{buildroot}%{_prefix}/bin/c99 <<"EOF"
+#!/bin/sh
+fl="-std=c99"
+for opt; do
+  case "$opt" in
+    -std=c99|-std=iso9899:1999) fl="";;
+    -std=*) echo "`basename $0` called with non ISO C99 option $opt" >&2
+	    exit 1;;
+  esac
+done
+exec gcc $fl ${1+"$@"}
+EOF
+chmod 755 %{buildroot}%{_prefix}/bin/c?9
+
+mkdir -p %{buildroot}%{_prefix}/sbin
+%ifarch %{arm}
+patch %{SOURCE1} < %{PATCH41}
+%endif
+gcc -static -Os %{SOURCE1} -o %{buildroot}%{_prefix}/sbin/libgcc_post_upgrade
+strip %{buildroot}%{_prefix}/sbin/libgcc_post_upgrade
+
+cd ..
+%find_lang %{name}
+%find_lang cpplib
+
+# Remove binaries we will not be including, so that they don't end up in
+# gcc-debuginfo
+rm -f %{buildroot}%{_prefix}/%{_lib}/{libffi*,libiberty.a}
+rm -f $FULLEPATH/install-tools/{mkheaders,fixincl}
+rm -f %{buildroot}%{_prefix}/lib/{32,64}/libiberty.a
+%ifarch %{ix86} x86_64
+%if !%{crossbuild}
+rm -f %{buildroot}%{_prefix}/%{_lib}/libssp*
+%endif
+%endif
+rm -f %{buildroot}%{_prefix}/bin/gnative2ascii
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-%{version} || :
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gfortran || :
+
+
+%ifarch %{multilib_64_archs}
+# Remove libraries for the other arch on multilib arches
+rm -f %{buildroot}%{_prefix}/lib/lib*.so*
+rm -f %{buildroot}%{_prefix}/lib/lib*.a
+%endif
+
+%if %{build_java}
+mkdir -p %{buildroot}%{_prefix}/share/java/gcj-endorsed \
+	 %{buildroot}%{_prefix}/%{_lib}/gcj-%{version}/classmap.db.d
+chmod 755 %{buildroot}%{_prefix}/share/java/gcj-endorsed \
+	  %{buildroot}%{_prefix}/%{_lib}/gcj-%{version} \
+	  %{buildroot}%{_prefix}/%{_lib}/gcj-%{version}/classmap.db.d
+touch %{buildroot}%{_prefix}/%{_lib}/gcj-%{version}/classmap.db
+%endif
+# /\/\/\
+# native
+%else
+# cross
+# \/\/\/
+# additional install for cross
+# remove some obsolete files
+%if !%{accelerator_crossbuild}
+#set -x
+rm -rRf %buildroot/%{_prefix}/lib/libiberty.a
+rm -rRf %buildroot/%{_prefix}/share
+#set +x
+%endif
+# /\/\/\
+# cross
+%endif
+
+%if !%{crossbuild}
+# checking and split packaging for native ...
+# native
+# \/\/\/
+
+%check
+%if 0
+cd obj-%{gcc_target_platform}
+
+# run the tests.
+make %{?_smp_mflags} -k check ALT_CC_UNDER_TEST=gcc ALT_CXX_UNDER_TEST=g++ RUNTESTFLAGS="--target_board=unix/'{,-fstack-protector}'" || :
+echo ====================TESTING=========================
+( LC_ALL=C ../contrib/test_summary || : ) 2>&1 | sed -n '/^cat.*EOF/,/^EOF/{/^cat.*EOF/d;/^EOF/d;/^LAST_UPDATED:/d;p;}'
+echo ====================TESTING END=====================
+mkdir testlogs-%{_target_platform}-%{version}-%{release}
+for i in `find . -name \*.log | grep -F testsuite/ | grep -v 'config.log\|acats\|ada'`; do
+  ln $i testlogs-%{_target_platform}-%{version}-%{release}/ || :
+done
+tar cf - testlogs-%{_target_platform}-%{version}-%{release} | bzip2 -9c \
+  | uuencode testlogs-%{_target_platform}.tar.bz2 || :
+rm -rf testlogs-%{_target_platform}-%{version}-%{release}
+
+%endif
+
+%clean
+rm -rf %{buildroot}
+
+%post
+[ -e %{_infodir}/gcc.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/gcc.info.gz || :
+
+%postun -p /sbin/ldconfig
+
+%preun
+if [ $1 = 0 ]; then
+  [ -e %{_infodir}/gcc.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/gcc.info.gz || :
+fi
+
+%post -n cpp
+[ -e %{_infodir}/cpp.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
+
+%preun -n cpp
+if [ $1 = 0 ]; then
+  [ -e %{_infodir}/cpp.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
+fi
+
+%post gfortran
+[ -e %{_infodir}/gfortran.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/gfortran.info.gz || :
+
+%preun gfortran
+if [ $1 = 0 ]; then
+  [ -e %{_infodir}/gfortran.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/gfortran.info.gz || :
+fi
+
+%post java
+[ -e %{_infodir}/gcj.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/gcj.info.gz || :
+
+%preun java
+if [ $1 = 0 ]; then
+  [ -e %{_infodir}/gcj.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/gcj.info.gz || :
+fi
+
+%post gnat
+[ -e %{_infodir}/gnat_rm.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/gnat_rm.info.gz || :
+[ -e %{_infodir}/gnat_ugn.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/gnat_ugn.info.gz || :
+[ -e %{_infodir}/gnat-style.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/gnat-style.info.gz || :
+
+%preun gnat
+if [ $1 = 0 ]; then
+  [ -e %{_infodir}/gnat_rm.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/gnat_rm.info.gz || :
+  [ -e %{_infodir}/gnat_ugn.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/gnat_ugn.info.gz || :
+  [ -e %{_infodir}/gnat_ugn.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/gnat-style.info.gz || :
+fi
+
+%post -n libgcc -p %{_prefix}/sbin/libgcc_post_upgrade
+
+%postun -n libgcc -p /sbin/ldconfig
+
+%post -n libstdc++ -p /sbin/ldconfig
+
+%postun -n libstdc++ -p /sbin/ldconfig
+
+%post -n libobjc -p /sbin/ldconfig
+
+%postun -n libobjc -p /sbin/ldconfig
+
+%post -n libgcj
+/sbin/ldconfig
+[ -e %{_infodir}/cp-tools.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/cp-tools.info.gz || :
+[ -e %{_infodir}/fastjar.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/fastjar.info.gz || :
+
+%preun -n libgcj
+if [ $1 = 0 ]; then
+  [ -e %{_infodir}/cp-tools.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/cp-tools.info.gz || :
+  [ -e %{_infodir}/fastjar.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/fastjar.info.gz || :
+fi
+
+%postun -n libgcj -p /sbin/ldconfig
+
+%post -n libgfortran -p /sbin/ldconfig
+
+%postun -n libgfortran -p /sbin/ldconfig
+
+%post -n libgnat -p /sbin/ldconfig
+
+%postun -n libgnat -p /sbin/ldconfig
+
+%post -n libgomp
+/sbin/ldconfig
+[ -e %{_infodir}/libgomp.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/libgomp.info.gz || :
+
+%preun -n libgomp
+if [ $1 = 0 ]; then
+  [ -e %{_infodir}/libgomp.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/libgomp.info.gz || :
+fi
+
+%postun -n libgomp -p /sbin/ldconfig
+
+%post -n libmudflap -p /sbin/ldconfig
+
+%postun -n libmudflap -p /sbin/ldconfig
+
+%post -n libquadmath
+/sbin/ldconfig
+if [ -f %{_infodir}/libquadmath.info.gz ]; then
+  /sbin/install-info \
+    --info-dir=%{_infodir} %{_infodir}/libquadmath.info.gz || :
+fi
+
+%preun -n libquadmath
+if [ $1 = 0 -a -f %{_infodir}/libquadmath.info.gz ]; then
+  /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/libquadmath.info.gz || :
+fi
+
+%postun -n libquadmath -p /sbin/ldconfig
+
+%files -f %{name}.lang
+%defattr(-,root,root,-)
+%{_prefix}/bin/cc
+%{_prefix}/bin/c89
+%{_prefix}/bin/c99
+%{_prefix}/bin/gcc
+%{_prefix}/bin/gcov
+%ifnarch %{arm}
+%{_prefix}/bin/%{gcc_target_platform}-gcc
+%endif
+%{_mandir}/man1/gcc.1*
+%{_mandir}/man1/gcov.1*
+%{_mandir}/man7/*
+%{_infodir}/gcc*
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include
+
+# Shouldn't include all files under this fold, split to diff pkgs
+#%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/*
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/lto1
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/lto-wrapper
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/liblto_plugin.so*
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/collect2
+
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/plugin
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/plugin/include
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/plugin/include/*
+
+# Shouldn't include all files under this fold, split to diff pkgs
+#%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/*
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stddef.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdarg.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdfix.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/varargs.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/float.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/limits.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdbool.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/iso646.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/syslimits.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/unwind.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/omp.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdint.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdint-gcc.h
+%ifarch %{ix86} x86_64
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/xmmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/emmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/pmmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/tmmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ammintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/smmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/nmmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/bmmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/wmmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/immintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/avxintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/x86intrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/fma4intrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/xopintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/lwpintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/abmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/popcntintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/bmiintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/tbmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ia32intrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mm_malloc.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mm3dnow.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/cpuid.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/cross-stdarg.h
+%endif
+
+# For ARM port
+%ifarch %{arm}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include-fixed
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include-fixed/README
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include-fixed/linux/a.out.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_neon.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mmintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/ssp.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/stdio.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/string.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/unistd.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdfix.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/install-tools
+%endif
+
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/crt*.o
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcc.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcov.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcc_eh.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcc_s.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.spec
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.so
+%ifarch %{multilib_64_archs}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/crt*.o
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcc.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcov.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcc_eh.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcc_s.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgomp.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgomp.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libmudflap.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libmudflapth.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libmudflap.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libmudflapth.so
+%if %{build_libquadmath}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libquadmath.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libquadmath.so
+%endif
+%endif
+%dir %{_prefix}/libexec/getconf
+%{_prefix}/libexec/getconf/default
+%doc gcc/README* rpm.doc/changelogs/gcc/ChangeLog* gcc/COPYING*
+
+%files -n cpp -f cpplib.lang
+%defattr(-,root,root,-)
+/lib/cpp
+%{_prefix}/bin/cpp
+%{_mandir}/man1/cpp.1*
+%{_infodir}/cpp*
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cc1
+
+%files -n libgcc
+%defattr(-,root,root,-)
+/%{_lib}/libgcc_s-%{gcc_version}.so.1
+/%{_lib}/libgcc_s.*
+/%{_libdir}/libgcc_s.*
+%{_prefix}/sbin/libgcc_post_upgrade
+%doc gcc/COPYING.LIB
+
+# For ARM port
+%ifarch %{arm}
+%{_prefix}/%{_lib}/libssp*
+%endif
+
+%files c++
+%defattr(-,root,root,-)
+%ifnarch %{arm}
+%{_prefix}/bin/%{gcc_target_platform}-*++
+%endif
+%{_prefix}/bin/g++
+%{_prefix}/bin/c++
+%{_mandir}/man1/g++.1*
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cc1plus
+%ifarch %{multilib_64_archs}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libstdc++.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libstdc++.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libsupc++.a
+%endif
+%ifarch %{multilib_64_archs}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libsupc++.a
+%endif
+%doc rpm.doc/changelogs/gcc/cp/ChangeLog*
+
+%files -n libstdc++
+%defattr(-,root,root,-)
+%{_prefix}/%{_lib}/libstdc++.*
+%dir %{_datadir}/gdb
+%dir %{_datadir}/gdb/auto-load
+%dir %{_datadir}/gdb/auto-load/%{_prefix}
+%dir %{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
+%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/libstdc*gdb.py*
+%dir %{_prefix}/share/gcc-%{gcc_version}
+%{_prefix}/share/gcc-%{gcc_version}/python
+
+%files -n libstdc++-devel
+%defattr(-,root,root,-)
+%dir %{_prefix}/include/c++
+%dir %{_prefix}/include/c++/%{gcc_version}
+%{_prefix}/include/c++/%{gcc_version}/[^gjos]*
+%{_prefix}/include/c++/%{gcc_version}/os*
+%{_prefix}/include/c++/%{gcc_version}/s[^u]*
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.a  
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libsupc++.a
+%ifnarch  %{multilib_64_archs}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.so
+%endif
+%doc rpm.doc/changelogs/libstdc++-v3/ChangeLog* libstdc++-v3/README*
+
+%if %{build_libstdcxx_docs}
+%files -n libstdc++-docs
+%defattr(-,root,root)
+%{_mandir}/man3/*
+%doc rpm.doc/libstdc++-v3/html
+%endif
+
+%files objc
+%defattr(-,root,root,-)
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/objc
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/objc/*.h
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cc1obj
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libobjc.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libobjc.so
+%ifarch %{multilib_64_archs}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libobjc.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libobjc.so
+%endif
+%doc rpm.doc/objc/*
+%doc libobjc/THREADS* rpm.doc/changelogs/libobjc/ChangeLog*
+
+%files objc++
+%defattr(-,root,root,-)
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cc1objplus
+
+%files -n libobjc
+%defattr(-,root,root,-)
+%{_prefix}/%{_lib}/libobjc.*
+
+%files gfortran
+%defattr(-,root,root,-)
+%{_prefix}/bin/gfortran
+%{_prefix}/bin/f95
+%{_mandir}/man1/gfortran.1*
+%{_infodir}/gfortran*
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude/omp_lib.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude/omp_lib.f90
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude/omp_lib.mod
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude/omp_lib_kinds.mod
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/f951
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgfortranbegin.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgfortran.so
+%ifarch %{multilib_64_archs}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgfortranbegin.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgfortran.so
+%endif
+%doc rpm.doc/gfortran/*
+
+%files -n libgfortran
+%defattr(-,root,root,-)
+%{_prefix}/%{_lib}/libgfortran.*
+
+%files -n libgfortran-static
+%defattr(-,root,root,-)
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgfortran.a
+%ifarch %{multilib_64_archs}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgfortran.a
+%endif
+
+%if %{build_java}
+%files java
+%defattr(-,root,root,-)
+%{_prefix}/bin/gcj
+%{_prefix}/bin/gjavah
+%{_prefix}/bin/gcjh
+%{_prefix}/bin/jcf-dump
+%{_mandir}/man1/gcj.1*
+%{_mandir}/man1/jcf-dump.1*
+%{_mandir}/man1/gjavah.1*
+%{_mandir}/man1/gcjh.1*
+%{_infodir}/gcj*
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/jc1
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/ecj1
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/jvgenmain
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcj.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcj-tools.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgij.so
+%ifarch %{multilib_64_archs}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcj.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcj-tools.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcj_bc.so
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgij.so
+%endif
+%doc rpm.doc/changelogs/gcc/java/ChangeLog*
+
+%files -n libgcj
+%defattr(-,root,root,-)
+%{_prefix}/bin/jv-convert
+%{_prefix}/bin/gij
+%{_prefix}/bin/gjar
+%{_prefix}/bin/fastjar
+%{_prefix}/bin/grepjar
+%{_prefix}/bin/grmic
+%{_prefix}/bin/grmid
+%{_prefix}/bin/grmiregistry
+%{_prefix}/bin/gtnameserv
+%{_prefix}/bin/gkeytool
+%{_prefix}/bin/gorbd
+%{_prefix}/bin/gserialver
+%{_prefix}/bin/gcj-dbtool
+%if %{include_gappletviewer}
+%{_prefix}/bin/gappletviewer
+%{_mandir}/man1/gappletviewer.1*
+%endif
+%{_prefix}/bin/gjarsigner
+%{_mandir}/man1/fastjar.1*
+%{_mandir}/man1/grepjar.1*
+%{_mandir}/man1/gjar.1*
+%{_mandir}/man1/gjarsigner.1*
+%{_mandir}/man1/jv-convert.1*
+%{_mandir}/man1/gij.1*
+%{_mandir}/man1/grmic.1*
+%{_mandir}/man1/grmiregistry.1*
+%{_mandir}/man1/gcj-dbtool.1*
+%{_mandir}/man1/gkeytool.1*
+%{_mandir}/man1/gorbd.1*
+%{_mandir}/man1/grmid.1*
+%{_mandir}/man1/gserialver.1*
+%{_mandir}/man1/gtnameserv.1*
+%{_infodir}/fastjar.info*
+%{_infodir}/cp-tools.info*
+%{_prefix}/%{_lib}/libgcj.so.*
+%{_prefix}/%{_lib}/libgcj-tools.so.*
+%{_prefix}/%{_lib}/libgcj_bc.so.*
+%{_prefix}/%{_lib}/libgij.so.*
+%dir %{_prefix}/%{_lib}/gcj-%{version}
+%{_prefix}/%{_lib}/gcj-%{version}/libgtkpeer.so
+%{_prefix}/%{_lib}/gcj-%{version}/libgjsmalsa.so
+%{_prefix}/%{_lib}/gcj-%{version}/libjawt.so
+%if %{include_gappletviewer}
+%{_prefix}/%{_lib}/gcj-%{version}/libgcjwebplugin.so
+%endif
+%{_prefix}/%{_lib}/gcj-%{version}/libjvm.so
+%{_prefix}/%{_lib}/gcj-%{version}/libjavamath.so
+%dir %{_prefix}/share/java
+%{_prefix}/share/java/[^sl]*
+%{_prefix}/share/java/libgcj-%{version}.jar
+%dir %{_prefix}/%{_lib}/security
+%config(noreplace) %{_prefix}/%{_lib}/security/classpath.security
+%{_prefix}/%{_lib}/logging.properties
+%dir %{_prefix}/%{_lib}/gcj-%{version}/classmap.db.d
+%attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) %{_prefix}/%{_lib}/gcj-%{version}/classmap.db
+%if %{include_gappletviewer}
+%doc rpm.doc/README.libgcjwebplugin.so
+%endif
+
+%files -n libgcj-devel
+%defattr(-,root,root,-)
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/gcj
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jawt.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jawt_md.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jni.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jni_md.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jvmpi.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcj.spec
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcj_bc.so  
+%dir %{_prefix}/include/c++
+%dir %{_prefix}/include/c++/%{gcc_version}
+%{_prefix}/include/c++/%{gcc_version}/[gj]*
+%{_prefix}/include/c++/%{gcc_version}/org
+%{_prefix}/include/c++/%{gcc_version}/sun
+%{_prefix}/%{_lib}/pkgconfig/libgcj-*.pc
+%doc rpm.doc/boehm-gc/* rpm.doc/fastjar/* rpm.doc/libffi/*
+%doc rpm.doc/libjava/*
+
+%files -n libgcj-src
+%defattr(-,root,root,-)
+%dir %{_prefix}/share/java
+%{_prefix}/share/java/src*.zip
+%{_prefix}/share/java/libgcj-tools-%{version}.jar
+%endif
+
+%if %{build_ada}
+%files gnat
+%defattr(-,root,root,-)
+%{_prefix}/bin/gnat*
+%{_infodir}/gnat*
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%ifarch %{multilib_64_archs}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/adainclude
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/adalib
+%endif
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/gnat1
+%doc rpm.doc/changelogs/gcc/ada/ChangeLog*
+
+%files -n libgnat
+%defattr(-,root,root,-)
+%{_prefix}/%{_lib}/libgnat-*.so
+%{_prefix}/%{_lib}/libgnarl-*.so
+
+%files -n libgnat-devel
+%defattr(-,root,root,-)
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/adainclude  
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/adalib  
+%endif
+
+%files -n libgomp
+%defattr(-,root,root,-)
+%{_prefix}/%{_lib}/libgomp.*
+%{_infodir}/libgomp.info*
+%doc rpm.doc/changelogs/libgomp/ChangeLog*
+
+%files -n libmudflap
+%defattr(-,root,root,-)
+%{_prefix}/%{_lib}/libmudflap.*
+%{_prefix}/%{_lib}/libmudflapth.*
+
+%files -n libmudflap-devel
+%defattr(-,root,root,-)
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mf-runtime.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libmudflap.a  
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libmudflapth.a  
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libmudflap.so  
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libmudflapth.so  
+%doc rpm.doc/changelogs/libmudflap/ChangeLog*
+
+%if %{build_64bit_multilib}
+%files -n gcc-multilib
+%defattr(-,root,root,-)
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/64
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/64/crt*.o
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/64/libgcc.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/64/libgcov.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/64/libgcc_eh.a
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/64/libgfortranbegin.a
+%dir %{_prefix}/lib64
+%{_prefix}/lib64/*
+%endif
+
+%if %{build_libquadmath}
+%files -n libquadmath
+%defattr(-,root,root,-)
+%{_prefix}/%{_lib}/libquadmath.so.0*
+%{_infodir}/libquadmath.info*
+%doc rpm.doc/libquadmath/COPYING*
+
+%files -n libquadmath-devel
+%defattr(-,root,root,-)
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/quadmath.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/quadmath_weak.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libquadmath.so
+%doc rpm.doc/libquadmath/ChangeLog*
+
+%files -n libquadmath-static
+%defattr(-,root,root,-)
+%dir %{_prefix}/lib/gcc
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
+%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libquadmath.a
+%endif
+
+# /\/\/\
+# native
+%else
+# cross
+# \/\/\/
+%files
+%defattr(-,root,root,-)
+%{_prefix}
+# /\/\/\
+# cross
+%endif
+

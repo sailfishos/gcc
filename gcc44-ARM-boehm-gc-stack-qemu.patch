@@ -1,0 +1,12 @@
+diff -Napur _/boehm-gc/include/private/gcconfig.h gcc-4.5.0/boehm-gc/include/private/gcconfig.h
+--- _/boehm-gc/include/private/gcconfig.h	2010-03-21 20:34:19.000000000 +0100
++++ gcc-4.5.0/boehm-gc/include/private/gcconfig.h	2010-06-25 12:24:23.000000000 +0200
+@@ -1860,7 +1860,7 @@
+ #   endif
+ #   ifdef LINUX
+ #       define OS_TYPE "LINUX"
+-#       define LINUX_STACKBOTTOM
++#       define HEURISTIC2
+ #       undef STACK_GRAN
+ #       define STACK_GRAN 0x10000000
+ #       define USE_GENERIC_PUSH_REGS

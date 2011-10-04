@@ -1,0 +1,242 @@
+* Thu Sep 15 2011 Carsten Munk <carsten@maemo.org> - 4.6.1
+- Add ability to vary on %_vendor
+
+* Wed Aug 24 2011 Carsten Munk <carsten@maemo.org> - 4.6.1
+- Revert: Cross compilation: lto1-wrapper, lto1, collect2 was not 
+  accelerated/x86 binary while rest was.
+
+* Wed Aug 24 2011 Carsten Munk <carsten@maemo.org> - 4.6.1
+- Cross compilation: lto1-wrapper, lto1, collect2 was not 
+  accelerated/x86 binary while rest was.
+
+* Thu Jul 07 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.1
+- Add subpackage libgfortran-static, libquadmath, libquadmath-devel, 
+  libquadmath-devel to fix ivihome and lapack unresovled failure.
+
+* Fri Jul 01 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.1
+- Update to 4.6.1.
+
+* Thu Jun 29 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
+- patch gcc46-arm-volatile.patch should be applied on cross toolchain too.
+
+* Thu Jun 09 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
+- Add gcc46-arm-volatile.patch to fix the compile error in qt header file.
+
+* Thu Jun 02 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
+- Add gcc46-libiberty-conftest.patch to make gcc build on arm.
+  (contribute by juha.kallioinen@nokia.com.)
+
+* Wed May 05 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
+- Update to 4.6.0, from svn on 20110419.
+
+* Sun Apr 24 08:02:35 UTC 2011 - Jan-Simon Möller <jsmoeller@linuxfoundation.org> - 1.0
+- Add baselibs.conf to src.rpm
+
+* Tue Apr 12 2011 Juha Kallioinen <juha.kallioinen@nokia.com> - 4.5.2
+- again disabled cloog for cross-builds in order to get the armv7hl
+  architecture seeded
+
+* Mon Apr 11 2011 Juha Kallioinen <juha.kallioinen@nokia.com> - 4.5.2
+- use cloog for arm and cross-builds
+
+* Fri Apr 08 2011 Juha Kallioinen <juha.kallioinen@nokia.com> - 4.5.2
+- roll back the cloog build, need to make a cross-chroot cloog package
+  first to keep things buildable
+
+* Tue Apr 05 2011 Juha Kallioinen <juha.kallioinen@nokia.com> - 4.5.2
+- build cloog for all archs. Depend on cloog >= 0.15.9
+
+* Tue Mar  8 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.5 2
+- Update to 4.5.2.
+- Update linaro patches. Drop the changes in the following three files:
+  gcc/config/arm/linux-atomic.c
+  gcc/cp/decl.c
+  gcc/testsuite/g++.dg/pr45112.C
+- Drop gcc45-pr45726.patch, which has been integrated into 4.5.2.
+
+* Mon Jan 17 2011 Austin Zhang <austin.zhang@intel.com> - 4.5.1
+- Bugfixing: BMC#11667:C++ routine does not compile with arm tool chain
+
+* Mon Jan 10 2011 Carsten Munk <carsten@maemo.org> - 4.5.1
+* BMC#12147: Linaro patches fail to build udev
+
+* Sun Jan  9 2011 Carsten Munk <carsten@maemo.org> - 4.5.1
+- Untar patch and re-gzip Linaro patch, solves BMC#11498
+
+* Tue Jan  4 2011 Carsten Munk <carsten@maemo.org> - 4.5.1
+- Change from blank macro to %{nil} in crossextraconfig
+
+* Mon Jan  3 2011 Carsten Munk <carsten@maemo.org> - 4.5.1
+- Add armv7hl and armv7nhl cross support
+
+* Fri Dec 31 2010 Carsten Munk - 4.5.1
+- Disable Linaro patchset to allow for bootstrap.
+
+* Fri Dec 10 2010 Jan-Simon Möller <jsmoeller@linuxfoudnation.org> - 4.5.1
+  Fri Dec 10 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
+- Added Linaro patchset based on GCC4.5.1 (BMC#10510)
+
+* Tue Dec 09 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
+- Update to 4.5.1 (BMC#FEA10510):Need to update gcc to 4.5.1 with 
+  linaro patchset for hardfp support 
+- Change format to tar.gz for SDK convenience
+- Fix BMC#9053:libssp.so.0 should be in libgcc
+- Fix BMC#9601:support for __ARM_PCS predefined symbol in gcc 4.5.x is needed
+- Fix BMC#10337,10339:Error when installing gdb with --excludedocs in .ks
+- Clean-up obsoleted content
+
+* Fri Oct 15 11:26:37 UTC 2010 - jsmoeller@linuxfoundation.org - 4.5.1
+- Merged/fixed devel:toolchain with devel:base
+
+* Tue Oct 14 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+- Applied 4.5.0 branch patch for fixing PR#45112 (BMC#8034)
+
+* Sat Sep 25 2010 Roger Wang <roger.wang@intel.com> - 4.5.0
+- Applied 4.5.0 branch patch for fixing PR#43972 (BMC#7281)
+
+* Wed Sep 15 2010 Jan-Simon Möller <jsmoeller@linuxfoudnation.org> - 4.5.1
+- Harden cross-gcc migration.
+
+* Tue Aug 31 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
+- 4.5.1 master
+
+* Mon Aug 09 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+- Changed some files packing to correct sub-packages.
+- Added ssp support for ARM port.
+
+* Mon Aug 09 2010 Jan-Simon Möller <jsmoeller@linuxfoundation.org> - 4.5.0
+- Fix dependency issue gcc vs. cross-gcc
+
+* Thu Aug 05 2010 Jan-Simon Möller <jsmoeller@linuxfoundation.org> - 4.5.0
+- Fix build on ARM with workaround for ggc+qemu oom issue and 
+- disable generation of precompiled headers for now on ARM.
+  Follow-up on BMC#3936.
+
+* Tue Jul 20 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+- Applied ARM hotfix for fixing byteswap issue from REV in ARMv5+
+  PR#43698 (BMC#3936)
+- Add missing dependency to fix BMC#4046
+
+* Tue Jul 08 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+- Applied 4.5.0 mainline branch patch for fixing PR#43572(PR#43904)
+- Added missing symbolic link
+
+* Tue Jun 29 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+- Fixed packing issue of symbolic link of libgcc_s.so
+- Fixed gcc45-use-atom arch string
+
+* Mon Jun 28 2010 Jan-Simon Möller <jsmoeller@łinuxfoundation.org> - 4.5.0
+- Added aaa_README.PACKAGER
+- Added precheckin.sh
+- Added cross-* conditionals to main gcc.spec
+- Added cross-* files
+- Added gcc44-ARM-boehm-gc-stack-qemu.patch (make qemu-arm happy)
+
+* Mon May 24 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+- Added rpmlintrc to suppress wanring/error.
+- Added multilib support explicitly
+
+* Mon Apr 19 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+- Gcc-4.5.0, the first official version with atom support inside
+- Added MPC support
+- Enable LTO
+- Remove protoize feature
+- Removed obsoleted stuffs
+
+* Thu Mar 25 2010 Anas Nashif <anas.nashif@intel.com> - 4.4.2
+- Spec cleanup
+- Do not provide .so files
+
+* Fri Mar 05 2010 Austin Zhang <austin.zhang@intel.com> - 4.4.2
+- Enable arm build
+- Add MeeGo bugzilla
+
+* Mon Feb 22 2010 Austin Zhang <austin.zhang@intel.com> - 4.4.2
+- Enable ppl/cloog support
+- Use release name : MeeGo.
+
+* Mon Jan 11 2010 Austin Zhang <austin.zhang@intel.com> - 4.4.2
+- Use release name : Moblin.
+
+* Fri Nov 27 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.2
+- Updated to 4.4.2.
+- Removed obseleted stuffs and non IA related patches.
+
+* Thu Nov 26 2009 Arjan van de Ven <arjan@linux.intel.com> - 4.4.1
+- default to atom tuning
+
+* Thu Oct 16 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
+- Add 'provides: gcc-fortran' for compatibility (MB#6798)
+
+* Thu Sep 16 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
+- Updated to 20090911 snapshot
+- Added patches from fedora:
+	gcc44-powerpc-libgcc_s_so.patch
+	gcc44-pr41175*
+	gcc44-rh5*
+	gcc44-vta-cfgexpand-ptr-mode-pr41248.patch
+- Removed obsoleted patches
+
+* Thu Aug 26 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
+- Fix bug 5649 (libstdc++ conflication with 'gcc update')
+
+* Sat Aug 22 2009 Anas Nashif <anas.nashif@intel.com> - 4.4.1
+- Update to 4.4.1
+
+* Tue Dec 23 2008 Anas Nashif <anas.nashif@intel.com> 4.3
+- Initial import into Moblin
+
+* Wed May  7 2008 rguenther@suse.de
+- Make dependencies between the gcc subpackages versioned. [bnc#385305]
+* Fri Nov 23 2007 rguenther@suse.de
+- Make gcc-gij dependency of gcc-java a recommendation, all java
+  tools are back to the gcc-java package.  Require libgcj-devel
+  from gcc-java.
+- Revert /lib/cpp changes.
+* Fri Nov 16 2007 rguenther@suse.de
+- For now disable symlinking of binaries and manpages that
+  conflict with the classpath package.
+* Tue Nov 13 2007 rguenther@suse.de
+- Make /lib/cpp traditional and avoid GCC and target specific
+  defines.
+* Tue Oct 30 2007 rguenther@suse.de
+- Add gcc-gij dependency to gcc-java as it contains many of the
+  tools formerly packaged in the gcc-java package.
+* Mon Sep 24 2007 rguenther@suse.de
+- Switch gcc default to 4.3.
+* Fri Jul 27 2007 rguenther@suse.de
+- Fix typo.
+* Tue Jul 24 2007 rguenther@suse.de
+- Add 32bit and 64bit variants of gcc-gij.  [#293423]
+* Fri Jul  6 2007 rguenther@suse.de
+- Mark ppc64 as separate bi-32.
+* Thu Jun 14 2007 ro@suse.de
+- Do not mark README.packaging as NoSource. (again)
+* Fri Jun  8 2007 rguenther@suse.de
+- Switch gcc default to 4.2.  [#275939]
+* Tue Apr 24 2007 rguenther@suse.de
+- Do not link to grmic and grmiregistry, they conflict with
+  the classpath package versions.
+* Tue Jan 16 2007 rguenther@suse.de
+- Do not mark README.packaging as NoSource.
+* Thu Nov  9 2006 rguenther@suse.de
+- Remove gcc-c++-32bit and gcc-c++-64bit packages.
+* Tue Oct 31 2006 dmueller@suse.de
+- don't build as root
+* Mon Oct 30 2006 rguenther@suse.de
+- Make gcc architecture dependent again.  [#215971]
+* Thu Oct 26 2006 rguenther@suse.de
+- Add dependencies to the gcc and non-32/64bit packages.  [#215217]
+* Tue Sep 19 2006 rguenther@suse.de
+- New gcc-gij package.
+* Fri Aug 25 2006 rguenther@suse.de
+- Add 32bit and 64bit support packages to gcc, gcc-c++, gcc-fortran,
+  gcc-objc and libffi-devel.
+* Thu Aug 24 2006 rguenther@suse.de
+- Make gcc require cpp to pull in /lib/cpp.
+* Fri Aug 18 2006 rguenther@suse.de
+- gcc obsoletes gcc-mudflap which is no longer.
+* Mon Aug  7 2006 rguenther@suse.de
+- Provide gcc-mudflap, gcc-info and gcc-locale packages [#197515].
+* Fri Jul 14 2006 rguenther@suse.de
+- New package.

@@ -1,0 +1,129 @@
+diff -ruNa gcc-4.6.0-20110419.orig/gcc/configure gcc-4.6.0-20110419/gcc/configure
+--- gcc-4.6.0-20110419.orig/gcc/configure	2011-06-08 18:07:09.469696309 +0800
++++ gcc-4.6.0-20110419/gcc/configure	2011-06-09 09:49:11.112634465 +0800
+@@ -1781,8 +1781,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } && {
+@@ -1819,8 +1820,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } && {
+@@ -1856,8 +1858,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } >/dev/null && {
+@@ -2357,8 +2360,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } && {
+@@ -2483,8 +2487,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } >/dev/null && {
+@@ -2617,8 +2622,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } && {
+diff -ruNa gcc-4.6.0-20110419.orig/libiberty/configure gcc-4.6.0-20110419/libiberty/configure
+--- gcc-4.6.0-20110419.orig/libiberty/configure	2011-06-08 18:07:05.864571233 +0800
++++ gcc-4.6.0-20110419/libiberty/configure	2011-06-09 09:50:30.368946306 +0800
+@@ -1459,8 +1459,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } >/dev/null && {
+diff -ruNa gcc-4.6.0-20110419.orig/libstdc++-v3/configure gcc-4.6.0-20110419/libstdc++-v3/configure
+--- gcc-4.6.0-20110419.orig/libstdc++-v3/configure	2011-06-08 18:07:05.793571681 +0800
++++ gcc-4.6.0-20110419/libstdc++-v3/configure	2011-06-09 09:45:32.002674826 +0800
+@@ -1688,8 +1688,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } && {
+@@ -1763,8 +1764,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } >/dev/null && {
+@@ -1801,8 +1803,9 @@
+   ac_status=$?
+   if test -s conftest.err; then
+     grep -v '^ *+' conftest.err >conftest.er1
+-    cat conftest.er1 >&5
+-    mv -f conftest.er1 conftest.err
++    grep -v 'qemu: Unsupported syscall:' conftest.er1 >conftest.err
++    cat conftest.err >&5
++    rm -f conftest.er1
+   fi
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; } && {
