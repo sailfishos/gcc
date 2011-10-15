@@ -617,7 +617,9 @@ This is one set of libraries which support 64bit multilib on top of
 %patch18 -p0 -b .ppl-0.10~
 %patch19 -p0 -b .pr47858~
 
+%ifarch i586
 %patch40 -p0 -b .atom
+%endif
 
 %ifarch %arm
 %patch42 -p1

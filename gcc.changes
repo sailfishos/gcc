@@ -1,3 +1,6 @@
+* Sat Sep 24 2011 Alistair Buxton <a.j.buxton@gmail.com>
+- Only apply Atom patch when building for i586.
+
 * Thu Sep 15 2011 Carsten Munk <carsten@maemo.org> - 4.6.1
 - Add ability to vary on %_vendor
 
