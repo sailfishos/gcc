@@ -1,8 +1,0 @@
-<package project="Mer:Trunk:Base" name="gcc">
-  <title>Various compilers (C, C++, Objective-C, Java, ...)</title>
-  <description>The gcc package contains the GNU Compiler Collection version 4.4.
-You'll need this package in order to compile C code.
-
-</description>
-  <url>http://gcc.gnu.org</url>
-</package>
