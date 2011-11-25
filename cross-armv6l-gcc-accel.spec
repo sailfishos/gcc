@@ -348,52 +348,6 @@ Autoreq: true
 This package contains Objective-C shared library which is needed to run
 Objective-C dynamically linked programs.
 
-%package gfortran
-Summary: Fortran support
-Group: Development/Languages
-BuildRequires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1
-Requires: gcc = %{version}-%{release}
-Requires: libgfortran = %{version}-%{release}
-%if %{build_libquadmath}
-Requires: libquadmath = %{version}-%{release}
-Requires: libquadmath-devel = %{version}-%{release}
-%endif
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
-Obsoletes: gcc-fortran < %{version}-%{release}
-Obsoletes: gcc43-fortran
-Autoreq: true
-Provides: gcc-fortran
-
-%description gfortran
-The gcc-gfortran package provides support for compiling Fortran
-programs with the GNU Compiler Collection.
-
-%package -n libgfortran
-Summary: Fortran runtime
-Group: System Environment/Libraries
-Obsoletes: libgfortran < %{version}-%{release}
-Obsoletes: libgfortran43
-Autoreq: true
-%if %{build_libquadmath}
-Requires: libquadmath = %{version}-%{release}
-%endif
-
-%description -n libgfortran
-This package contains Fortran shared library which is needed to run
-Fortran dynamically linked programs.
-
-%package -n libgfortran-static
-Summary: Static Fortran libraries
-Group: Development/Libraries
-Requires: libgfortran = %{version}-%{release}
-Requires: gcc = %{version}-%{release}
-%if %{build_libquadmath}
-Requires: libquadmath-static = %{version}-%{release}
-%endif
-
-%description -n libgfortran-static
-This package contains static Fortran libraries.
 
 %package -n libgomp
 Summary: GCC OpenMP v3.0 shared support library
@@ -783,15 +737,15 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--enable-linker-build-id \
 %if !%{build_ada}
 %if !%{build_java}
-	--enable-languages=c,c++,objc,obj-c++,fortran \
+	--enable-languages=c,c++,objc,obj-c++ \
 %else
-	--enable-languages=c,c++,objc,obj-c++,java,fortran \
+	--enable-languages=c,c++,objc,obj-c++,java \
 %endif
 %else
 %if !%{build_java}
-	--enable-languages=c,c++,objc,obj-c++,fortran,ada \
+	--enable-languages=c,c++,objc,obj-c++,ada \
 %else
-	--enable-languages=c,c++,objc,obj-c++,java,fortran,ada \
+	--enable-languages=c,c++,objc,obj-c++,java,ada \
 %endif
 %endif
 %if !%{build_java}
@@ -972,7 +926,6 @@ FULLEPATH=%{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_versio
 ln -sf gcc %{buildroot}%{_prefix}/bin/cc
 mkdir -p %{buildroot}/lib
 ln -sf ..%{_prefix}/bin/cpp %{buildroot}/lib/cpp
-ln -sf gfortran %{buildroot}%{_prefix}/bin/f95
 rm -f %{buildroot}%{_infodir}/dir
 gzip -9 %{buildroot}%{_infodir}/*.info*
 
@@ -1094,7 +1047,6 @@ pushd $FULLPATH
 if [ "%{_lib}" = "lib" ]; then
 ln -sf ../../../libobjc.so.3 libobjc.so
 ln -sf ../../../libstdc++.so.6.* libstdc++.so
-ln -sf ../../../libgfortran.so.3.* libgfortran.so
 ln -sf ../../../libgomp.so.1.* libgomp.so
 ln -sf ../../../libmudflap.so.0.* libmudflap.so
 ln -sf ../../../libmudflapth.so.0.* libmudflapth.so
@@ -1109,7 +1061,6 @@ ln -sf ../../../libgij.so.10.* libgij.so
 else
 ln -sf ../../../../%{_lib}/libobjc.so.3 libobjc.so
 ln -sf ../../../../%{_lib}/libstdc++.so.6.* libstdc++.so
-ln -sf ../../../../%{_lib}/libgfortran.so.3.* libgfortran.so
 ln -sf ../../../../%{_lib}/libgomp.so.1.* libgomp.so
 ln -sf ../../../../%{_lib}/libmudflap.so.0.* libmudflap.so
 ln -sf ../../../../%{_lib}/libmudflapth.so.0.* libmudflapth.so
@@ -1127,7 +1078,6 @@ mv -f %{buildroot}%{_prefix}/%{_lib}/libgcj_bc.so $FULLLPATH/
 %endif
 mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++.*a $FULLLPATH/
 mv -f %{buildroot}%{_prefix}/%{_lib}/libsupc++.*a .
-mv -f %{buildroot}%{_prefix}/%{_lib}/libgfortran.*a .
 mv -f %{buildroot}%{_prefix}/%{_lib}/libobjc.*a .
 mv -f %{buildroot}%{_prefix}/%{_lib}/libgomp.*a .
 mv -f %{buildroot}%{_prefix}/%{_lib}/libmudflap{,th}.*a $FULLLPATH/
@@ -1176,7 +1126,6 @@ fi
 mkdir -p 32
 ln -sf ../../../../libobjc.so.3 32/libobjc.so
 ln -sf ../`echo ../../../../lib64/libstdc++.so.6.* | sed s~/../lib64/~/~` 32/libstdc++.so
-ln -sf ../`echo ../../../../lib64/libgfortran.so.3.* | sed s~/../lib64/~/~` 32/libgfortran.so
 ln -sf ../`echo ../../../../lib64/libgomp.so.1.* | sed s~/../lib64/~/~` 32/libgomp.so
 rm -f libmudflap.so libmudflapth.so
 echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libmudflap.so.0.* | sed 's,^.*libm,libm,'`' )' > libmudflap.so
@@ -1194,7 +1143,6 @@ ln -sf ../`echo ../../../../lib64/libgcj-tools.so.10.* | sed s~/../lib64/~/~` 32
 ln -sf ../`echo ../../../../lib64/libgij.so.10.* | sed s~/../lib64/~/~` 32/libgij.so
 %endif
 mv -f %{buildroot}%{_prefix}/lib/libsupc++.*a 32/
-mv -f %{buildroot}%{_prefix}/lib/libgfortran.*a 32/
 mv -f %{buildroot}%{_prefix}/lib/libobjc.*a 32/
 mv -f %{buildroot}%{_prefix}/lib/libgomp.*a 32/
 ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libstdc++.a 32/libstdc++.a
@@ -1213,11 +1161,10 @@ ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/adal
 %endif
 
 # Strip debug info from Fortran/ObjC/Java static libraries
-strip -g `find . \( -name libgfortran.a -o -name libobjc.a -o -name libgomp.a \
+strip -g `find . \( -name libobjc.a -o -name libgomp.a \
 		    -o -name libmudflap.a -o -name libmudflapth.a \
 		    -o -name libgcc.a -o -name libgcov.a -name libquadmath.a \) -a -type f`
 popd
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgfortran.so.3.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgomp.so.1.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libmudflap{,th}.so.0.*
 %if %{build_libquadmath}
@@ -1289,7 +1236,6 @@ rm -f %{buildroot}%{_prefix}/%{_lib}/libssp*
 %endif
 rm -f %{buildroot}%{_prefix}/bin/gnative2ascii
 rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-%{version} || :
-rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gfortran || :
 
 
 %ifarch %{multilib_64_archs}
@@ -1372,16 +1318,6 @@ if [ $1 = 0 ]; then
     --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
 fi
 
-%post gfortran
-[ -e %{_infodir}/gfortran.info.gz ] && /sbin/install-info \
-  --info-dir=%{_infodir} %{_infodir}/gfortran.info.gz || :
-
-%preun gfortran
-if [ $1 = 0 ]; then
-  [ -e %{_infodir}/gfortran.info.gz ] && /sbin/install-info --delete \
-    --info-dir=%{_infodir} %{_infodir}/gfortran.info.gz || :
-fi
-
 %post java
 [ -e %{_infodir}/gcj.info.gz ] && /sbin/install-info \
   --info-dir=%{_infodir} %{_infodir}/gcj.info.gz || :
@@ -1438,10 +1374,6 @@ if [ $1 = 0 ]; then
 fi
 
 %postun -n libgcj -p /sbin/ldconfig
-
-%post -n libgfortran -p /sbin/ldconfig
-
-%postun -n libgfortran -p /sbin/ldconfig
 
 %post -n libgnat -p /sbin/ldconfig
 
@@ -1718,47 +1650,6 @@ fi
 %files -n libobjc
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libobjc.*
-
-%files gfortran
-%defattr(-,root,root,-)
-%{_prefix}/bin/gfortran
-%{_prefix}/bin/f95
-%{_mandir}/man1/gfortran.1*
-%{_infodir}/gfortran*
-%dir %{_prefix}/lib/gcc
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
-%dir %{_prefix}/libexec/gcc
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude/omp_lib.h
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude/omp_lib.f90
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude/omp_lib.mod
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/finclude/omp_lib_kinds.mod
-%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/f951
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgfortranbegin.a
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgfortran.so
-%ifarch %{multilib_64_archs}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgfortranbegin.a
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgfortran.so
-%endif
-%doc rpm.doc/gfortran/*
-
-%files -n libgfortran
-%defattr(-,root,root,-)
-%{_prefix}/%{_lib}/libgfortran.*
-
-%files -n libgfortran-static
-%defattr(-,root,root,-)
-%dir %{_prefix}/lib/gcc
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgfortran.a
-%ifarch %{multilib_64_archs}
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgfortran.a
-%endif
 
 %if %{build_java}
 %files java

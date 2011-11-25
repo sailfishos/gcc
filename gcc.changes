@@ -1,3 +1,6 @@
+* Fri Nov 25 2011 Carsten Munk <carsten@merproject.org>
+- Drop fortran support, it takes up too much time when gcc on target is being built.
+
 * Sat Sep 24 2011 Alistair Buxton <a.j.buxton@gmail.com>
 - Only apply Atom patch when building for i586.
 
