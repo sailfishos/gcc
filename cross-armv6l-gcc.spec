@@ -112,7 +112,7 @@ ExclusiveArch: %ix86
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 # end crossbuild / accelerator section
 
-%global gcc_version 4.6.2
+%global gcc_version 4.6.3
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global include_gappletviewer 0

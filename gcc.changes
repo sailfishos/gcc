@@ -1,4 +1,7 @@
 * Mon Dec 12 2011 Ray Donnelly <mingw.android@gmail.com>
+- Update version to 4.6.3 (i.e. it's not 4.6.2 2011.12)
+
+* Mon Dec 12 2011 Ray Donnelly <mingw.android@gmail.com>
 - Updated to linaro gcc 4.6.2 2011.12
 
 * Fri Nov 25 2011 Carsten Munk <carsten@merproject.org>
