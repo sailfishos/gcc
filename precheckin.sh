@@ -55,8 +55,8 @@ cat >> baselibs.conf << EOF
   targettype ${l} -/usr/share/locale
   targettype ${l} requires "meego-accelerator"
   targettype ${l} post "#set -x"
-  targettype ${l} post " export GCCVER=\$(LANG=C gcc --version | head -1 | cut -d" " -f3) "
-  targettype ${l} post " export GCCVER_NEW=\$(LANG=C <prefix>/usr/bin/gcc --version | head -1 | cut -d" " -f3) "
+  targettype ${l} post " export GCCVER=\$(LANG=C gcc --version | head -1 | sed 's/\([a-z+]*\) \((.*)\) \([1-9\.]*\)\(.*\)/\3/') "
+  targettype ${l} post " export GCCVER_NEW=\$(LANG=C <prefix>/usr/bin/gcc --version | head -1 | sed 's/\([a-z+]*\) \((.*)\) \([1-9\.]*\)\(.*\)/\3/') "
   targettype ${l} post " echo \"GCCVER: \$GCCVER     GCCVER_NEW: \$GCCVER_NEW \" "
   targettype ${l} post " if test "\${GCCVER}" == "\${GCCVER_NEW}"; then"
   targettype ${l} post "  echo "GCC and GCC-accel versions match. Enabling cross-compiler." "
@@ -89,7 +89,7 @@ cat >> baselibs.conf << EOF
   targettype ${l} post "  done "  
   targettype ${l} post " fi"
 
-  targettype ${l} preun " export GCCVER=\$(LANG=C gcc --version | head -1 | cut -d" " -f3) "
+  targettype ${l} preun " export GCCVER=\$(LANG=C gcc --version | head -1 | sed 's/\([a-z+]*\) \((.*)\) \([1-9\.]*\)\(.*\)/\3/') "
   targettype ${l} preun " for i in gcc g++ ; do if test -e /usr/bin/\${i}.orig-arm ; then rm /usr/bin/\${i} ; mv /usr/bin/\${i}.orig-arm /usr/bin/\${i}; fi ; done "
   targettype ${l} preun " for i in cc1 cc1plus ; do cd /usr/libexec/gcc/${l}-${VENDOR}-linux-gnueabi/\$GCCVER ; if test -e \${i}.orig-arm ; then rm \${i} ; mv \${i}.orig-arm \${i} ; fi ; done "
 

@@ -1,3 +1,6 @@
+* Mon Dec 12 2011 Ray Donnelly <mingw.android@gmail.com>
+- Updated to linaro gcc 4.6.2 2011.12
+
 * Fri Nov 25 2011 Carsten Munk <carsten@merproject.org>
 - Drop fortran support, it takes up too much time when gcc on target is being built.
 

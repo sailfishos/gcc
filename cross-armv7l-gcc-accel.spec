@@ -112,7 +112,7 @@ ExclusiveArch: %ix86
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 # end crossbuild / accelerator section
 
-%global gcc_version 4.6.1
+%global gcc_version 4.6.2
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global include_gappletviewer 0
@@ -142,8 +142,8 @@ Version: %{gcc_version}
 Release: %{gcc_release}
 License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
-URL: http://gcc.gnu.org
-Source0: gcc-%{version}.tar.bz2
+URL: http://launchpad.net/gcc-linaro
+Source0: http://launchpad.net/gcc-linaro/4.6/4.6-2011.12/+download/gcc-linaro-4.6-2011.12.tar.bz2
 Source1: libgcc_post_upgrade.c
 Source2: README.libgcjwebplugin.so
 %global fastjar_ver 0.97
@@ -154,7 +154,7 @@ Source300: precheckin.sh
 Source301: aaa_README.PACKAGER
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: binutils >= 2.20.51.0.2-12
+BuildRequires: binutils >= 2.22
 BuildRequires: glibc-static
 BuildRequires: zlib-devel, gettext,  bison, flex, texinfo
 BuildRequires: mpc-devel
@@ -229,8 +229,6 @@ Patch19: gcc46-pr47858.patch
 Patch40: gcc46-use-atom.patch
 Patch41: libgcc_post_upgrade.c.arm.patch
 Patch42: gcc46-libiberty-conftest.patch
-Patch43: gcc46-arm-volatile.patch
-
 Patch1000: fastjar-0.97-segfault.patch
 Patch1001: fastjar-0.97-len1.patch
 Patch1002: fastjar-0.97-filename0.patch
@@ -552,7 +550,7 @@ This is one set of libraries which support 64bit multilib on top of
 32bit enviroment from compiler side.
 
 %prep
-%setup -q -n gcc-%{version}
+%setup -q -n gcc-linaro-4.6-2011.12
 %patch0 -p0 -b .hack~
 %patch2 -p0 -b .c++-builtin-redecl~
 %patch4 -p0 -b .java-nomulti~
@@ -578,8 +576,6 @@ This is one set of libraries which support 64bit multilib on top of
 %ifarch %arm
 %patch42 -p1
 %endif
-
-%patch43 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
