@@ -184,11 +184,13 @@ BuildRequires: doxygen
 BuildRequires: graphviz
 %endif
 
+%if !%{crossbuild}
 Requires: cpp = %{version}-%{release}
 Requires: libgcc >= %{version}-%{release}
 Requires: libgomp = %{version}-%{release}
 Requires: glibc-devel
-Requires: binutils >= 2.20.51.0.2-12
+Requires: binutils >= 2.22
+%endif
 
 %if !%{crossbuild} 
 %if !%{build_ada}
@@ -229,11 +231,13 @@ Patch19: gcc46-pr47858.patch
 Patch40: gcc46-use-atom.patch
 Patch41: libgcc_post_upgrade.c.arm.patch
 Patch42: gcc46-libiberty-conftest.patch
+Patch43: gcc463-sync-upto-r182741.patch
 Patch1000: fastjar-0.97-segfault.patch
 Patch1001: fastjar-0.97-len1.patch
 Patch1002: fastjar-0.97-filename0.patch
 Patch1003: fastjar-CVE-2010-0831.patch
 Patch1004: fastjar-man.patch
+
 
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
@@ -576,6 +580,7 @@ This is one set of libraries which support 64bit multilib on top of
 %ifarch %arm
 %patch42 -p1
 %endif
+%patch43 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
@@ -1256,6 +1261,7 @@ touch %{buildroot}%{_prefix}/%{_lib}/gcj-%{version}/classmap.db
 # additional install for cross
 # remove some obsolete files
 %if !%{accelerator_crossbuild}
+ln -sf %{cross_gcc_target_platform}-gcc %{buildroot}%{_prefix}/bin/%{cross_gcc_target_platform}-cc
 #set -x
 rm -rRf %buildroot/%{_prefix}/lib/libiberty.a
 rm -rRf %buildroot/%{_prefix}/share
