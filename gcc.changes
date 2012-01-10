@@ -1,3 +1,7 @@
+* Tue Jan 10 2012 Carsten Munk <carsten.munk@gmail.com>
+- Change to --linker-hash-style=gnu
+- Remove traces of gcj and ada
+
 * Sat Dec 31 2011 Carsten Munk <carsten.munk@gmail.com>
 - Fix cross compiler bad dependancies
 - Add target-cc symlink to non-accel cross compiler

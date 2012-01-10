@@ -116,16 +116,12 @@ ExclusiveArch: %ix86
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global include_gappletviewer 0
-%global build_ada 0
-%global build_java 0
 %if !%{crossbuild} 
 %global build_cloog 1
 %else
 %global build_cloog 0
 %endif
 %global build_libstdcxx_docs 0
-%global bootstrap_java %{?_with_java_bootstrap:%{build_java}}%{!?_with_java_bootstrap:0}
-%global build_java_tar %{?_with_java_tar:%{build_java}}%{!?_with_java_tar:0}
 %global multilib_64_archs x86_64
 %ifarch x86_64
 %global multilib_32_arch i686
@@ -146,34 +142,17 @@ URL: http://launchpad.net/gcc-linaro
 Source0: http://launchpad.net/gcc-linaro/4.6/4.6-2011.12/+download/gcc-linaro-4.6-2011.12.tar.bz2
 Source1: libgcc_post_upgrade.c
 Source2: README.libgcjwebplugin.so
-%global fastjar_ver 0.97
-Source4: http://download.savannah.nongnu.org/releases/fastjar/fastjar-%{fastjar_ver}.tar.gz
 Source100: gcc-rpmlintrc
 Source200: baselibs.conf
 Source300: precheckin.sh
 Source301: aaa_README.PACKAGER
 
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: binutils >= 2.22
 BuildRequires: glibc-static
 BuildRequires: zlib-devel, gettext,  bison, flex, texinfo
 BuildRequires: mpc-devel
 BuildRequires: glibc-devel >= 2.4.90-13
 BuildRequires: elfutils-devel >= 0.72
-
-%if %{build_java}
-BuildRequires: /usr/share/java/eclipse-ecj.jar, zip, unzip
-%if %{bootstrap_java}
-Source10: libjava-classes-%{version}-%{release}.tar.bz2
-%else
-BuildRequires: gcc-java, libgcj
-%endif
-%endif
-
-%if %{build_ada}
-# Ada requires Ada to build
-BuildRequires: gcc-gnat >= 3.1, libgnat >= 3.1
-%endif
 
 %if %{build_cloog}
 BuildRequires: ppl >= 0.10, ppl-devel >= 0.10, cloog-ppl >= 0.15, cloog-ppl-devel >= 0.15
@@ -193,10 +172,6 @@ Requires: binutils >= 2.22
 %endif
 
 %if !%{crossbuild} 
-%if !%{build_ada}
-Obsoletes: gcc-gnat < %{version}-%{release}
-Obsoletes: libgnat < %{version}-%{release}
-%endif
 
 %if %{build_cloog}
 Requires: cloog-ppl >= 0.15
@@ -232,12 +207,7 @@ Patch40: gcc46-use-atom.patch
 Patch41: libgcc_post_upgrade.c.arm.patch
 Patch42: gcc46-libiberty-conftest.patch
 Patch43: gcc463-sync-upto-r182741.patch
-Patch1000: fastjar-0.97-segfault.patch
-Patch1001: fastjar-0.97-len1.patch
-Patch1002: fastjar-0.97-filename0.patch
-Patch1003: fastjar-CVE-2010-0831.patch
-Patch1004: fastjar-man.patch
-
+Patch44: gcc-hash-style-gnu.diff
 
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
@@ -414,73 +384,6 @@ Requires: libquadmath-devel = %{version}-%{release}
 This package contains static libraries for building Fortran programs
 using REAL*16 and programs using __float128 math.
 
-%package java
-Summary: Java support for GCC
-Group: Development/Languages
-Requires: gcc = %{version}-%{release}
-Requires: libgcj = %{version}-%{release}
-Requires: libgcj-devel = %{version}-%{release}
-Requires: /usr/share/java/eclipse-ecj.jar
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
-Obsoletes: gcc-java < %{version}-%{release}
-Obsoletes: gcc43-java
-Autoreq: true
-
-%description java
-This package adds support for compiling Java(tm) programs and
-bytecode into native code.
-
-%package -n libgcj
-Summary: Java runtime library for gcc
-Group: System Environment/Libraries
-%if %{build_java}
-BuildRequires: gtk2-devel >= 2.4.0
-BuildRequires: glib2-devel >= 2.4.0
-BuildRequires: xulrunner-devel
-BuildRequires: libart_lgpl-devel >= 2.1.0
-BuildRequires: alsa-lib-devel
-BuildRequires: libXtst-devel
-BuildRequires: libXt-devel
-%endif
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
-Requires: zip >= 2.1
-Requires: gtk2 >= 2.4.0
-Requires: glib2 >= 2.4.0
-Requires: libart_lgpl >= 2.1.0
-Obsoletes: libgcj < %{version}-%{release}
-Obsoletes: libgcj43
-Autoreq: true
-
-%description -n libgcj
-The Java(tm) runtime library. You will need this package to run your Java
-programs compiled using the Java compiler from GNU Compiler Collection (gcj).
-
-%package -n libgcj-devel
-Summary: Libraries for Java development using GCC
-Group: Development/Languages
-Requires: libgcj = %{version}-%{release}, %{_prefix}/%{_lib}/libgcj.so.10
-Requires: zlib-devel, %{_prefix}/%{_lib}/libz.so
-Requires: /bin/awk
-Obsoletes: libgcj-devel < %{version}-%{release}
-Obsoletes: libgcj43-devel
-Autoreq: false
-Autoprov: false
-
-%description -n libgcj-devel
-The Java(tm) static libraries and C header files. You will need this
-package to compile your Java programs using the GCC Java compiler (gcj).
-
-%package -n libgcj-src
-Summary: Java library sources from GCC4 preview
-Group: System Environment/Libraries
-Requires: libgcj = %{version}-%{release}
-Autoreq: true
-
-%description -n libgcj-src
-The Java(tm) runtime library sources for use in Eclipse.
-
 %package -n cpp
 Summary: The C Preprocessor
 Group: Development/Languages
@@ -512,37 +415,6 @@ compiler about where each source line originated).
 
 You should install this package if you are a C programmer and you use
 macros.
-
-%package gnat
-Summary: Ada 95 support for GCC
-Group: Development/Languages
-Requires: gcc = %{version}-%{release}
-Requires: libgnat = %{version}-%{release}, libgnat-devel = %{version}-%{release}
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
-Autoreq: true
-
-%description gnat
-GNAT is a GNU Ada 95 front-end to GCC. This package includes development tools,
-the documents and Ada 95 compiler.
-
-%package -n libgnat
-Summary: GNU Ada 95 runtime shared libraries
-Group: System Environment/Libraries
-Autoreq: true
-
-%description -n libgnat
-GNAT is a GNU Ada 95 front-end to GCC. This package includes shared libraries,
-which are required to run programs compiled with the GNAT.
-
-%package -n libgnat-devel
-Summary: GNU Ada 95 libraries
-Group: System Environment/Libraries
-Autoreq: true
-
-%description -n libgnat-devel
-GNAT is a GNU Ada 95 front-end to GCC. This package includes libraries,
-which are required to compile with the GNAT.
 
 %package -n gcc-multilib
 Summary: for 64bit multilib support
@@ -581,29 +453,18 @@ This is one set of libraries which support 64bit multilib on top of
 %patch42 -p1
 %endif
 %patch43 -p1
+%patch44 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
 
-tar xzf %{SOURCE4}
-
-%patch1000 -p0 -b .fastjar-0.97-segfault~
-%patch1001 -p0 -b .fastjar-0.97-len1~
-%patch1002 -p0 -b .fastjar-0.97-filename0~
-%patch1003 -p0 -b .fastjar-CVE-2010-0831~
-%patch1004 -p0 -b .fastjar-man~
-
 %patch9999 -p1 -b .arm-boehm-gc~
 
-%if %{bootstrap_java}
-tar xjf %{SOURCE10}
-%endif
+echo 'Mer %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
-echo 'MeeGo %{version}-%{gcc_release}' > gcc/DEV-PHASE
-
-# Default to -gdwarf-3 rather than -gdwarf-2
-sed -i '/UInteger Var(dwarf_version)/s/Init(2)/Init(3)/' gcc/common.opt
-sed -i 's/\(may be either 2 or 3; the default version is \)2\./\13./' gcc/doc/invoke.texi
+# Default to -gdwarf-4 rather than -gdwarf-2
+sed -i '/UInteger Var(dwarf_version)/s/Init(2)/Init(4)/' gcc/common.opt
+sed -i 's/\(may be either 2 or 3 or 4; the default version is \)2\./\14./' gcc/doc/invoke.texi
 
 cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 
@@ -621,46 +482,9 @@ LC_ALL=C sed -i -e 's/\xa0/ /' gcc/doc/options.texi
 
 %build
 
-%if %{build_java}
-mkdir fastjar-%{fastjar_ver}/obj-%{gcc_target_platform}
-cd fastjar-%{fastjar_ver}/obj-%{gcc_target_platform}
-../configure CFLAGS="%{optflags}" --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir}
-make %{?_smp_mflags}
-export PATH=`pwd`${PATH:+:$PATH}
-cd ../../
-%endif
-
 rm -fr obj-%{gcc_target_platform}
 mkdir obj-%{gcc_target_platform}
 cd obj-%{gcc_target_platform}
-
-%if %{build_java}
-%if !%{bootstrap_java}
-mkdir java_hacks
-cd java_hacks
-cp -a ../../libjava/classpath/tools/external external
-mkdir -p gnu/classpath/tools
-cp -a ../../libjava/classpath/tools/gnu/classpath/tools/{common,javah,getopt} gnu/classpath/tools/
-cp -a ../../libjava/classpath/tools/resource/gnu/classpath/tools/common/Messages.properties gnu/classpath/tools/common
-cp -a ../../libjava/classpath/tools/resource/gnu/classpath/tools/getopt/Messages.properties gnu/classpath/tools/getopt
-cd external/asm; for i in `find . -name \*.java`; do gcj --encoding ISO-8859-1 -C $i -I.; done; cd ../..
-for i in `find gnu -name \*.java`; do gcj -C $i -I. -Iexternal/asm/; done
-gcj -findirect-dispatch -O2 -fmain=gnu.classpath.tools.javah.Main -I. -Iexternal/asm/ `find . -name \*.class` -o gjavah.real
-cat > gjavah <<EOF
-#!/bin/sh
-export CLASSPATH=`pwd`${CLASSPATH:+:$CLASSPATH}
-exec `pwd`/gjavah.real "\$@"
-EOF
-chmod +x `pwd`/gjavah
-cat > ecj1 <<EOF
-#!/bin/sh
-exec gij -cp /usr/share/java/eclipse-ecj.jar org.eclipse.jdt.internal.compiler.batch.GCCMain "\$@"
-EOF
-chmod +x `pwd`/ecj1
-export PATH=`pwd`${PATH:+:$PATH}
-cd ..
-%endif
-%endif
 
 CC=gcc
 OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
@@ -736,31 +560,8 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
 	--enable-gnu-unique-object --enable-lto \
 	--enable-linker-build-id \
-%if !%{build_ada}
-%if !%{build_java}
 	--enable-languages=c,c++,objc,obj-c++ \
-%else
-	--enable-languages=c,c++,objc,obj-c++,java \
-%endif
-%else
-%if !%{build_java}
-	--enable-languages=c,c++,objc,obj-c++,ada \
-%else
-	--enable-languages=c,c++,objc,obj-c++,java,ada \
-%endif
-%endif
-%if !%{build_java}
 	--disable-libgcj \
-%else
-	--enable-java-awt=gtk --disable-dssi --enable-plugin \
-	--with-java-home=%{_prefix}/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre \
-	--enable-libgcj-multifile \
-%if !%{bootstrap_java}
-	--enable-java-maintainer-mode \
-%endif
-	--with-ecj-jar=/usr/share/java/eclipse-ecj.jar \
-	--disable-libjava-multilib \
-%endif
 %ifarch %{arm}
 	--disable-sjlj-exceptions \
 %endif
@@ -828,11 +629,11 @@ cd ../..
 # Copy various doc files here and there
 cd ..
 mkdir -p rpm.doc/gfortran rpm.doc/objc rpm.doc/libquadmath
-mkdir -p rpm.doc/boehm-gc rpm.doc/fastjar rpm.doc/libffi rpm.doc/libjava
-mkdir -p rpm.doc/changelogs/{gcc/cp,gcc/java,gcc/ada,libstdc++-v3,libobjc,libmudflap,libgomp}
+mkdir -p rpm.doc/boehm-gc rpm.doc/fastjar rpm.doc/libffi
+mkdir -p rpm.doc/changelogs/{gcc/cp,libstdc++-v3,libobjc,libmudflap,libgomp}
 sed -e 's,@VERSION@,%{gcc_version},' %{SOURCE2} > rpm.doc/README.libgcjwebplugin.so
 
-for i in {gcc,gcc/cp,gcc/java,gcc/ada,libstdc++-v3,libobjc,libmudflap,libgomp}/ChangeLog*; do
+for i in {gcc,gcc/cp,libstdc++-v3,libobjc,libmudflap,libgomp}/ChangeLog*; do
 	cp -p $i rpm.doc/changelogs/$i
 done
 
@@ -857,10 +658,6 @@ done)
 (cd libffi; for i in ChangeLog* README* LICENSE; do
 	cp -p $i ../rpm.doc/libffi/$i.libffi
 done)
-(cd libjava; for i in ChangeLog* README*; do
-	cp -p $i ../rpm.doc/libjava/$i.libjava
-done)
-cp -p libjava/LIBGCJ_LICENSE rpm.doc/libjava/
 %if %{build_libquadmath}
 (cd libquadmath; for i in ChangeLog* COPYING.LIB; do
         cp -p $i ../rpm.doc/libquadmath/$i.libquadmath
@@ -870,25 +667,10 @@ done)
 rm -f rpm.doc/changelogs/gcc/ChangeLog.[1-9]
 find rpm.doc -name \*ChangeLog\* | xargs bzip2 -9
 
-%if %{build_java_tar}
-find libjava -name \*.h -type f | xargs grep -l '// DO NOT EDIT THIS FILE - it is machine generated' > libjava-classes.list
-find libjava -name \*.class -type f >> libjava-classes.list
-find libjava/testsuite -name \*.jar -type f >> libjava-classes.list
-tar cf - -T libjava-classes.list | bzip2 -9 > $RPM_SOURCE_DIR/libjava-classes-%{version}-%{release}.tar.bz2
-%endif
-
-
 %install
 rm -fr %{buildroot}
 
 cd obj-%{gcc_target_platform}
-
-%if %{build_java}
-export PATH=`pwd`/../fastjar-%{fastjar_ver}/obj-%{gcc_target_platform}${PATH:+:$PATH}
-%if !%{bootstrap_java}
-export PATH=`pwd`/java_hacks${PATH:+:$PATH}
-%endif
-%endif
 
 %if !%{crossbuild}
 # native
@@ -914,13 +696,6 @@ make DESTDIR=%{buildroot} install
 %if !%{crossbuild}
 # native
 # \/\/\/
-%if %{build_java}
-make DESTDIR=%{buildroot} -C %{gcc_target_platform}/libjava install-src.zip
-%endif
-%if %{build_ada}
-chmod 644 %{buildroot}%{_infodir}/gnat*
-%endif
-
 FULLPATH=%{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
 FULLEPATH=%{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
 
@@ -992,16 +767,6 @@ else
 fi
 
 find %{buildroot} -name \*.la | xargs rm -f
-%if %{build_java}
-find %{buildroot} -name libgcj.a -o -name libgtkpeer.a \
-		     -o -name libgjsmalsa.a -o -name libgcj-tools.a -o -name libjvm.a \
-		     -o -name libgij.a -o -name libgcj_bc.a -o -name libjavamath.a \
-  | xargs rm -f
-
-mv %{buildroot}%{_prefix}/lib/libgcj.spec $FULLPATH/
-sed -i -e 's/lib: /&%%{static:%%eJava programs cannot be linked statically}/' \
-  $FULLPATH/libgcj.spec
-%endif
 
 mkdir -p %{buildroot}/%{_lib}
 mv -f %{buildroot}%{_prefix}/%{_lib}/libgcc_s.so.1 %{buildroot}/%{_lib}/libgcc_s-%{gcc_version}.so.1
@@ -1015,30 +780,12 @@ ln -sf /lib/libgcc_s.so.1 $FULLPATH/32/libgcc_s.so
 
 mv -f %{buildroot}%{_prefix}/%{_lib}/libgomp.spec $FULLPATH/
 
-%if %{build_ada}
-mv -f $FULLPATH/adalib/libgnarl-*.so %{buildroot}%{_prefix}/%{_lib}/
-mv -f $FULLPATH/adalib/libgnat-*.so %{buildroot}%{_prefix}/%{_lib}/
-rm -f $FULLPATH/adalib/libgnarl.so* $FULLPATH/adalib/libgnat.so*
-%endif
-
 mkdir -p %{buildroot}%{_prefix}/libexec/getconf
 if gcc/xgcc -B gcc/ -E -dD -xc /dev/null | grep __LONG_MAX__.*2147483647; then
   ln -sf POSIX_V6_ILP32_OFF32 %{buildroot}%{_prefix}/libexec/getconf/default
 else
   ln -sf POSIX_V6_LP64_OFF64 %{buildroot}%{_prefix}/libexec/getconf/default
 fi
-
-%if %{build_java}
-pushd ../fastjar-%{fastjar_ver}/obj-%{gcc_target_platform}
-make install DESTDIR=%{buildroot}
-popd
-
-if [ "%{_lib}" != "lib" ]; then
-  mkdir -p %{buildroot}%{_prefix}/%{_lib}/pkgconfig
-  sed '/^libdir/s/lib$/%{_lib}/' %{buildroot}%{_prefix}/lib/pkgconfig/libgcj-*.pc \
-    > %{buildroot}%{_prefix}/%{_lib}/pkgconfig/`basename %{buildroot}%{_prefix}/lib/pkgconfig/libgcj-*.pc`
-fi
-%endif
 
 mkdir -p %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}
 mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++*gdb.py* \
@@ -1054,11 +801,6 @@ ln -sf ../../../libmudflapth.so.0.* libmudflapth.so
 %if %{build_libquadmath}
 ln -sf ../../../libquadmath.so.0.* libquadmath.so
 %endif
-%if %{build_java}
-ln -sf ../../../libgcj.so.10.* libgcj.so
-ln -sf ../../../libgcj-tools.so.10.* libgcj-tools.so
-ln -sf ../../../libgij.so.10.* libgij.so
-%endif
 else
 ln -sf ../../../../%{_lib}/libobjc.so.3 libobjc.so
 ln -sf ../../../../%{_lib}/libstdc++.so.6.* libstdc++.so
@@ -1068,15 +810,7 @@ ln -sf ../../../../%{_lib}/libmudflapth.so.0.* libmudflapth.so
 %if %{build_libquadmath}
 ln -sf ../../../../%{_lib}/libquadmath.so.0.* libquadmath.so
 %endif
-%if %{build_java}
-ln -sf ../../../../%{_lib}/libgcj.so.10.* libgcj.so
-ln -sf ../../../../%{_lib}/libgcj-tools.so.10.* libgcj-tools.so
-ln -sf ../../../../%{_lib}/libgij.so.10.* libgij.so
-%endif
 fi
-%if %{build_java}
-mv -f %{buildroot}%{_prefix}/%{_lib}/libgcj_bc.so $FULLLPATH/
-%endif
 mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++.*a $FULLLPATH/
 mv -f %{buildroot}%{_prefix}/%{_lib}/libsupc++.*a .
 mv -f %{buildroot}%{_prefix}/%{_lib}/libobjc.*a .
@@ -1086,42 +820,6 @@ mv -f %{buildroot}%{_prefix}/%{_lib}/libmudflap{,th}.*a $FULLLPATH/
 mv -f %{buildroot}%{_prefix}/%{_lib}/libquadmath.*a $FULLLPATH/
 %endif
 
-
-%if %{build_ada}
-%ifarch %{multilib_64_archs}
-rm -rf $FULLPATH/32/ada{include,lib}
-%endif
-if [ "$FULLPATH" != "$FULLLPATH" ]; then
-mv -f $FULLPATH/ada{include,lib} $FULLLPATH/
-pushd $FULLLPATH/adalib
-if [ "%{_lib}" = "lib" ]; then
-ln -sf ../../../../../libgnarl-*.so libgnarl.so
-ln -sf ../../../../../libgnarl-*.so libgnarl-4.4.so
-ln -sf ../../../../../libgnat-*.so libgnat.so
-ln -sf ../../../../../libgnat-*.so libgnat-4.4.so
-else
-ln -sf ../../../../../../%{_lib}/libgnarl-*.so libgnarl.so
-ln -sf ../../../../../../%{_lib}/libgnarl-*.so libgnarl-4.4.so
-ln -sf ../../../../../../%{_lib}/libgnat-*.so libgnat.so
-ln -sf ../../../../../../%{_lib}/libgnat-*.so libgnat-4.4.so
-fi
-popd
-else
-pushd $FULLPATH/adalib
-if [ "%{_lib}" = "lib" ]; then
-ln -sf ../../../../libgnarl-*.so libgnarl.so
-ln -sf ../../../../libgnarl-*.so libgnarl-4.4.so
-ln -sf ../../../../libgnat-*.so libgnat.so
-ln -sf ../../../../libgnat-*.so libgnat-4.4.so
-else
-ln -sf ../../../../../%{_lib}/libgnarl-*.so libgnarl.so
-ln -sf ../../../../../%{_lib}/libgnarl-*.so libgnarl-4.4.so
-ln -sf ../../../../../%{_lib}/libgnat-*.so libgnat.so
-ln -sf ../../../../../%{_lib}/libgnat-*.so libgnat-4.4.so
-fi
-popd
-fi
-%endif
 
 %ifarch %{multilib_64_archs}
 mkdir -p 32
@@ -1138,11 +836,6 @@ rm -f libquadmath.so
 echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libquadmath.so.0.* | sed 's,^.*libq,libq,'`' )' > libquadmath.so
 echo 'INPUT ( %{_prefix}/lib/'`echo ../../../../lib64/libquadmath.so.0.* | sed 's,^.*libq,libq,'`' )' > 32/libquadmath.so
 %endif
-%if %{build_java}
-ln -sf ../`echo ../../../../lib64/libgcj.so.10.* | sed s~/../lib64/~/~` 32/libgcj.so
-ln -sf ../`echo ../../../../lib64/libgcj-tools.so.10.* | sed s~/../lib64/~/~` 32/libgcj-tools.so
-ln -sf ../`echo ../../../../lib64/libgij.so.10.* | sed s~/../lib64/~/~` 32/libgij.so
-%endif
 mv -f %{buildroot}%{_prefix}/lib/libsupc++.*a 32/
 mv -f %{buildroot}%{_prefix}/lib/libobjc.*a 32/
 mv -f %{buildroot}%{_prefix}/lib/libgomp.*a 32/
@@ -1151,13 +844,6 @@ ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libm
 ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libmudflapth.a 32/libmudflapth.a
 %if %{build_libquadmath}
 ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libquadmath.a 32/libquadmath.a
-%endif
-%if %{build_java}
-ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libgcj_bc.so 32/libgcj_bc.so
-%endif
-%if %{build_ada}
-ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/adainclude 32/adainclude
-ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/adalib 32/adalib
 %endif
 %endif
 
@@ -1172,11 +858,6 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/libmudflap{,th}.so.0.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libquadmath.so.0.*
 %endif
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libobjc.so.3.*
-
-%if %{build_ada}
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgnarl*so*
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgnat*so*
-%endif
 
 mv $FULLPATH/include-fixed/syslimits.h $FULLPATH/include/syslimits.h
 mv $FULLPATH/include-fixed/limits.h $FULLPATH/include/limits.h
@@ -1245,14 +926,6 @@ rm -f %{buildroot}%{_prefix}/lib/lib*.so*
 rm -f %{buildroot}%{_prefix}/lib/lib*.a
 %endif
 
-%if %{build_java}
-mkdir -p %{buildroot}%{_prefix}/share/java/gcj-endorsed \
-	 %{buildroot}%{_prefix}/%{_lib}/gcj-%{version}/classmap.db.d
-chmod 755 %{buildroot}%{_prefix}/share/java/gcj-endorsed \
-	  %{buildroot}%{_prefix}/%{_lib}/gcj-%{version} \
-	  %{buildroot}%{_prefix}/%{_lib}/gcj-%{version}/classmap.db.d
-touch %{buildroot}%{_prefix}/%{_lib}/gcj-%{version}/classmap.db
-%endif
 # /\/\/\
 # native
 %else
@@ -1320,34 +993,6 @@ if [ $1 = 0 ]; then
     --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
 fi
 
-%post java
-[ -e %{_infodir}/gcj.info.gz ] && /sbin/install-info \
-  --info-dir=%{_infodir} %{_infodir}/gcj.info.gz || :
-
-%preun java
-if [ $1 = 0 ]; then
-  [ -e %{_infodir}/gcj.info.gz ] && /sbin/install-info --delete \
-    --info-dir=%{_infodir} %{_infodir}/gcj.info.gz || :
-fi
-
-%post gnat
-[ -e %{_infodir}/gnat_rm.info.gz ] && /sbin/install-info \
-  --info-dir=%{_infodir} %{_infodir}/gnat_rm.info.gz || :
-[ -e %{_infodir}/gnat_ugn.info.gz ] && /sbin/install-info \
-  --info-dir=%{_infodir} %{_infodir}/gnat_ugn.info.gz || :
-[ -e %{_infodir}/gnat-style.info.gz ] && /sbin/install-info \
-  --info-dir=%{_infodir} %{_infodir}/gnat-style.info.gz || :
-
-%preun gnat
-if [ $1 = 0 ]; then
-  [ -e %{_infodir}/gnat_rm.info.gz ] && /sbin/install-info --delete \
-    --info-dir=%{_infodir} %{_infodir}/gnat_rm.info.gz || :
-  [ -e %{_infodir}/gnat_ugn.info.gz ] && /sbin/install-info --delete \
-    --info-dir=%{_infodir} %{_infodir}/gnat_ugn.info.gz || :
-  [ -e %{_infodir}/gnat_ugn.info.gz ] && /sbin/install-info --delete \
-    --info-dir=%{_infodir} %{_infodir}/gnat-style.info.gz || :
-fi
-
 %post -n libgcc -p %{_prefix}/sbin/libgcc_post_upgrade
 
 %postun -n libgcc -p /sbin/ldconfig
@@ -1359,27 +1004,6 @@ fi
 %post -n libobjc -p /sbin/ldconfig
 
 %postun -n libobjc -p /sbin/ldconfig
-
-%post -n libgcj
-/sbin/ldconfig
-[ -e %{_infodir}/cp-tools.info.gz ] && /sbin/install-info \
-  --info-dir=%{_infodir} %{_infodir}/cp-tools.info.gz || :
-[ -e %{_infodir}/fastjar.info.gz ] && /sbin/install-info \
-  --info-dir=%{_infodir} %{_infodir}/fastjar.info.gz || :
-
-%preun -n libgcj
-if [ $1 = 0 ]; then
-  [ -e %{_infodir}/cp-tools.info.gz ] && /sbin/install-info --delete \
-    --info-dir=%{_infodir} %{_infodir}/cp-tools.info.gz || :
-  [ -e %{_infodir}/fastjar.info.gz ] && /sbin/install-info --delete \
-    --info-dir=%{_infodir} %{_infodir}/fastjar.info.gz || :
-fi
-
-%postun -n libgcj -p /sbin/ldconfig
-
-%post -n libgnat -p /sbin/ldconfig
-
-%postun -n libgnat -p /sbin/ldconfig
 
 %post -n libgomp
 /sbin/ldconfig
@@ -1652,163 +1276,6 @@ fi
 %files -n libobjc
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libobjc.*
-
-%if %{build_java}
-%files java
-%defattr(-,root,root,-)
-%{_prefix}/bin/gcj
-%{_prefix}/bin/gjavah
-%{_prefix}/bin/gcjh
-%{_prefix}/bin/jcf-dump
-%{_mandir}/man1/gcj.1*
-%{_mandir}/man1/jcf-dump.1*
-%{_mandir}/man1/gjavah.1*
-%{_mandir}/man1/gcjh.1*
-%{_infodir}/gcj*
-%dir %{_prefix}/libexec/gcc
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
-%dir %{_prefix}/lib/gcc
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
-%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/jc1
-%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/ecj1
-%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/jvgenmain
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcj.so
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcj-tools.so
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgij.so
-%ifarch %{multilib_64_archs}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcj.so
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcj-tools.so
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcj_bc.so
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgij.so
-%endif
-%doc rpm.doc/changelogs/gcc/java/ChangeLog*
-
-%files -n libgcj
-%defattr(-,root,root,-)
-%{_prefix}/bin/jv-convert
-%{_prefix}/bin/gij
-%{_prefix}/bin/gjar
-%{_prefix}/bin/fastjar
-%{_prefix}/bin/grepjar
-%{_prefix}/bin/grmic
-%{_prefix}/bin/grmid
-%{_prefix}/bin/grmiregistry
-%{_prefix}/bin/gtnameserv
-%{_prefix}/bin/gkeytool
-%{_prefix}/bin/gorbd
-%{_prefix}/bin/gserialver
-%{_prefix}/bin/gcj-dbtool
-%if %{include_gappletviewer}
-%{_prefix}/bin/gappletviewer
-%{_mandir}/man1/gappletviewer.1*
-%endif
-%{_prefix}/bin/gjarsigner
-%{_mandir}/man1/fastjar.1*
-%{_mandir}/man1/grepjar.1*
-%{_mandir}/man1/gjar.1*
-%{_mandir}/man1/gjarsigner.1*
-%{_mandir}/man1/jv-convert.1*
-%{_mandir}/man1/gij.1*
-%{_mandir}/man1/grmic.1*
-%{_mandir}/man1/grmiregistry.1*
-%{_mandir}/man1/gcj-dbtool.1*
-%{_mandir}/man1/gkeytool.1*
-%{_mandir}/man1/gorbd.1*
-%{_mandir}/man1/grmid.1*
-%{_mandir}/man1/gserialver.1*
-%{_mandir}/man1/gtnameserv.1*
-%{_infodir}/fastjar.info*
-%{_infodir}/cp-tools.info*
-%{_prefix}/%{_lib}/libgcj.so.*
-%{_prefix}/%{_lib}/libgcj-tools.so.*
-%{_prefix}/%{_lib}/libgcj_bc.so.*
-%{_prefix}/%{_lib}/libgij.so.*
-%dir %{_prefix}/%{_lib}/gcj-%{version}
-%{_prefix}/%{_lib}/gcj-%{version}/libgtkpeer.so
-%{_prefix}/%{_lib}/gcj-%{version}/libgjsmalsa.so
-%{_prefix}/%{_lib}/gcj-%{version}/libjawt.so
-%if %{include_gappletviewer}
-%{_prefix}/%{_lib}/gcj-%{version}/libgcjwebplugin.so
-%endif
-%{_prefix}/%{_lib}/gcj-%{version}/libjvm.so
-%{_prefix}/%{_lib}/gcj-%{version}/libjavamath.so
-%dir %{_prefix}/share/java
-%{_prefix}/share/java/[^sl]*
-%{_prefix}/share/java/libgcj-%{version}.jar
-%dir %{_prefix}/%{_lib}/security
-%config(noreplace) %{_prefix}/%{_lib}/security/classpath.security
-%{_prefix}/%{_lib}/logging.properties
-%dir %{_prefix}/%{_lib}/gcj-%{version}/classmap.db.d
-%attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) %{_prefix}/%{_lib}/gcj-%{version}/classmap.db
-%if %{include_gappletviewer}
-%doc rpm.doc/README.libgcjwebplugin.so
-%endif
-
-%files -n libgcj-devel
-%defattr(-,root,root,-)
-%dir %{_prefix}/lib/gcc
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/gcj
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jawt.h
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jawt_md.h
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jni.h
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jni_md.h
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/jvmpi.h
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcj.spec
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgcj_bc.so  
-%dir %{_prefix}/include/c++
-%dir %{_prefix}/include/c++/%{gcc_version}
-%{_prefix}/include/c++/%{gcc_version}/[gj]*
-%{_prefix}/include/c++/%{gcc_version}/org
-%{_prefix}/include/c++/%{gcc_version}/sun
-%{_prefix}/%{_lib}/pkgconfig/libgcj-*.pc
-%doc rpm.doc/boehm-gc/* rpm.doc/fastjar/* rpm.doc/libffi/*
-%doc rpm.doc/libjava/*
-
-%files -n libgcj-src
-%defattr(-,root,root,-)
-%dir %{_prefix}/share/java
-%{_prefix}/share/java/src*.zip
-%{_prefix}/share/java/libgcj-tools-%{version}.jar
-%endif
-
-%if %{build_ada}
-%files gnat
-%defattr(-,root,root,-)
-%{_prefix}/bin/gnat*
-%{_infodir}/gnat*
-%dir %{_prefix}/lib/gcc
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
-%dir %{_prefix}/libexec/gcc
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
-%ifarch %{multilib_64_archs}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/adainclude
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/adalib
-%endif
-%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/gnat1
-%doc rpm.doc/changelogs/gcc/ada/ChangeLog*
-
-%files -n libgnat
-%defattr(-,root,root,-)
-%{_prefix}/%{_lib}/libgnat-*.so
-%{_prefix}/%{_lib}/libgnarl-*.so
-
-%files -n libgnat-devel
-%defattr(-,root,root,-)
-%dir %{_prefix}/lib/gcc
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/adainclude  
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/adalib  
-%endif
 
 %files -n libgomp
 %defattr(-,root,root,-)
