@@ -2,7 +2,7 @@
 
 NAME=gcc
 SPECNAME=${NAME}.spec
-ARCHES="armv5tel armv6l armv7l armv7hl armv7nhl"
+ARCHES="armv5tel armv6l armv7l armv7hl armv7nhl mipsel"
 # If your %_vendor changes, please edit this too --cvm
 VENDOR=meego
 TOBASELIBS=""

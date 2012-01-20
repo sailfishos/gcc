@@ -1,3 +1,9 @@
+* Fri Jan 20 2012 Carsten Munk <carsten.munk@gmail.com>
+- Add support for MIPS o32 port (mipsel),
+  patches:
+   - gcc-4.6.0-mips_fix-1.patch
+   - gcc46-MIPS-boehm-gc-stack-qemu.patch
+
 * Tue Jan 10 2012 Carsten Munk <carsten.munk@gmail.com>
 - Change to --linker-hash-style=gnu
 - Remove traces of gcj and ada

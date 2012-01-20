@@ -18,7 +18,11 @@ AutoReqProv: 0
 AutoReq: false
 BuildRequires: -rpmlint-Moblin -rpmlint-mini -post-build-checks
 # cross platform
+%if "%{name}" != "cross-mipsel-gcc"
 %define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnueabi
+%else
+%define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnu
+%endif
 # gcc_target_platform holds the host (executing the compiler)
 # cross_gcc_target_platform holds the target (for which the compiler is producing binaries)
 # prefix for cross compiler
@@ -58,6 +62,11 @@ BuildRequires: cross-armv7nhl-glibc cross-armv7nhl-glibc-devel cross-armv7nhl-gl
 BuildRequires: cross-armv7nhl-kernel-headers cross-armv7nhl-binutils
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
 %endif
+%if "%{name}" == "cross-mipsel-gcc"
+BuildRequires: cross-mipsel-glibc cross-mipsel-glibc-devel cross-mipsel-glibc-headers
+BuildRequires: cross-mipsel-kernel-headers cross-mipsel-binutils
+%define crossextraconfig --disable-fixed-point --disable-ssp --disable-libstdcxx-pch --with-arch=mips32
+%endif
 # Fixme: see above
 %if "%{name}" == "cross-armv5tel-gcc-accel"
 BuildRequires: cross-armv5tel-glibc cross-armv5tel-glibc-devel cross-armv5tel-glibc-headers
@@ -83,6 +92,11 @@ BuildRequires: cross-armv7hl-kernel-headers cross-armv7hl-binutils
 BuildRequires: cross-armv7nhl-glibc cross-armv7nhl-glibc-devel cross-armv7nhl-glibc-headers
 BuildRequires: cross-armv7nhl-kernel-headers cross-armv7nhl-binutils
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
+%endif
+%if "%{name}" == "cross-mipsel-gcc-accel"
+BuildRequires: cross-mipsel-glibc cross-mipsel-glibc-devel cross-mipsel-glibc-headers
+BuildRequires: cross-mipsel-kernel-headers cross-mipsel-binutils
+%define crossextraconfig --disable-fixed-point --disable-ssp --disable-libstdcxx-pch --with-arch=mips32
 %endif
 # single target atm.
 ExclusiveArch: %ix86
@@ -117,7 +131,11 @@ ExclusiveArch: %ix86
 %global _unpackaged_files_terminate_build 0
 %global include_gappletviewer 0
 %if !%{crossbuild} 
+%ifnarch mips mipsel
 %global build_cloog 1
+%else
+%global build_cloog 0
+%endif
 %else
 %global build_cloog 0
 %endif
@@ -208,6 +226,8 @@ Patch41: libgcc_post_upgrade.c.arm.patch
 Patch42: gcc46-libiberty-conftest.patch
 Patch43: gcc463-sync-upto-r182741.patch
 Patch44: gcc-hash-style-gnu.diff
+Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
+Patch46: gcc-4.6.0-mips_fix-1.patch
 
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
@@ -454,6 +474,8 @@ This is one set of libraries which support 64bit multilib on top of
 %endif
 %patch43 -p1
 %patch44 -p1
+%patch45 -p1
+%patch46 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
@@ -500,6 +522,10 @@ case "$OPT_FLAGS" in
     ;;
 esac
 
+%ifarch mipsel
+export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
+%endif
+
 %ifarch %arm
 # gcc 45 fails to bootstrap itself otherwise on insn-attrtab.o
 # issue is bad interaction between ggc and qemu
@@ -522,6 +548,9 @@ export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=6
 %endif
 %endif
 
+#export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s/-O2/-O2 -fkeep-inline-functions/g"`
+export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s/-fstack-protector//g"`
+
 %if %{crossbuild}
 # cross build
 export PATH=/opt/cross/bin:$PATH
@@ -537,17 +566,25 @@ export OPT_FLAGS="$OPT_FLAGS -Wl,-rpath,/emul/ia32-linux/usr/lib:/emul/ia32-linu
 CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
 	GCJFLAGS="$OPT_FLAGS" \
 	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
-%ifarch %{arm}
+%ifarch %{arm} mipsel
 	--with-bugurl=http://bugzilla.meego.com/ --disable-bootstrap \
-	--enable-shared --enable-threads=posix --disable-checking \
+	--enable-shared --enable-threads=posix --enable-checking=release \
+%ifarch mipsel
+        --disable-fixed-point \
+        --disable-ssp \
+	--disable-libstdcxx-pch \
+        --with-arch=mips32 \
+%endif
+%ifarch %{arm}
 	%ARM_EXTRA_CONFIGURE \
+%endif
 %else
 %if %{crossbuild}
 	--build=%{gcc_target_platform} \
 	--host=%{gcc_target_platform} \
 	--target=%{cross_gcc_target_platform} \
 	--with-bugurl=http://bugzilla.meego.com/ --disable-bootstrap \
-	--enable-shared --enable-threads=posix --disable-checking \
+	--enable-shared --enable-threads=posix --enable-checking=release \
 %else
 	--with-bugurl=http://bugzilla.meego.com/ --enable-bootstrap \
 	--enable-shared --enable-threads=posix --enable-checking=release \
@@ -594,8 +631,8 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 
 
 #GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" bootstrap
-%ifarch %{arm}
-GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS"
+%ifarch %{arm} mipsel
+GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" 
 # native ARM
 %else
 %if !%{crossbuild}
@@ -899,8 +936,10 @@ mkdir -p %{buildroot}%{_prefix}/sbin
 %ifarch %{arm}
 patch %{SOURCE1} < %{PATCH41}
 %endif
+%ifnarch mipsel
 gcc -static -Os %{SOURCE1} -o %{buildroot}%{_prefix}/sbin/libgcc_post_upgrade
 strip %{buildroot}%{_prefix}/sbin/libgcc_post_upgrade
+%endif
 
 cd ..
 %find_lang %{name}
@@ -965,7 +1004,6 @@ done
 tar cf - testlogs-%{_target_platform}-%{version}-%{release} | bzip2 -9c \
   | uuencode testlogs-%{_target_platform}.tar.bz2 || :
 rm -rf testlogs-%{_target_platform}-%{version}-%{release}
-
 %endif
 
 %clean
@@ -993,7 +1031,9 @@ if [ $1 = 0 ]; then
     --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
 fi
 
+%ifnarch mipsel
 %post -n libgcc -p %{_prefix}/sbin/libgcc_post_upgrade
+%endif
 
 %postun -n libgcc -p /sbin/ldconfig
 
@@ -1044,7 +1084,7 @@ fi
 %{_prefix}/bin/c99
 %{_prefix}/bin/gcc
 %{_prefix}/bin/gcov
-%ifnarch %{arm}
+%ifnarch %{arm} mipsel
 %{_prefix}/bin/%{gcc_target_platform}-gcc
 %endif
 %{_mandir}/man1/gcc.1*
@@ -1174,17 +1214,19 @@ fi
 /%{_lib}/libgcc_s-%{gcc_version}.so.1
 /%{_lib}/libgcc_s.*
 /%{_libdir}/libgcc_s.*
+%ifnarch mipsel
 %{_prefix}/sbin/libgcc_post_upgrade
+%endif
 %doc gcc/COPYING.LIB
 
 # For ARM port
-%ifarch %{arm}
+%ifarch %{arm} mipsel
 %{_prefix}/%{_lib}/libssp*
 %endif
 
 %files c++
 %defattr(-,root,root,-)
-%ifnarch %{arm}
+%ifnarch %{arm} mipsel
 %{_prefix}/bin/%{gcc_target_platform}-*++
 %endif
 %{_prefix}/bin/g++

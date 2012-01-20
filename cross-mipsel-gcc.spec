@@ -1,5 +1,5 @@
 # Combined gcc / cross-armv*-gcc(-accel) specfile
-Name: cross-armv6l-gcc
+Name: cross-mipsel-gcc
 # Keep Name on top !
 
 # crossbuild / accelerator section
