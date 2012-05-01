@@ -606,8 +606,11 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 %ifarch %{ix86} x86_64
 	--with-tune=generic \
 %endif
-%ifarch %{ix86}
+%ifarch i586
 	--with-arch=i686 \
+%endif
+%ifarch i486
+	--with-arch=i486 \
 %endif
 %ifarch x86_64
 	--with-arch_32=i686 \
