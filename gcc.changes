@@ -1,3 +1,7 @@
+* Fri Sep 07 2012 David Greaves <david@dgreaves.com>
+- Add armv7tnhl. Run precheckin.sh. Updated gcc.spec.
+  Clarify instructions
+
 * Tue May 01 2012 Carsten Munk <carsten@merproject.org>
 - Fix MER#323 reported by eocanha: Gcc for target i486-meego-linux is actually built for i686
 

@@ -62,6 +62,11 @@ BuildRequires: cross-armv7nhl-glibc cross-armv7nhl-glibc-devel cross-armv7nhl-gl
 BuildRequires: cross-armv7nhl-kernel-headers cross-armv7nhl-binutils
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
 %endif
+%if "%{name}" == "cross-armv7tnhl-gcc"
+BuildRequires: cross-armv7tnhl-glibc cross-armv7tnhl-glibc-devel cross-armv7tnhl-glibc-headers
+BuildRequires: cross-armv7tnhl-kernel-headers cross-armv7tnhl-binutils
+%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
+%endif
 %if "%{name}" == "cross-mipsel-gcc"
 BuildRequires: cross-mipsel-glibc cross-mipsel-glibc-devel cross-mipsel-glibc-headers
 BuildRequires: cross-mipsel-kernel-headers cross-mipsel-binutils
@@ -92,6 +97,11 @@ BuildRequires: cross-armv7hl-kernel-headers cross-armv7hl-binutils
 BuildRequires: cross-armv7nhl-glibc cross-armv7nhl-glibc-devel cross-armv7nhl-glibc-headers
 BuildRequires: cross-armv7nhl-kernel-headers cross-armv7nhl-binutils
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
+%endif
+%if "%{name}" == "cross-armv7tnhl-gcc-accel"
+BuildRequires: cross-armv7tnhl-glibc cross-armv7tnhl-glibc-devel cross-armv7tnhl-glibc-headers
+BuildRequires: cross-armv7tnhl-kernel-headers cross-armv7tnhl-binutils
+%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
 %endif
 %if "%{name}" == "cross-mipsel-gcc-accel"
 BuildRequires: cross-mipsel-glibc cross-mipsel-glibc-devel cross-mipsel-glibc-headers
@@ -545,6 +555,10 @@ export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=6
 # for armv7nhl reset the gcc specs
 %ifarch armv7nhl
 %define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a
+%endif
+# for armv7tnhl reset the gcc specs
+%ifarch armv7tnhl
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a --mode=thumb
 %endif
 %endif
 
