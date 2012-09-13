@@ -136,7 +136,7 @@ ExclusiveArch: %ix86
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 # end crossbuild / accelerator section
 
-%global gcc_version 4.6.3
+%global gcc_version 4.6.4
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global include_gappletviewer 0
@@ -167,7 +167,7 @@ Release: %{gcc_release}
 License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
 URL: http://launchpad.net/gcc-linaro
-Source0: http://launchpad.net/gcc-linaro/4.6/4.6-2011.12/+download/gcc-linaro-4.6-2011.12.tar.bz2
+Source0: https://launchpad.net/gcc-linaro/4.6/4.6-2012.08/+download/gcc-linaro-4.6-2012.08.tar.bz2
 Source1: libgcc_post_upgrade.c
 Source2: README.libgcjwebplugin.so
 Source100: gcc-rpmlintrc
@@ -234,7 +234,6 @@ Patch19: gcc46-pr47858.patch
 Patch40: gcc46-use-atom.patch
 Patch41: libgcc_post_upgrade.c.arm.patch
 Patch42: gcc46-libiberty-conftest.patch
-Patch43: gcc463-sync-upto-r182741.patch
 Patch44: gcc-hash-style-gnu.diff
 Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
 Patch46: gcc-4.6.0-mips_fix-1.patch
@@ -456,7 +455,7 @@ This is one set of libraries which support 64bit multilib on top of
 32bit enviroment from compiler side.
 
 %prep
-%setup -q -n gcc-linaro-4.6-2011.12
+%setup -q -n gcc-linaro-4.6-2012.08
 %patch0 -p0 -b .hack~
 %patch2 -p0 -b .c++-builtin-redecl~
 %patch4 -p0 -b .java-nomulti~
@@ -482,7 +481,6 @@ This is one set of libraries which support 64bit multilib on top of
 %ifarch %arm
 %patch42 -p1
 %endif
-%patch43 -p1
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
@@ -580,6 +578,7 @@ export OPT_FLAGS="$OPT_FLAGS -Wl,-rpath,/emul/ia32-linux/usr/lib:/emul/ia32-linu
 CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
 	GCJFLAGS="$OPT_FLAGS" \
 	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
+        --disable-bootstrap \
 %ifarch %{arm} mipsel
 	--with-bugurl=http://bugzilla.meego.com/ --disable-bootstrap \
 	--enable-shared --enable-threads=posix --enable-checking=release \
@@ -600,7 +599,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--with-bugurl=http://bugzilla.meego.com/ --disable-bootstrap \
 	--enable-shared --enable-threads=posix --enable-checking=release \
 %else
-	--with-bugurl=http://bugzilla.meego.com/ --enable-bootstrap \
+	--with-bugurl=http://bugzilla.meego.com/ \
 	--enable-shared --enable-threads=posix --enable-checking=release \
 %endif
 %if %{build_64bit_multilib}
@@ -652,13 +651,13 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" 
 # native ARM
 %else
-%if !%{crossbuild}
-GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" profiledbootstrap
-# native x86
-%else
+#%if !%{crossbuild}
+#GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" profiledbootstrap
+## native x86
+#%else#
 GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS"
 # crosscompiler
-%endif
+#%endif
 %endif
 
 # Make
