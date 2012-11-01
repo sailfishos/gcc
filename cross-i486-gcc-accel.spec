@@ -1,5 +1,5 @@
 # Combined gcc / cross-armv*-gcc(-accel) specfile
-Name: cross-armv5tel-gcc
+Name: cross-i486-gcc-accel
 # Keep Name on top !
 
 # crossbuild / accelerator section

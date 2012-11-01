@@ -18,10 +18,10 @@ AutoReqProv: 0
 AutoReq: false
 BuildRequires: -rpmlint-Moblin -rpmlint-mini -post-build-checks
 # cross platform
-%if "%{name}" != "cross-mipsel-gcc"
-%define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnueabi
-%else
+%if "%{name}" == "cross-mipsel-gcc" || "%{name}" == "cross-i486-gcc"
 %define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnu
+%else
+%define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnueabi
 %endif
 # gcc_target_platform holds the host (executing the compiler)
 # cross_gcc_target_platform holds the target (for which the compiler is producing binaries)
@@ -72,6 +72,11 @@ BuildRequires: cross-mipsel-glibc cross-mipsel-glibc-devel cross-mipsel-glibc-he
 BuildRequires: cross-mipsel-kernel-headers cross-mipsel-binutils
 %define crossextraconfig --disable-fixed-point --disable-ssp --disable-libstdcxx-pch --with-arch=mips32
 %endif
+%if "%{name}" == "cross-i486-gcc"
+BuildRequires: cross-i486-glibc cross-i486-glibc-devel cross-i486-glibc-headers
+BuildRequires: cross-i486-kernel-headers cross-i486-binutils
+%define crossextraconfig --disable-libstdcxx-pch --with-arch=i486 --with-gnu-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-gnu-ld=/opt/cross/bin/i486-meego-linux-gnu-ld --with-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-ld=/opt/cross/bin/i486-meego-linux-gnu-ld
+%endif
 # Fixme: see above
 %if "%{name}" == "cross-armv5tel-gcc-accel"
 BuildRequires: cross-armv5tel-glibc cross-armv5tel-glibc-devel cross-armv5tel-glibc-headers
@@ -107,6 +112,11 @@ BuildRequires: cross-armv7tnhl-kernel-headers cross-armv7tnhl-binutils
 BuildRequires: cross-mipsel-glibc cross-mipsel-glibc-devel cross-mipsel-glibc-headers
 BuildRequires: cross-mipsel-kernel-headers cross-mipsel-binutils
 %define crossextraconfig --disable-fixed-point --disable-ssp --disable-libstdcxx-pch --with-arch=mips32
+%endif
+%if "%{name}" == "cross-i486-gcc-accel"
+BuildRequires: cross-i486-glibc cross-i486-glibc-devel cross-i486-glibc-headers
+BuildRequires: cross-i486-kernel-headers cross-i486-binutils
+%define crossextraconfig --disable-libstdcxx-pch --with-arch=i486 --with-gnu-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-gnu-ld=/opt/cross/bin/i486-meego-linux-gnu-ld --with-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-ld=/opt/cross/bin/i486-meego-linux-gnu-ld
 %endif
 # single target atm.
 ExclusiveArch: %ix86
