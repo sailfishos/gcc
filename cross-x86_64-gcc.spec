@@ -124,7 +124,7 @@ Release: %{gcc_release}
 License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
 URL: http://launchpad.net/gcc-linaro
-Source0: https://launchpad.net/gcc-linaro/4.6/4.6-2012.08/+download/gcc-linaro-4.6-2012.08.tar.bz2
+Source0: https://launchpad.net/gcc-linaro/4.6/4.6-2013.01/+download/gcc-linaro-4.6-2013.01.tar.bz2
 Source1: libgcc_post_upgrade.c
 Source2: README.libgcjwebplugin.so
 Source100: gcc-rpmlintrc
@@ -177,7 +177,6 @@ AutoReq: true
 Patch0: gcc46-hack.patch
 Patch2: gcc46-c++-builtin-redecl.patch
 Patch4: gcc46-java-nomulti.patch
-Patch6: gcc46-pr33763.patch
 Patch7: gcc46-rh330771.patch
 Patch8: gcc46-i386-libgomp.patch
 Patch10: gcc46-libgomp-omp_h-multilib.patch
@@ -413,11 +412,10 @@ This is one set of libraries which support 64bit multilib on top of
 32bit enviroment from compiler side.
 
 %prep
-%setup -q -n gcc-linaro-4.6-2012.08
+%setup -q -n gcc-linaro-4.6-2013.01
 %patch0 -p0 -b .hack~
 %patch2 -p0 -b .c++-builtin-redecl~
 %patch4 -p0 -b .java-nomulti~
-%patch6 -p0 -b .pr33763~
 %patch7 -p0 -b .rh341221~
 %patch8 -p0 -b .i386-libgomp~
 %patch10 -p0 -b .libgomp-omp_h-multilib~
