@@ -1,5 +1,6 @@
 # Combined gcc / cross-armv*-gcc) specfile
 Name: cross-armv7hl-gcc
+%define crossarch armv7hl
 # Keep Name on top !
 
 %if "%{?bootstrap}" == ""
@@ -16,8 +17,6 @@ Name: cross-armv7hl-gcc
 %if "%{name}" != "gcc"
 # this is the ix86 -> arm cross compiler (cross-armv*-gcc)
 #
-# cross arch retrieval
-%define crossarch %(echo %{name} | sed -e "s/cross-\\(.*\\)-gcc/\\1/")
 # We set requires/provides by hand and disable post-build-checks.
 # Captain Trunk: Sledge, you cannot disarm that nuclear bomb!
 # Sledge Hammer: Trust me, I know what I'm doing. 
@@ -42,12 +41,17 @@ BuildRequires: -rpmlint-Moblin -rpmlint-mini -post-build-checks
 %define crossbuild 1
 # macros in buildrequires is hard to expand for the scheduler (e.g. crossarch) which would make this easier.
 %if %{bootstrap} == 2
-BuildRequires: cross-%{crossarch}-glibc-headers
+%define cross_deps cross-%{crossarch}-glibc-headers cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
 %endif
 %if %{bootstrap} == 0
-BuildRequires: cross-%{crossarch}-glibc cross-%{crossarch}-glibc-devel cross-%{crossarch}-glibc-headers
+%define cross_deps cross-%{crossarch}-glibc cross-%{crossarch}-glibc-devel cross-%{crossarch}-glibc-headers cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
 %endif
-BuildRequires: cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
+%if %{bootstrap} == 1
+%define cross_deps cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
+%endif
+
+BuildRequires: %{cross_deps}
+
 # Fixme: find way to make this without listing every package
 %if "%{crossarch}" == "armv5tel"
 %define crossextraconfig %{nil}

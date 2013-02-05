@@ -1,3 +1,6 @@
+* Tue Feb 5 2013 Carsten Munk <carsten.munk@jollamobile.com> - 4.6.4
+- Add better way of handling crossarch to simplify spec file
+
 * Thu Nov 01 2012 David Greaves <david@dgreaves.com> - 4.6.4
 - Add i486 cross target
 
