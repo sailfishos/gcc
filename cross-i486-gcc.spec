@@ -1,11 +1,18 @@
-# Combined gcc / cross-armv*-gcc(-accel) specfile
+# Combined gcc / cross-armv*-gcc) specfile
 Name: cross-i486-gcc
 # Keep Name on top !
+
+%if "%{?bootstrap}" == ""
+%define bootstrap 0
+%else
+%if "%{bootstrap}" != "0" && "%{bootstrap}" != "1" && "%{bootstrap}" != "2"
+%{error:Bootstrap parameter should me one of: 0, 1, 2}
+%endif
+%endif
 
 # crossbuild / accelerator section
 # \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 %define crossbuild 0
-%define accelerator_crossbuild 0
 %if "%{name}" != "gcc"
 # this is the ix86 -> arm cross compiler (cross-armv*-gcc)
 #
@@ -18,10 +25,10 @@ AutoReqProv: 0
 AutoReq: false
 BuildRequires: -rpmlint-Moblin -rpmlint-mini -post-build-checks
 # cross platform
-%if "%{name}" == "cross-mipsel-gcc" || "%{name}" == "cross-i486-gcc"
-%define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnu
-%else
+%if %(echo %{crossarch} | grep -q "^arm" && echo 1 || echo 0)
 %define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnueabi
+%else
+%define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnu
 %endif
 # gcc_target_platform holds the host (executing the compiler)
 # cross_gcc_target_platform holds the target (for which the compiler is producing binaries)
@@ -34,117 +41,49 @@ BuildRequires: -rpmlint-Moblin -rpmlint-mini -post-build-checks
 # flag
 %define crossbuild 1
 # macros in buildrequires is hard to expand for the scheduler (e.g. crossarch) which would make this easier.
-#BuildRequires: cross-%{crossarch}-glibc cross-%{crossarch}-glibc-devel cross-%{crossarch}-glibc-headers
-#BuildRequires: cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
+%if %{bootstrap} == 2
+BuildRequires: cross-%{crossarch}-glibc-headers
+%endif
+%if %{bootstrap} == 0
+BuildRequires: cross-%{crossarch}-glibc cross-%{crossarch}-glibc-devel cross-%{crossarch}-glibc-headers
+%endif
+BuildRequires: cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
 # Fixme: find way to make this without listing every package
-%if "%{name}" == "cross-armv5tel-gcc"
-BuildRequires: cross-armv5tel-glibc cross-armv5tel-glibc-devel cross-armv5tel-glibc-headers
-BuildRequires: cross-armv5tel-kernel-headers cross-armv5tel-binutils
+%if "%{crossarch}" == "armv5tel"
 %define crossextraconfig %{nil}
 %endif
-%if "%{name}" == "cross-armv6l-gcc"
-BuildRequires: cross-armv6l-glibc cross-armv6l-glibc-devel cross-armv6l-glibc-headers
-BuildRequires: cross-armv6l-kernel-headers cross-armv6l-binutils
+%if "%{crossarch}" == "armv6l"
 %define crossextraconfig --with-fpu=vfp --with-arch=armv6
 %endif
-%if "%{name}" == "cross-armv7l-gcc"
-BuildRequires: cross-armv7l-glibc cross-armv7l-glibc-devel cross-armv7l-glibc-headers
-BuildRequires: cross-armv7l-kernel-headers cross-armv7l-binutils
+%if "%{crossarch}" == "armv7l"
 %define crossextraconfig --with-fpu=vfpv3-d16 --with-arch=armv7-a
 %endif
-%if "%{name}" == "cross-armv7hl-gcc"
-BuildRequires: cross-armv7hl-glibc cross-armv7hl-glibc-devel cross-armv7hl-glibc-headers
-BuildRequires: cross-armv7hl-kernel-headers cross-armv7hl-binutils
+%if "%{crossarch}" == "armv7hl"
 %define crossextraconfig --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a
 %endif
-%if "%{name}" == "cross-armv7nhl-gcc"
-BuildRequires: cross-armv7nhl-glibc cross-armv7nhl-glibc-devel cross-armv7nhl-glibc-headers
-BuildRequires: cross-armv7nhl-kernel-headers cross-armv7nhl-binutils
+%if "%{crossarch}" == "armv7nhl"
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
 %endif
-%if "%{name}" == "cross-armv7tnhl-gcc"
-BuildRequires: cross-armv7tnhl-glibc cross-armv7tnhl-glibc-devel cross-armv7tnhl-glibc-headers
-BuildRequires: cross-armv7tnhl-kernel-headers cross-armv7tnhl-binutils
+%if "%{crossarch}" == "armv7tnhl"
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
 %endif
-%if "%{name}" == "cross-mipsel-gcc"
-BuildRequires: cross-mipsel-glibc cross-mipsel-glibc-devel cross-mipsel-glibc-headers
-BuildRequires: cross-mipsel-kernel-headers cross-mipsel-binutils
+%if "%{crossarch}" == "mipsel"
 %define crossextraconfig --disable-fixed-point --disable-ssp --disable-libstdcxx-pch --with-arch=mips32
 %endif
-%if "%{name}" == "cross-i486-gcc"
-BuildRequires: cross-i486-glibc cross-i486-glibc-devel cross-i486-glibc-headers
-BuildRequires: cross-i486-kernel-headers cross-i486-binutils
+%if "%{crossarch}" == "i486"
 %define crossextraconfig --disable-libstdcxx-pch --with-arch=i486 --with-gnu-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-gnu-ld=/opt/cross/bin/i486-meego-linux-gnu-ld --with-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-ld=/opt/cross/bin/i486-meego-linux-gnu-ld
 %endif
-# Fixme: see above
-%if "%{name}" == "cross-armv5tel-gcc-accel"
-BuildRequires: cross-armv5tel-glibc cross-armv5tel-glibc-devel cross-armv5tel-glibc-headers
-BuildRequires: cross-armv5tel-kernel-headers cross-armv5tel-binutils
-%define crossextraconfig %{nil}
-%endif
-%if "%{name}" == "cross-armv6l-gcc-accel"
-BuildRequires: cross-armv6l-glibc cross-armv6l-glibc-devel cross-armv6l-glibc-headers
-BuildRequires: cross-armv6l-kernel-headers cross-armv6l-binutils
-%define crossextraconfig --with-fpu=vfp --with-arch=armv6
-%endif
-%if "%{name}" == "cross-armv7l-gcc-accel"
-BuildRequires: cross-armv7l-glibc cross-armv7l-glibc-devel cross-armv7l-glibc-headers
-BuildRequires: cross-armv7l-kernel-headers cross-armv7l-binutils
-%define crossextraconfig --with-fpu=vfpv3-d16 --with-arch=armv7-a
-%endif
-%if "%{name}" == "cross-armv7hl-gcc-accel"
-BuildRequires: cross-armv7hl-glibc cross-armv7hl-glibc-devel cross-armv7hl-glibc-headers
-BuildRequires: cross-armv7hl-kernel-headers cross-armv7hl-binutils
-%define crossextraconfig --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a
-%endif
-%if "%{name}" == "cross-armv7nhl-gcc-accel"
-BuildRequires: cross-armv7nhl-glibc cross-armv7nhl-glibc-devel cross-armv7nhl-glibc-headers
-BuildRequires: cross-armv7nhl-kernel-headers cross-armv7nhl-binutils
-%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
-%endif
-%if "%{name}" == "cross-armv7tnhl-gcc-accel"
-BuildRequires: cross-armv7tnhl-glibc cross-armv7tnhl-glibc-devel cross-armv7tnhl-glibc-headers
-BuildRequires: cross-armv7tnhl-kernel-headers cross-armv7tnhl-binutils
-%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
-%endif
-%if "%{name}" == "cross-mipsel-gcc-accel"
-BuildRequires: cross-mipsel-glibc cross-mipsel-glibc-devel cross-mipsel-glibc-headers
-BuildRequires: cross-mipsel-kernel-headers cross-mipsel-binutils
-%define crossextraconfig --disable-fixed-point --disable-ssp --disable-libstdcxx-pch --with-arch=mips32
-%endif
-%if "%{name}" == "cross-i486-gcc-accel"
-BuildRequires: cross-i486-glibc cross-i486-glibc-devel cross-i486-glibc-headers
-BuildRequires: cross-i486-kernel-headers cross-i486-binutils
-%define crossextraconfig --disable-libstdcxx-pch --with-arch=i486 --with-gnu-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-gnu-ld=/opt/cross/bin/i486-meego-linux-gnu-ld --with-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-ld=/opt/cross/bin/i486-meego-linux-gnu-ld
+%if "%{crossarch}" == "x86_64"
+%define crossextraconfig --disable-libstdcxx-pch
 %endif
 # single target atm.
 ExclusiveArch: %ix86
 #
-# special handling for MeeGo ARM build acceleration
-# cross-armv*-gcc-accel
-%if "%(echo %{name} | sed -e "s/cross-.*-gcc-\\(.*\\)/\\1/")" == "accel"
-# cross architecture
-%define crossarch %(echo %{name} | sed -e "s/cross-\\(.*\\)-gcc-accel/\\1/")
-# cross target platform
-%define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnueabi
-# prefix - as it's going to "replace" the original compiler ...
-%define _prefix /usr
-# cross-build sets sysroot as default , we need to override this a bit
+# ??? -cvm
 %define crosssysroot /
-# where to find the libs during the build
-%define crossbuildsysroot /opt/cross/%{cross_gcc_target_platform}/sys-root
-# flags
-%define crossbuild 1
-%define accelerator_crossbuild 1
-# where to find the libs at runtime
-%define newrpath /emul/ia32-linux/lib:/emul/ia32-linux/usr/lib
-%define _build_name_fmt    %%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.dontuse.rpm
-%endif
-# end special accel
-%endif
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 # end crossbuild / accelerator section
+%endif
 
 %global gcc_version 4.6.4
 %global gcc_release 1
@@ -160,7 +99,7 @@ ExclusiveArch: %ix86
 %global build_cloog 0
 %endif
 %global build_libstdcxx_docs 0
-%global multilib_64_archs x86_64
+%global multilib_64_archs %{nil}
 %ifarch x86_64
 %global multilib_32_arch i686
 %endif
@@ -173,7 +112,11 @@ ExclusiveArch: %ix86
 
 Summary: Various compilers (C, C++, Objective-C, Java, ...)
 Version: %{gcc_version}
+%if %{bootstrap}
+Release: 0.%{bootstrap}.%{gcc_release}
+%else
 Release: %{gcc_release}
+%endif
 License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
 URL: http://launchpad.net/gcc-linaro
@@ -240,6 +183,7 @@ Patch14: gcc46-pr38757.patch
 Patch15: gcc46-libstdc++-docs.patch
 Patch18: gcc46-ppl-0.10.patch
 Patch19: gcc46-pr47858.patch
+Patch20: gcc46-x86_64-nolib64.patch
 
 Patch40: gcc46-use-atom.patch
 Patch41: libgcc_post_upgrade.c.arm.patch
@@ -483,6 +427,7 @@ This is one set of libraries which support 64bit multilib on top of
 %endif
 %patch18 -p0 -b .ppl-0.10~
 %patch19 -p0 -b .pr47858~
+%patch20 -p1
 
 %ifarch i586
 %patch40 -p0 -b .atom
@@ -579,19 +524,19 @@ export PATH=/opt/cross/bin:$PATH
 # strip all after -march . no arch specific options in cross-compiler build .
 # -march=core2 -mssse3 -mtune=atom -mfpmath=sse -fasynchronous-unwi
 export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s#\-march=.*##g"`
-%if %{accelerator_crossbuild}
-# adding -rpath to the special crosscompiler
-export OPT_FLAGS="$OPT_FLAGS -Wl,-rpath,/emul/ia32-linux/usr/lib:/emul/ia32-linux/lib:/usr/lib:/lib"
-%endif
 %endif
 
 CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
 	GCJFLAGS="$OPT_FLAGS" \
 	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
         --disable-bootstrap \
-%ifarch %{arm} mipsel
-	--with-bugurl=http://bugzilla.meego.com/ --disable-bootstrap \
-	--enable-shared --enable-threads=posix --enable-checking=release \
+	--with-bugurl=http://bugzilla.meego.com/ \
+	--build=%{gcc_target_platform} \
+%if %{crossbuild}
+	--host=%{gcc_target_platform} \
+	--target=%{cross_gcc_target_platform} \
+	--disable-multilib \
+%else
 %ifarch mipsel
         --disable-fixed-point \
         --disable-ssp \
@@ -600,32 +545,8 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 %endif
 %ifarch %{arm}
 	%ARM_EXTRA_CONFIGURE \
-%endif
-%else
-%if %{crossbuild}
-	--build=%{gcc_target_platform} \
-	--host=%{gcc_target_platform} \
-	--target=%{cross_gcc_target_platform} \
-	--with-bugurl=http://bugzilla.meego.com/ --disable-bootstrap \
-	--enable-shared --enable-threads=posix --enable-checking=release \
-%else
-	--with-bugurl=http://bugzilla.meego.com/ \
-	--enable-shared --enable-threads=posix --enable-checking=release \
-%endif
-%if %{build_64bit_multilib}
-	--enable-targets=all \
-	--enable-multilib \
-%endif
-%endif
-	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
-	--enable-gnu-unique-object --enable-lto \
-	--enable-linker-build-id \
-	--enable-languages=c,c++,objc,obj-c++ \
-	--disable-libgcj \
-%ifarch %{arm}
 	--disable-sjlj-exceptions \
 %endif
-%if !%{crossbuild}
 %ifarch %{ix86} x86_64
 	--with-tune=generic \
 %endif
@@ -636,39 +557,52 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--with-arch=i486 \
 %endif
 %ifarch x86_64
-	--with-arch_32=i686 \
+	--disable-libstdcxx-pch \
 %endif
-	--build=%{gcc_target_platform}  || ( cat config.log ; exit 1 )
-#end for x86
-%else
-%if !%{accelerator_crossbuild}
-	%{crossextraconfig} \
-	--with-sysroot=%{crosssysroot}
-#end for cross-compiler
-%else
-	%{crossextraconfig} \
-	--program-transform-name='s/%{cross_gcc_target_platform}-//' \
-	--with-gxx-include-dir=%{_prefix}/include/c++/%{gcc_version} \
-	--with-build-sysroot=%{crossbuildsysroot} \
-	--with-sysroot=%{crosssysroot} 
-#end for special cross-compiler
 %endif
+%if %{build_64bit_multilib}
+	--enable-targets=all \
+	--enable-multilib \
+%else
+	--disable-multilib \
+%endif
+	--enable-checking=release \
+	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
+	--enable-gnu-unique-object --enable-lto \
+	--enable-linker-build-id \
+%if %{bootstrap} == 0
+	--enable-languages=c,c++,objc,obj-c++ \
+	--enable-threads=posix \
+	--enable-shared \
+%endif
+%if %{bootstrap} == 1
+	--enable-languages=c \
+	--without-headers \
+	--with-newlib \
+	--disable-decimal-float \
+	--disable-fixed-point \
+	--disable-threads \
+	--disable-shared \
+	--disable-libssp \
+	--disable-libgomp \
+	--disable-libmudflap \
+	--disable-libquadmath \
+%endif
+%if %{bootstrap} == 2
+	--enable-languages=c \
+	--with-sysroot=%{crosssysroot} \
+	--disable-libssp \
+	--disable-libgomp \
+	--disable-libmudflap \
+	--disable-libquadmath \
+%endif
+	--disable-libgcj \
+%if %{crossbuild}
+	%{crossextraconfig}
 %endif
 
 
-#GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" bootstrap
-%ifarch %{arm} mipsel
-GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" 
-# native ARM
-%else
-#%if !%{crossbuild}
-#GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" profiledbootstrap
-## native x86
-#%else#
 GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS"
-# crosscompiler
-#%endif
-%endif
 
 # Make
 #make -C gcc CC="./xgcc -B ./ -O2" all
@@ -998,13 +932,11 @@ rm -f %{buildroot}%{_prefix}/lib/lib*.a
 # \/\/\/
 # additional install for cross
 # remove some obsolete files
-%if !%{accelerator_crossbuild}
 ln -sf %{cross_gcc_target_platform}-gcc %{buildroot}%{_prefix}/bin/%{cross_gcc_target_platform}-cc
 #set -x
 rm -rRf %buildroot/%{_prefix}/lib/libiberty.a
 rm -rRf %buildroot/%{_prefix}/share
 #set +x
-%endif
 # /\/\/\
 # cross
 %endif
