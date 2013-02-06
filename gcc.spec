@@ -82,8 +82,6 @@ BuildRequires: %{cross_deps}
 # single target atm.
 ExclusiveArch: %ix86
 #
-# ??? -cvm
-%define crosssysroot /
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 # end crossbuild / accelerator section
 %endif
@@ -531,11 +529,12 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	GCJFLAGS="$OPT_FLAGS" \
 	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
         --disable-bootstrap \
-	--with-bugurl=http://bugzilla.meego.com/ \
+	--with-bugurl=http://bugs.merproject.org/ \
 	--build=%{gcc_target_platform} \
 %if %{crossbuild}
 	--host=%{gcc_target_platform} \
 	--target=%{cross_gcc_target_platform} \
+        --with-sysroot=%{crosssysroot} \
 	--disable-multilib \
 %else
 %ifarch mipsel
@@ -599,8 +598,9 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 %endif
 	--disable-libgcj \
 %if %{crossbuild}
-	%{crossextraconfig}
+	%{crossextraconfig} \
 %endif
+	--build=%{gcc_target_platform} || ( cat config.log ; exit 1 )
 
 
 GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS"
