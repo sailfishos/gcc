@@ -1,6 +1,6 @@
 # Combined gcc / cross-armv*-gcc) specfile
-Name: cross-armv7nhl-gcc
-%define crossarch armv7nhl
+Name: cross-armv7thl-gcc
+%define crossarch armv7thl
 # Keep Name on top !
 
 %if "%{?bootstrap}" == ""

@@ -1,0 +1,245 @@
+diff --git a/gcc/ChangeLog.gold b/gcc/ChangeLog.gold
+new file mode 100644
+index 0000000..b93b9a3
+--- /dev/null
++++ b/gcc/ChangeLog.gold
+@@ -0,0 +1,16 @@
++2013-01-07   Nick Clifton  <nickc@redhat.com>
++	     Matthias Klose <doko@debian.org>
++	     Doug Kwan  <dougkwan@google.com>
++	     H.J. Lu  <hongjiu.lu@intel.com>
++
++	PR driver/55470
++	* collect2.c (main): Support -fuse-ld=bfd and -fuse-ld=gold.
++
++	* common.opt: Add fuse-ld=bfd and fuse-ld=gold.
++
++	* gcc.c (LINK_COMMAND_SPEC): Pass -fuse-ld=* to collect2.
++
++	* opts.c (comman_handle_option): Ignore -fuse-ld=bfd and
++	-fuse-ld=gold.
++
++	* doc/invoke.texi: Document -fuse-ld=bfd and -fuse-ld=gold.
+diff --git a/gcc/collect2.c b/gcc/collect2.c
+index 42e35b6..6f12d1e 100644
+--- a/gcc/collect2.c
++++ b/gcc/collect2.c
+@@ -1075,8 +1075,21 @@
+ int
+ main (int argc, char **argv)
+ {
+-  static const char *const ld_suffix	= "ld";
+-  static const char *const plugin_ld_suffix = PLUGIN_LD;
++  enum linker_select
++    {
++      USE_DEFAULT_LD,
++      USE_PLUGIN_LD,
++      USE_GOLD_LD,
++      USE_BFD_LD,
++      USE_LD_MAX
++    } selected_linker = USE_DEFAULT_LD;
++  static const char *const ld_suffixes[USE_LD_MAX] =
++    {
++      "ld",
++      PLUGIN_LD,
++      "ld.gold",
++      "ld.bfd"
++    };
+   static const char *const real_ld_suffix = "real-ld";
+   static const char *const collect_ld_suffix = "collect-ld";
+   static const char *const nm_suffix	= "nm";
+@@ -1087,16 +1100,13 @@
+   static const char *const strip_suffix = "strip";
+   static const char *const gstrip_suffix = "gstrip";
+ 
++  const char *full_ld_suffixes[USE_LD_MAX];
+ #ifdef CROSS_DIRECTORY_STRUCTURE
+   /* If we look for a program in the compiler directories, we just use
+      the short name, since these directories are already system-specific.
+      But it we look for a program in the system directories, we need to
+      qualify the program name with the target machine.  */
+ 
+-  const char *const full_ld_suffix =
+-    concat(target_machine, "-", ld_suffix, NULL);
+-  const char *const full_plugin_ld_suffix =
+-    concat(target_machine, "-", plugin_ld_suffix, NULL);
+   const char *const full_nm_suffix =
+     concat (target_machine, "-", nm_suffix, NULL);
+   const char *const full_gnm_suffix =
+@@ -1110,13 +1120,11 @@
+   const char *const full_gstrip_suffix =
+     concat (target_machine, "-", gstrip_suffix, NULL);
+ #else
+-  const char *const full_ld_suffix	= ld_suffix;
+-  const char *const full_plugin_ld_suffix = plugin_ld_suffix;
+-  const char *const full_nm_suffix	= nm_suffix;
+-  const char *const full_gnm_suffix	= gnm_suffix;
+ #ifdef LDD_SUFFIX
+   const char *const full_ldd_suffix	= ldd_suffix;
+ #endif
++  const char *const full_nm_suffix	= nm_suffix;
++  const char *const full_gnm_suffix	= gnm_suffix;
+   const char *const full_strip_suffix	= strip_suffix;
+   const char *const full_gstrip_suffix	= gstrip_suffix;
+ #endif /* CROSS_DIRECTORY_STRUCTURE */
+@@ -1133,6 +1141,7 @@
+   char **ld1_argv;
+   const char **ld1;
+   bool use_plugin = false;
++  bool use_collect_ld = false;
+ 
+   /* The kinds of symbols we will have to consider when scanning the
+      outcome of a first pass link.  This is ALL to start with, then might
+@@ -1149,6 +1158,15 @@
+   int first_file;
+   int num_c_args;
+   char **old_argv;
++  int i;
++
++  for (i = 0; i < USE_LD_MAX; i++)
++    full_ld_suffixes[i]
++#ifdef CROSS_DIRECTORY_STRUCTURE
++      = concat (target_machine, "-", ld_suffixes[i], NULL);
++#else
++      = ld_suffixes[i];
++#endif
+ 
+   old_argv = argv;
+   expandargv (&argc, &argv);
+@@ -1199,7 +1217,6 @@
+      are called.  We also look for the -flto or -flto-partition=none flag to know
+      what LTO mode we are in.  */
+   {
+-    int i;
+     bool no_partition = false;
+ 
+     for (i = 1; argv[i] != NULL; i ++)
+@@ -1217,7 +1234,14 @@
+ 	  {
+ 	    use_plugin = true;
+ 	    lto_mode = LTO_MODE_NONE;
++	    if (selected_linker == USE_DEFAULT_LD)
++	      selected_linker = USE_PLUGIN_LD;
+ 	  }
++	else if (strcmp (argv[i], "-fuse-ld=bfd") == 0)
++	  selected_linker = USE_BFD_LD;
++	else if (strcmp (argv[i], "-fuse-ld=gold") == 0)
++	  selected_linker = USE_GOLD_LD;
++
+ #ifdef COLLECT_EXPORT_LIST
+ 	/* since -brtl, -bexport, -b64 are not position dependent
+ 	   also check for them here */
+@@ -1313,21 +1337,18 @@
+   ld_file_name = find_a_file (&cpath, real_ld_suffix);
+   /* Likewise for `collect-ld'.  */
+   if (ld_file_name == 0)
+-    ld_file_name = find_a_file (&cpath, collect_ld_suffix);
++    {
++      ld_file_name = find_a_file (&cpath, collect_ld_suffix);
++      use_collect_ld = ld_file_name != 0;
++    }
+   /* Search the compiler directories for `ld'.  We have protection against
+      recursive calls in find_a_file.  */
+   if (ld_file_name == 0)
+-    ld_file_name = find_a_file (&cpath,
+-				use_plugin
+-				? plugin_ld_suffix
+-				: ld_suffix);
++    ld_file_name = find_a_file (&cpath, ld_suffixes[selected_linker]);
+   /* Search the ordinary system bin directories
+      for `ld' (if native linking) or `TARGET-ld' (if cross).  */
+   if (ld_file_name == 0)
+-    ld_file_name = find_a_file (&path,
+-				use_plugin
+-				? full_plugin_ld_suffix
+-				: full_ld_suffix);
++    ld_file_name = find_a_file (&path, full_ld_suffixes[selected_linker]);
+ 
+ #ifdef REAL_NM_FILE_NAME
+   nm_file_name = find_a_file (&path, REAL_NM_FILE_NAME);
+@@ -1490,6 +1511,13 @@
+ 			 "configuration");
+ #endif
+ 		}
++	      else if (!use_collect_ld
++		       && strncmp (arg, "-fuse-ld=", 9) == 0)
++		{
++		  /* Do not pass -fuse-ld={bfd|gold} to the linker. */
++		  ld1--;
++		  ld2--;
++		}
+               break;
+ 
+ 	    case 'l':
+diff --git a/gcc/common.opt b/gcc/common.opt
+index 6056551..d92c282 100644
+--- a/gcc/common.opt
++++ b/gcc/common.opt
+@@ -2028,6 +2028,14 @@
+ Common Report Var(flag_unwind_tables) Optimization
+ Just generate unwind tables for exception handling
+ 
++fuse-ld=bfd
++Common Negative(fuse-ld=gold)
++Use the bfd linker instead of the default linker
++
++fuse-ld=gold
++Common Negative(fuse-ld=bfd)
++Use the gold linker instead of the default linker
++
+ fuse-linker-plugin
+ Common Undocumented
+ 
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index 4e56044..58aa1a5 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -401,7 +401,7 @@
+ -funit-at-a-time -funroll-all-loops -funroll-loops @gol
+ -funsafe-loop-optimizations -funsafe-math-optimizations -funswitch-loops @gol
+ -fvariable-expansion-in-unroller -fvect-cost-model -fvpt -fweb @gol
+--fwhole-program -fwpa -fuse-linker-plugin @gol
++-fwhole-program -fwpa -fuse-ld=@var{linker} -fuse-linker-plugin @gol
+ --param @var{name}=@var{value}
+ -O  -O0  -O1  -O2  -O3  -Os -Ofast}
+ 
+@@ -7743,6 +7743,12 @@
+ 
+ Enabled at levels @option{-O}, @option{-O2}, @option{-O3}, @option{-Os}.
+ 
++@item -fuse-ld=bfd
++Use the @command{bfd} linker instead of the default linker.
++
++@item -fuse-ld=gold
++Use the @command{gold} linker instead of the default linker.
++
+ @item -fcprop-registers
+ @opindex fcprop-registers
+ After register allocation and post-register allocation instruction splitting,
+diff --git a/gcc/gcc.c b/gcc/gcc.c
+index 75f522e..6495d62 100644
+--- a/gcc/gcc.c
++++ b/gcc/gcc.c
+@@ -657,7 +657,8 @@
+     }"PLUGIN_COND_CLOSE" \
+     %{flto|flto=*:%<fcompare-debug*} \
+     %{flto} %{flto=*} %l " LINK_PIE_SPEC \
+-   "%X %{o*} %{e*} %{N} %{n} %{r}\
++   "%{fuse-ld=*:-fuse-ld=%*}\
++    %X %{o*} %{e*} %{N} %{n} %{r}\
+     %{s} %{t} %{u*} %{z} %{Z} %{!nostdlib:%{!nostartfiles:%S}}\
+     %{static:} %{L*} %(mfwrap) %(link_libgcc) %o\
+     %{fopenmp|ftree-parallelize-loops=*:%:include(libgomp.spec)%(link_gomp)}\
+diff --git a/gcc/opts.c b/gcc/opts.c
+index 9f93356..3914155 100644
+--- a/gcc/opts.c
++++ b/gcc/opts.c
+@@ -1692,6 +1692,8 @@
+       dc->max_errors = value;
+       break;
+ 
++    case OPT_fuse_ld_bfd:
++    case OPT_fuse_ld_gold:
+     case OPT_fuse_linker_plugin:
+       /* No-op. Used by the driver and passed to us because it starts with f.*/
+       break;

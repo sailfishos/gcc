@@ -67,6 +67,9 @@ BuildRequires: %{cross_deps}
 %if "%{crossarch}" == "armv7nhl"
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
 %endif
+%if "%{crossarch}" == "armv7thl"
+%define crossextraconfig --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a --with-mode=thumb
+%endif
 %if "%{crossarch}" == "armv7tnhl"
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
 %endif
@@ -191,6 +194,7 @@ Patch42: gcc46-libiberty-conftest.patch
 Patch44: gcc-hash-style-gnu.diff
 Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
 Patch46: gcc-4.6.0-mips_fix-1.patch
+Patch47: gcc46-fuse-ld-gold.patch
 
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
@@ -438,6 +442,7 @@ This is one set of libraries which support 64bit multilib on top of
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
+%patch47 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
@@ -508,7 +513,11 @@ export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=6
 %ifarch armv7nhl
 %define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a
 %endif
-# for armv7tnhl reset the gcc specs
+# for armv7thl reset the gcc specs
+%ifarch armv7thl
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a --with-mode=thumb
+%endif
+%# for armv7tnhl reset the gcc specs
 %ifarch armv7tnhl
 %define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
 %endif
