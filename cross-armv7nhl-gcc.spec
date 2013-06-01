@@ -518,7 +518,7 @@ export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=6
 %ifarch armv7thl
 %define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a --with-mode=thumb
 %endif
-%# for armv7tnhl reset the gcc specs
+# for armv7tnhl reset the gcc specs
 %ifarch armv7tnhl
 %define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
 %endif
