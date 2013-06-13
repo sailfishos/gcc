@@ -124,7 +124,7 @@ Release: %{gcc_release}
 License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
 URL: http://launchpad.net/gcc-linaro
-Source0: https://launchpad.net/gcc-linaro/4.6/4.6-2013.01/+download/gcc-linaro-4.6-2013.01.tar.bz2
+Source0: https://launchpad.net/gcc-linaro/4.6/4.6-2013.05/+download/gcc-linaro-4.6-2013.05.tar.bz2
 Source1: libgcc_post_upgrade.c
 Source2: README.libgcjwebplugin.so
 Source100: gcc-rpmlintrc
@@ -415,7 +415,7 @@ This is one set of libraries which support 64bit multilib on top of
 32bit enviroment from compiler side.
 
 %prep
-%setup -q -n gcc-linaro-4.6-2013.01
+%setup -q -n gcc-linaro-4.6-2013.05
 %patch0 -p0 -b .hack~
 %patch2 -p0 -b .c++-builtin-redecl~
 %patch4 -p0 -b .java-nomulti~
