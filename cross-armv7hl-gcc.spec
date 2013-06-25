@@ -197,6 +197,8 @@ Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
 Patch46: gcc-4.6.0-mips_fix-1.patch
 Patch47: gcc46-fuse-ld-gold.patch
 
+Patch50: fix-stable-debugtypes.patch
+
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
 #We need -gnueabi indicator for ARM
@@ -444,6 +446,8 @@ This is one set of libraries which support 64bit multilib on top of
 %patch45 -p1
 %patch46 -p1
 %patch47 -p1
+
+%patch50 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
