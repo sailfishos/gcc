@@ -1,3 +1,6 @@
+* Fri Sep 5 2013 Davide Bettio <davide.bettio@ispirata.com> - 4.8.2
+- Upgrade to Linaro 4.8 2013.10 (based on 4.8.1+svn203510)
+
 * Wed Jun 12 2013 D Wadsworth <letters.random13@gmail.com> - 4.6.4
 - Fixes MER#759: Upgrade to Linaro 4.6 2013.05
 
