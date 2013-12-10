@@ -545,7 +545,7 @@ This is one set of libraries which support 64bit multilib on top of
 Summary: Support for compiling GCC plugins
 Group: Development/Languages
 Requires: gcc = %{version}-%{release}
-Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
+Requires: mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
 
 %description plugin-devel
 This package contains header files and other support files
@@ -671,8 +671,12 @@ export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s#\-march=.*##g"`
 CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
 	GCJFLAGS="$OPT_FLAGS" \
 	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
+%if !%{crossbuild}
 %if ! 0%{?qemu_user_space_build}
         --enable-bootstrap \
+%else
+	--disable-bootstrap \
+%endif
 %else
 	--disable-bootstrap \
 %endif
