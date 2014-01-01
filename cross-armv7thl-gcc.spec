@@ -665,7 +665,7 @@ export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s/-fstack-protector//g"`
 export PATH=/opt/cross/bin:$PATH
 # strip all after -march . no arch specific options in cross-compiler build .
 # -march=core2 -mssse3 -mtune=atom -mfpmath=sse -fasynchronous-unwi
-export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s#\-march=.*##g"`
+export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s#\-march=.*##g" | sed -e 's#\-mtune=.*##g`
 %endif
 
 CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
