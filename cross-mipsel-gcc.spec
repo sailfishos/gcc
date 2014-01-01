@@ -84,7 +84,7 @@ BuildRequires: %{cross_deps}
 %define crossextraconfig --disable-libstdcxx-pch
 %endif
 # single target atm.
-ExclusiveArch: %ix86
+ExclusiveArch: %ix86 x86_64
 #
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 # end crossbuild / accelerator section
