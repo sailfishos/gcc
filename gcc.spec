@@ -93,7 +93,7 @@ ExclusiveArch: %ix86 x86_64
 # end crossbuild / accelerator section
 %endif
 
-%global gcc_version 4.8.2
+%global gcc_version 4.8.3
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global include_gappletviewer 0
@@ -149,7 +149,7 @@ Release: %{gcc_release}
 License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
 URL: http://launchpad.net/gcc-linaro
-Source0: https://launchpad.net/gcc-linaro/4.8/4.8-2013.10/+download/gcc-linaro-4.8-2013.10.tar.xz
+Source0: https://launchpad.net/gcc-linaro/4.8/4.8-2014.01/+download/gcc-linaro-4.8-2014.01.tar.xz
 Source1: libgcc_post_upgrade.c
 Source2: README.libgcjwebplugin.so
 Source100: gcc-rpmlintrc
@@ -561,7 +561,7 @@ for compiling GCC plugins.  The GCC plugin ABI is currently
 not stable, so plugins must be rebuilt any time GCC is updated.
 
 %prep
-%setup -q -n gcc-linaro-4.8-2013.10
+%setup -q -n gcc-linaro-4.8-2014.01
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch3 -p0 -b .rh330771~
