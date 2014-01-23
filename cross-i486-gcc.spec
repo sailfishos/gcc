@@ -83,6 +83,10 @@ BuildRequires: %{cross_deps}
 %if "%{crossarch}" == "x86_64"
 %define crossextraconfig --disable-libstdcxx-pch
 %endif
+%if "%{crossarch}" == "aarch64"
+%define crossextraconfig --disable-libstdcxx-pch
+%endif
+
 # single target atm.
 ExclusiveArch: %ix86 x86_64
 #
@@ -114,12 +118,16 @@ ExclusiveArch: %ix86 x86_64
 %else
 %global build_libquadmath 0
 %endif
-%ifnarch mipsel
+%ifnarch mipsel aarch64
 %global build_libitm 1
 %else
 %global build_libitm 0
 %endif
+%ifnarch aarch64
 %global build_libatomic 1
+%else
+%global build_libatomic 0
+%endif
 %ifarch x86_64
 %global build_libtsan 1
 %else
@@ -212,6 +220,7 @@ Patch44: gcc-hash-style-gnu.diff
 Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
 
 Patch50: fix-stable-debugtypes.patch
+Patch51: use-lib-for-aarch64.patch
 
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
@@ -577,6 +586,7 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 %patch45 -p1
 
 %patch50 -p1
+%patch51 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
@@ -1060,7 +1070,7 @@ mkdir -p %{buildroot}%{_prefix}/sbin
 %ifarch %{arm}
 patch %{SOURCE1} < %{PATCH41}
 %endif
-%ifnarch mipsel
+%ifnarch mipsel aarch64
 gcc -static -Os %{SOURCE1} -o %{buildroot}%{_prefix}/sbin/libgcc_post_upgrade
 strip %{buildroot}%{_prefix}/sbin/libgcc_post_upgrade
 %endif
@@ -1153,7 +1163,7 @@ if [ $1 = 0 ]; then
     --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
 fi
 
-%ifnarch mipsel
+%ifnarch mipsel aarch64
 %post -n libgcc -p %{_prefix}/sbin/libgcc_post_upgrade
 %endif
 
@@ -1313,14 +1323,16 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/unwind-arm-common.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_neon.h
 %endif
-%ifnarch mips mipsel
+%ifnarch mips mipsel aarch64
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mmintrin.h
 %endif
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/ssp.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/stdio.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/string.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/unistd.h
+%ifnarch aarch64
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdfix.h
+%endif
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdalign.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdnoreturn.h
 
@@ -1372,7 +1384,7 @@ fi
 /%{_lib}/libgcc_s-%{gcc_version}.so.1
 /%{_lib}/libgcc_s.*
 /%{_libdir}/libgcc_s.*
-%ifnarch mipsel
+%ifnarch mipsel aarch64
 %{_prefix}/sbin/libgcc_post_upgrade
 %endif
 %doc gcc/COPYING.LIB

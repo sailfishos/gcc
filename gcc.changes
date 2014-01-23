@@ -1,3 +1,6 @@
+* Sun Jan 23 2014 Oleg Girko <oleg.girko@jolla.com> - 4.8.2
+- Add aarch64 support.
+
 * Fri Sep 5 2013 Davide Bettio <davide.bettio@ispirata.com> - 4.8.2
 - Upgrade to Linaro 4.8 2013.10 (based on 4.8.1+svn203510)
 

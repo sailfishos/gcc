@@ -1,5 +1,6 @@
 # Combined gcc / cross-armv*-gcc) specfile
-Name: gcc
+Name: cross-aarch64-gcc
+%define crossarch aarch64
 # Keep Name on top !
 
 %if "%{?bootstrap}" == ""
