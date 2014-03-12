@@ -151,7 +151,6 @@ License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
 URL: http://launchpad.net/gcc-linaro
 Source0: https://launchpad.net/gcc-linaro/4.8/4.8-2014.01/+download/gcc-linaro-4.8-2014.01.tar.xz
-Source1: libgcc_post_upgrade.c
 Source2: README.libgcjwebplugin.so
 Source100: gcc-rpmlintrc
 Source200: baselibs.conf
@@ -214,7 +213,6 @@ Patch11: gcc48-libstdc++-docs.patch
 
 Patch20: gcc48-x86_64-nolib64.patch
 
-Patch41: libgcc_post_upgrade.c.arm.patch
 Patch42: gcc46-libiberty-conftest.patch
 Patch44: gcc-hash-style-gnu.diff
 Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
@@ -1066,15 +1064,6 @@ exec gcc $fl ${1+"$@"}
 EOF
 chmod 755 %{buildroot}%{_prefix}/bin/c?9
 
-mkdir -p %{buildroot}%{_prefix}/sbin
-%ifarch %{arm}
-patch %{SOURCE1} < %{PATCH41}
-%endif
-%ifnarch mipsel aarch64
-gcc -static -Os %{SOURCE1} -o %{buildroot}%{_prefix}/sbin/libgcc_post_upgrade
-strip %{buildroot}%{_prefix}/sbin/libgcc_post_upgrade
-%endif
-
 cd ..
 %find_lang %{name}
 %find_lang cpplib
@@ -1163,11 +1152,25 @@ if [ $1 = 0 ]; then
     --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
 fi
 
-%ifnarch mipsel aarch64
-%post -n libgcc -p %{_prefix}/sbin/libgcc_post_upgrade
-%endif
+%post -n libgcc -p <lua>
+if posix.access ("/sbin/ldconfig", "x") then
+  local pid = posix.fork ()
+  if pid == 0 then
+    posix.exec ("/sbin/ldconfig")
+  elseif pid ~= -1 then
+    posix.wait (pid)
+  end
+end
 
-%postun -n libgcc -p /sbin/ldconfig
+%postun -n libgcc -p <lua>
+if posix.access ("/sbin/ldconfig", "x") then
+  local pid = posix.fork ()
+  if pid == 0 then
+    posix.exec ("/sbin/ldconfig")
+  elseif pid ~= -1 then
+    posix.wait (pid)
+  end
+end
 
 %post -n libstdc++ -p /sbin/ldconfig
 
@@ -1384,9 +1387,6 @@ fi
 /%{_lib}/libgcc_s-%{gcc_version}.so.1
 /%{_lib}/libgcc_s.*
 /%{_libdir}/libgcc_s.*
-%ifnarch mipsel aarch64
-%{_prefix}/sbin/libgcc_post_upgrade
-%endif
 %doc gcc/COPYING.LIB
 
 # For ARM port

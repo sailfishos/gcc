@@ -1,3 +1,6 @@
+* Fri Mar 14 2014 Oleg Girko <oleg.girko@jolla.com> - 4.8.3
+- Drop libgcc_post_upgrade utility in favour of lua %post and %postun scripts.
+
 * Thu Mar 13 2014 Davide Bettio <davide.bettio@ispirata.com> - 4.8.3
 - Upgrade to Linaro 4.8 2014.01 (based on GCC 4.8.3+svn206350)
 
