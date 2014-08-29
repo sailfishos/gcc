@@ -212,6 +212,8 @@ Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
 Patch50: fix-stable-debugtypes.patch
 Patch51: use-lib-for-aarch64.patch
 
+Patch1100: isl-%{isl_version}-aarch64-config.patch
+
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
 #We need -gnueabi indicator for ARM
@@ -580,6 +582,8 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
+
+%patch1100 -p0 -b .isl-aarch64~
 
 %patch9999 -p1 -b .arm-boehm-gc~
 
