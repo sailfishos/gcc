@@ -98,15 +98,7 @@ ExclusiveArch: %ix86 x86_64
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global include_gappletviewer 0
-%if !%{crossbuild} 
-%ifnarch mips mipsel
 %global build_cloog 1
-%else
-%global build_cloog 0
-%endif
-%else
-%global build_cloog 0
-%endif
 %global build_libstdcxx_docs 0
 %global multilib_64_archs %{nil}
 %ifarch x86_64
@@ -151,7 +143,11 @@ License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
 URL: http://launchpad.net/gcc-linaro
 Source0: https://launchpad.net/gcc-linaro/4.8/4.8-2014.01/+download/gcc-linaro-4.8-2014.01.tar.xz
-Source2: README.libgcjwebplugin.so
+%global isl_version 0.11.1
+Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-0.11.1.tar.bz2
+%global cloog_version 0.18.1
+Source2: ftp://gcc.gnu.org/pub/gcc/infrastructure/cloog-0.18.1.tar.gz
+Source3: README.libgcjwebplugin.so
 Source100: gcc-rpmlintrc
 Source200: baselibs.conf
 Source300: precheckin.sh
@@ -164,10 +160,6 @@ BuildRequires: mpc-devel
 BuildRequires: glibc-devel >= 2.4.90-13
 BuildRequires: elfutils-devel >= 0.72
 BuildRequires: libstdc++-devel
-
-%if %{build_cloog}
-BuildRequires: ppl >= 0.10, ppl-devel >= 0.10, cloog-ppl >= 0.15, cloog-ppl-devel >= 0.15
-%endif
 
 %if %{build_libstdcxx_docs}
 BuildRequires: doxygen
@@ -560,7 +552,7 @@ for compiling GCC plugins.  The GCC plugin ABI is currently
 not stable, so plugins must be rebuilt any time GCC is updated.
 
 %prep
-%setup -q -n gcc-linaro-4.8-2014.01
+%setup -q -n gcc-linaro-4.8-2014.01 -a 1 -a 2
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch3 -p0 -b .rh330771~
@@ -616,6 +608,48 @@ LC_ALL=C sed -i -e 's/\xa0/ /' gcc/doc/options.texi
 rm -fr obj-%{gcc_target_platform}
 mkdir obj-%{gcc_target_platform}
 cd obj-%{gcc_target_platform}
+
+%if %{build_cloog}
+mkdir isl-build isl-install
+%ifarch s390 s390x
+ISL_FLAG_PIC=-fPIC
+%else
+ISL_FLAG_PIC=-fpic
+%endif
+cd isl-build
+../../isl-%{isl_version}/configure --disable-shared \
+  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
+  CFLAGS="${CFLAGS:-%optflags} $ISL_FLAG_PIC" --prefix=`cd ..; pwd`/isl-install
+make %{?_smp_mflags}
+make install
+cd ..
+
+mkdir cloog-build cloog-install
+cd cloog-build
+cat >> ../../cloog-%{cloog_version}/source/isl/constraints.c << \EOF
+#include <isl/flow.h>
+static void __attribute__((used)) *s1 = (void *) isl_union_map_compute_flow;
+static void __attribute__((used)) *s2 = (void *) isl_map_dump;
+EOF
+sed -i 's|libcloog|libgcc48privatecloog|g' \
+  ../../cloog-%{cloog_version}/{,test/}Makefile.{am,in}
+isl_prefix=`cd ../isl-install; pwd` \
+../../cloog-%{cloog_version}/configure --with-isl=system \
+  --with-isl-prefix=`cd ../isl-install; pwd` \
+  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
+  CFLAGS="${CFLAGS:-%optflags}" CXXFLAGS="${CXXFLAGS:-%optflags}" \
+   --prefix=`cd ..; pwd`/cloog-install
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+make %{?_smp_mflags}
+make %{?_smp_mflags} install
+cd ../cloog-install/lib
+rm libgcc48privatecloog-isl.so{,.4}
+mv libgcc48privatecloog-isl.so.4.0.0 libcloog-isl.so.4
+ln -sf libcloog-isl.so.4 libcloog-isl.so
+ln -sf libcloog-isl.so.4 libcloog.so
+cd ../..
+%endif
 
 CC=gcc
 OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
@@ -690,6 +724,11 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 %endif
 	--with-bugurl=http://bugs.merproject.org/ \
 	--build=%{gcc_target_platform} \
+%if %{build_cloog}
+	--with-isl=`pwd`/isl-install --with-cloog=`pwd`/cloog-install \
+%else
+	--without-isl --without-cloog \
+%endif
 %if %{crossbuild}
 	--host=%{gcc_target_platform} \
 	--target=%{cross_gcc_target_platform} \
@@ -766,6 +805,10 @@ GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS"
 
 # Make
 #make -C gcc CC="./xgcc -B ./ -O2" all
+
+%if %{build_cloog}
+cp -a cloog-install/lib/libcloog-isl.so.4 gcc/
+%endif
 
 # Make generated man pages even if Pod::Man is not new enough
 perl -pi -e 's/head3/head2/' ../contrib/texi2pod.pl
@@ -855,6 +898,10 @@ make DESTDIR=%{buildroot} install
 # \/\/\/
 FULLPATH=%{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
 FULLEPATH=%{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+
+%if %{build_cloog}
+cp -a cloog-install/lib/libcloog-isl.so.4 $FULLPATH/
+%endif
 
 ln -sf gcc %{buildroot}%{_prefix}/bin/cc
 mkdir -p %{buildroot}/lib
@@ -1349,6 +1396,9 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.spec
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.a
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.so
+%if %{build_cloog}
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libcloog-isl.so.*
+%endif
 %ifarch %{multilib_64_archs}
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/crt*.o
