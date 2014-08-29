@@ -1,3 +1,6 @@
+* Fri Aug 29 2014 Davide Bettio <davide.bettio@ispirata.com> - 4.8.3
+- Switch to private cloog-isl and isl libraries
+
 * Fri Mar 14 2014 Oleg Girko <oleg.girko@jolla.com> - 4.8.3
 - Drop libgcc_post_upgrade utility in favour of lua %post and %postun scripts.
 
