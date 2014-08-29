@@ -176,10 +176,6 @@ Requires: binutils >= 2.22
 
 %if !%{crossbuild} 
 
-%if %{build_cloog}
-Requires: cloog-ppl >= 0.15
-%endif
-
 %if %{build_64bit_multilib}
 Requires: glibc64bit-helper
 %endif
