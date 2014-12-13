@@ -62,7 +62,7 @@ BuildRequires: %{cross_deps}
 %define crossextraconfig --with-fpu=vfpv3-d16 --with-arch=armv7-a
 %endif
 %if "%{crossarch}" == "armv7hl"
-%define crossextraconfig --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
 %endif
 %if "%{crossarch}" == "armv7nhl"
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
@@ -77,7 +77,7 @@ BuildRequires: %{cross_deps}
 %define crossextraconfig --disable-fixed-point --disable-ssp --disable-libstdcxx-pch --with-arch=mips32
 %endif
 %if "%{crossarch}" == "i486"
-%define crossextraconfig --disable-libstdcxx-pch --with-arch=i486 --with-gnu-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-gnu-ld=/opt/cross/bin/i486-meego-linux-gnu-ld --with-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-ld=/opt/cross/bin/i486-meego-linux-gnu-ld
+%define crossextraconfig --disable-libstdcxx-pch --with-arch=i686 --with-fpmatch=sse --with-gnu-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-gnu-ld=/opt/cross/bin/i486-meego-linux-gnu-ld --with-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-ld=/opt/cross/bin/i486-meego-linux-gnu-ld
 %endif
 %if "%{crossarch}" == "x86_64"
 %define crossextraconfig --disable-libstdcxx-pch
@@ -686,7 +686,7 @@ esac
 %define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-fpu=vfpv3-d16 --with-arch=armv7-a
 %endif
 %ifarch armv7hl
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-mode=thumb --with-arch=armv7-a
 %endif
 # for armv7nhl reset the gcc specs
 %ifarch armv7nhl
@@ -755,7 +755,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--with-arch=core2 --with-tune=atom --with-fpmath=sse \
 %endif
 %ifarch i486
-	--with-arch=i486 \
+	--with-arch=i686 --with-fpmath=sse  \
 %endif
 %ifarch x86_64
 	--disable-libstdcxx-pch \

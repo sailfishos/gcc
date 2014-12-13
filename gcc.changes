@@ -1,4 +1,8 @@
 * Sat Dec 13 2014 Carsten Munk <carsten.munk@jolla.com> - 4.8.3
+- Make i486 equal to --with-arch=i686 and fpmath=sse2
+- Make armv7hl equal to armv7tnhl
+
+* Sat Dec 13 2014 Carsten Munk <carsten.munk@jolla.com> - 4.8.3
 - We don't need ggc hack for bootstrapped targets.
 
 * Sat Dec 13 2014 Carsten Munk <carsten.munk@jolla.com> - 4.8.3
