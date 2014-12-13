@@ -765,6 +765,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--disable-multilib \
 %endif
 	--enable-checking=release \
+        --disable-fixed-point \
 	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
 	--enable-gnu-unique-object --enable-lto \
 	--enable-linker-build-id \

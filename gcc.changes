@@ -1,3 +1,6 @@
+* Sat Dec 13 2014 Carsten Munk <carsten.munk@jolla.com> - 4.8.3
+- Disables fixed point arthemetic, takes ages to build
+
 * Fri Aug 29 2014 Davide Bettio <davide.bettio@ispirata.com> - 4.8.3
 - Switch to private cloog-isl and isl libraries
 
