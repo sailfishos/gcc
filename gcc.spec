@@ -665,13 +665,17 @@ case "$OPT_FLAGS" in
 esac
 
 %ifarch mipsel
-export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
+# Apply this in case you ever need to qemu bootstrap --cvm
+#
+# export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
 %endif
 
 %ifarch %arm
 # gcc 45 fails to bootstrap itself otherwise on insn-attrtab.o
 # issue is bad interaction between ggc and qemu
-export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
+# Enable this only if --enable-bootstrap is active for QEMU --cvm
+# export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
+
 # gcc 45 segfaults on O2g.gch generation. (cc1plus)
 %define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch
 # for armv7hl reset the gcc specs
