@@ -1,3 +1,6 @@
+* Mon Apr 13 2015 Islam Amer <islam.amer@jolla.com> - 4.8.3
+- Changelog and spec file validation fixes MER#890
+
 * Sat Dec 13 2014 Carsten Munk <carsten.munk@jolla.com> - 4.8.3
 - Make i486 equal to --with-arch=i686 and fpmath=sse2
 - Make armv7hl equal to armv7tnhl
@@ -41,43 +44,40 @@
 * Tue Sep 11 2012 Carsten Munk <carsten@merproject.org> - 4.6.4
 - Upgrade to Linaro 4.6 2012.08
 
-* Sat Sep 08 2012 Carsten Munk <carsten.munk@jollamobile.com>
-- 
-
-* Fri Sep 07 2012 David Greaves <david@dgreaves.com>
+* Fri Sep 07 2012 David Greaves <david@dgreaves.com> - 4.6.3
 - Add armv7tnhl. Run precheckin.sh. Updated gcc.spec.
   Clarify instructions
 
-* Tue May 01 2012 Carsten Munk <carsten@merproject.org>
+* Tue May 01 2012 Carsten Munk <carsten@merproject.org> - 4.6.3
 - Fix MER#323 reported by eocanha: Gcc for target i486-meego-linux is actually built for i686
 
-* Fri Jan 20 2012 Carsten Munk <carsten.munk@gmail.com>
+* Fri Jan 20 2012 Carsten Munk <carsten.munk@gmail.com> - 4.6.3
 - Add support for MIPS o32 port (mipsel),
   patches:
    - gcc-4.6.0-mips_fix-1.patch
    - gcc46-MIPS-boehm-gc-stack-qemu.patch
 
-* Tue Jan 10 2012 Carsten Munk <carsten.munk@gmail.com>
+* Tue Jan 10 2012 Carsten Munk <carsten.munk@gmail.com> - 4.6.3
 - Change to --linker-hash-style=gnu
 - Remove traces of gcj and ada
 
-* Sat Dec 31 2011 Carsten Munk <carsten.munk@gmail.com>
+* Sat Dec 31 2011 Carsten Munk <carsten.munk@gmail.com> - 4.6.3
 - Fix cross compiler bad dependancies
 - Add target-cc symlink to non-accel cross compiler
 - Pull in latest fixes from GCC 4.6 branch, fixes 
   https://bugs.launchpad.net/gcc-linaro/+bug/897583 and
   other issues.
 
-* Mon Dec 12 2011 Ray Donnelly <mingw.android@gmail.com>
+* Mon Dec 12 2011 Ray Donnelly <mingw.android@gmail.com> - 4.6.3
 - Update version to 4.6.3 (i.e. it's not 4.6.2 2011.12)
 
-* Mon Dec 12 2011 Ray Donnelly <mingw.android@gmail.com>
+* Mon Dec 12 2011 Ray Donnelly <mingw.android@gmail.com> - 4.6.2
 - Updated to linaro gcc 4.6.2 2011.12
 
-* Fri Nov 25 2011 Carsten Munk <carsten@merproject.org>
+* Fri Nov 25 2011 Carsten Munk <carsten@merproject.org> - 4.6.1
 - Drop fortran support, it takes up too much time when gcc on target is being built.
 
-* Sat Sep 24 2011 Alistair Buxton <a.j.buxton@gmail.com>
+* Sat Sep 24 2011 Alistair Buxton <a.j.buxton@gmail.com> - 4.6.1
 - Only apply Atom patch when building for i586.
 
 * Thu Sep 15 2011 Carsten Munk <carsten@maemo.org> - 4.6.1
@@ -111,7 +111,7 @@
 * Wed May 05 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
 - Update to 4.6.0, from svn on 20110419.
 
-* Sun Apr 24 08:02:35 UTC 2011 - Jan-Simon Möller <jsmoeller@linuxfoundation.org> - 1.0
+* Sun Apr 24 2011 - Jan-Simon Möller <jsmoeller@linuxfoundation.org> - 4.5.2
 - Add baselibs.conf to src.rpm
 
 * Tue Apr 12 2011 Juha Kallioinen <juha.kallioinen@nokia.com> - 4.5.2
@@ -128,7 +128,7 @@
 * Tue Apr 05 2011 Juha Kallioinen <juha.kallioinen@nokia.com> - 4.5.2
 - build cloog for all archs. Depend on cloog >= 0.15.9
 
-* Tue Mar  8 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.5 2
+* Tue Mar 8 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.5.2
 - Update to 4.5.2.
 - Update linaro patches. Drop the changes in the following three files:
   gcc/config/arm/linux-atomic.c
@@ -140,7 +140,7 @@
 - Bugfixing: BMC#11667:C++ routine does not compile with arm tool chain
 
 * Mon Jan 10 2011 Carsten Munk <carsten@maemo.org> - 4.5.1
-* BMC#12147: Linaro patches fail to build udev
+- BMC#12147: Linaro patches fail to build udev
 
 * Sun Jan  9 2011 Carsten Munk <carsten@maemo.org> - 4.5.1
 - Untar patch and re-gzip Linaro patch, solves BMC#11498
@@ -151,11 +151,10 @@
 * Mon Jan  3 2011 Carsten Munk <carsten@maemo.org> - 4.5.1
 - Add armv7hl and armv7nhl cross support
 
-* Fri Dec 31 2010 Carsten Munk - 4.5.1
+* Fri Dec 31 2010 Carsten Munk <carsten@maemo.org> - 4.5.1
 - Disable Linaro patchset to allow for bootstrap.
 
 * Fri Dec 10 2010 Jan-Simon Möller <jsmoeller@linuxfoudnation.org> - 4.5.1
-  Fri Dec 10 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
 - Added Linaro patchset based on GCC4.5.1 (BMC#10510)
 
 * Tue Dec 09 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
@@ -167,13 +166,13 @@
 - Fix BMC#10337,10339:Error when installing gdb with --excludedocs in .ks
 - Clean-up obsoleted content
 
-* Fri Oct 15 11:26:37 UTC 2010 - jsmoeller@linuxfoundation.org - 4.5.1
+* Fri Oct 15 2010 Jan-Simon Möller <jsmoeller@linuxfoundation.org> - 4.5.1
 - Merged/fixed devel:toolchain with devel:base
 
-* Tue Oct 14 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+* Tue Oct 14 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
 - Applied 4.5.0 branch patch for fixing PR#45112 (BMC#8034)
 
-* Sat Sep 25 2010 Roger Wang <roger.wang@intel.com> - 4.5.0
+* Sat Sep 25 2010 Roger Wang <roger.wang@intel.com> - 4.5.1
 - Applied 4.5.0 branch patch for fixing PR#43972 (BMC#7281)
 
 * Wed Sep 15 2010 Jan-Simon Möller <jsmoeller@linuxfoudnation.org> - 4.5.1
@@ -265,60 +264,82 @@
 * Sat Aug 22 2009 Anas Nashif <anas.nashif@intel.com> - 4.4.1
 - Update to 4.4.1
 
-* Tue Dec 23 2008 Anas Nashif <anas.nashif@intel.com> 4.3
+* Tue Dec 23 2008 Anas Nashif <anas.nashif@intel.com> - 4.3
 - Initial import into Moblin
 
-* Wed May  7 2008 rguenther@suse.de
+* Wed May 7 2008 Richard Guenther <rguenther@suse.de> - 4.3
 - Make dependencies between the gcc subpackages versioned. [bnc#385305]
-* Fri Nov 23 2007 rguenther@suse.de
+
+* Fri Nov 23 2007 Richard Guenther <rguenther@suse.de> - 4.3
 - Make gcc-gij dependency of gcc-java a recommendation, all java
   tools are back to the gcc-java package.  Require libgcj-devel
   from gcc-java.
 - Revert /lib/cpp changes.
-* Fri Nov 16 2007 rguenther@suse.de
+
+* Fri Nov 16 2007 Richard Guenther <rguenther@suse.de> - 4.3
 - For now disable symlinking of binaries and manpages that
   conflict with the classpath package.
-* Tue Nov 13 2007 rguenther@suse.de
+
+* Tue Nov 13 2007 Richard Guenther <rguenther@suse.de> - 4.3
 - Make /lib/cpp traditional and avoid GCC and target specific
   defines.
-* Tue Oct 30 2007 rguenther@suse.de
+
+* Tue Oct 30 2007 Richard Guenther <rguenther@suse.de> - 4.3
 - Add gcc-gij dependency to gcc-java as it contains many of the
   tools formerly packaged in the gcc-java package.
-* Mon Sep 24 2007 rguenther@suse.de
+
+* Mon Sep 24 2007 Richard Guenther <rguenther@suse.de> - 4.3
 - Switch gcc default to 4.3.
-* Fri Jul 27 2007 rguenther@suse.de
+
+* Fri Jul 27 2007 Richard Guenther <rguenther@suse.de> - 4.2
 - Fix typo.
-* Tue Jul 24 2007 rguenther@suse.de
+
+* Tue Jul 24 2007 Richard Guenther <rguenther@suse.de> - 4.2
 - Add 32bit and 64bit variants of gcc-gij.  [#293423]
-* Fri Jul  6 2007 rguenther@suse.de
+
+* Fri Jul 6 2007 Richard Guenther <rguenther@suse.de> - 4.2
 - Mark ppc64 as separate bi-32.
-* Thu Jun 14 2007 ro@suse.de
+
+* Thu Jun 14 2007 unknown <ro@suse.de> - 4.2
 - Do not mark README.packaging as NoSource. (again)
-* Fri Jun  8 2007 rguenther@suse.de
+
+* Fri Jun  8 2007 Richard Guenther <rguenther@suse.de> - 4.2
 - Switch gcc default to 4.2.  [#275939]
-* Tue Apr 24 2007 rguenther@suse.de
+
+* Tue Apr 24 2007 Richard Guenther <rguenther@suse.de> - 4.2
 - Do not link to grmic and grmiregistry, they conflict with
   the classpath package versions.
-* Tue Jan 16 2007 rguenther@suse.de
+
+* Tue Jan 16 2007 Richard Guenther <rguenther@suse.de> - 4.2
 - Do not mark README.packaging as NoSource.
-* Thu Nov  9 2006 rguenther@suse.de
+
+* Thu Nov  9 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - Remove gcc-c++-32bit and gcc-c++-64bit packages.
-* Tue Oct 31 2006 dmueller@suse.de
+
+* Tue Oct 31 2006 Dirk Mueller <dmueller@suse.de> - 4.2
 - don't build as root
-* Mon Oct 30 2006 rguenther@suse.de
+
+* Mon Oct 30 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - Make gcc architecture dependent again.  [#215971]
-* Thu Oct 26 2006 rguenther@suse.de
+
+* Thu Oct 26 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - Add dependencies to the gcc and non-32/64bit packages.  [#215217]
-* Tue Sep 19 2006 rguenther@suse.de
+
+* Tue Sep 19 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - New gcc-gij package.
-* Fri Aug 25 2006 rguenther@suse.de
+
+* Fri Aug 25 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - Add 32bit and 64bit support packages to gcc, gcc-c++, gcc-fortran,
   gcc-objc and libffi-devel.
-* Thu Aug 24 2006 rguenther@suse.de
+
+* Thu Aug 24 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - Make gcc require cpp to pull in /lib/cpp.
-* Fri Aug 18 2006 rguenther@suse.de
+
+* Fri Aug 18 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - gcc obsoletes gcc-mudflap which is no longer.
-* Mon Aug  7 2006 rguenther@suse.de
+
+* Mon Aug 7 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - Provide gcc-mudflap, gcc-info and gcc-locale packages [#197515].
-* Fri Jul 14 2006 rguenther@suse.de
+
+* Fri Jul 14 2006 Richard Guenther <rguenther@suse.de> - 4.2
 - New package.
