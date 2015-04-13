@@ -22,7 +22,9 @@ Name: cross-mipsel-gcc
 # Sledge Hammer: Trust me, I know what I'm doing. 
 AutoReqProv: 0
 AutoReq: false
-BuildRequires: -rpmlint-Moblin -rpmlint-mini -post-build-checks
+#!BuildIgnore: rpmlint-Moblin
+#!BuildIgnore: rpmlint-mini
+#!BuildIgnore: post-build-checks
 # cross platform
 %if %(echo %{crossarch} | grep -q "^arm" && echo 1 || echo 0)
 %define cross_gcc_target_platform %{crossarch}-%{_vendor}-linux-gnueabi
