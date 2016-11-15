@@ -86,7 +86,7 @@ BuildRequires: %{cross_deps}
 %define crossextraconfig --disable-libstdcxx-pch
 %endif
 %if "%{crossarch}" == "aarch64"
-%define crossextraconfig --disable-libstdcxx-pch
+%define crossextraconfig --with-arch=armv8-a --disable-libstdcxx-pch
 %endif
 
 # single target atm.
@@ -144,7 +144,7 @@ Release: %{gcc_release}
 License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
 URL: http://launchpad.net/gcc-linaro
-Source0: https://launchpad.net/gcc-linaro/4.8/4.8-2014.01/+download/gcc-linaro-4.8-2014.01.tar.xz
+Source0: https://launchpad.net/gcc-linaro/4.8/4.8-2014.04/+download/gcc-linaro-4.8-2014.04.tar.xz
 %global isl_version 0.11.1
 Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-0.11.1.tar.bz2
 %global cloog_version 0.18.1
@@ -215,7 +215,7 @@ Patch1100: isl-%{isl_version}-aarch64-config.patch
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
 #We need -gnueabi indicator for ARM
-%ifnarch %{arm}
+%ifnarch %{arm} aarch64
 %global _gnu %{nil}
 %endif
 %global gcc_target_platform %{_target_platform}
@@ -552,7 +552,7 @@ for compiling GCC plugins.  The GCC plugin ABI is currently
 not stable, so plugins must be rebuilt any time GCC is updated.
 
 %prep
-%setup -q -n gcc-linaro-4.8-2014.01 -a 1 -a 2
+%setup -q -n gcc-linaro-4.8-2014.04 -a 1 -a 2
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch3 -p0 -b .rh330771~
@@ -569,7 +569,7 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 %endif
 %patch20 -p1
 
-%ifarch %arm
+%ifarch %arm aarch64
 %patch42 -p1
 %endif
 %patch44 -p1
@@ -673,7 +673,7 @@ esac
 # export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
 %endif
 
-%ifarch %arm
+%ifarch %arm aarch64
 # gcc 45 fails to bootstrap itself otherwise on insn-attrtab.o
 # issue is bad interaction between ggc and qemu
 # Enable this only if --enable-bootstrap is active for QEMU --cvm
@@ -702,6 +702,10 @@ esac
 # for armv7tnhl reset the gcc specs
 %ifarch armv7tnhl
 %define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
+%endif
+# aarch64
+%ifarch aarch64
+%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-arch=armv8-a
 %endif
 %endif
 
@@ -747,7 +751,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--disable-libstdcxx-pch \
         --with-arch=mips32 \
 %endif
-%ifarch %{arm}
+%ifarch %{arm} aarch64
 	%ARM_EXTRA_CONFIGURE \
 	--disable-sjlj-exceptions \
 %endif
@@ -1289,7 +1293,7 @@ fi
 %{_prefix}/bin/gcc-ar
 %{_prefix}/bin/gcc-nm
 %{_prefix}/bin/gcc-ranlib
-%ifnarch %{arm} mipsel
+%ifnarch %{arm} aarch64 mipsel
 %{_prefix}/bin/%{gcc_target_platform}-gcc
 %{_prefix}/bin/%{gcc_target_platform}-gcc-ar
 %{_prefix}/bin/%{gcc_target_platform}-gcc-nm
@@ -1447,13 +1451,13 @@ fi
 %doc gcc/COPYING.LIB
 
 # For ARM port
-%ifarch %{arm} mipsel
+%ifarch %{arm} aarch64 mipsel
 %{_prefix}/%{_lib}/libssp*
 %endif
 
 %files c++
 %defattr(-,root,root,-)
-%ifnarch %{arm} mipsel
+%ifnarch %{arm} aarch64 mipsel
 %{_prefix}/bin/%{gcc_target_platform}-*++
 %endif
 %{_prefix}/bin/g++
