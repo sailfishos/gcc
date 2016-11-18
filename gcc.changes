@@ -1,3 +1,7 @@
+* Fri Nov 18 2016 Niels Breet <niels.breet@jolla.com> - 4.8.3-2
+- Fixes for aarch64. MER#1703
+- Upgrade to Linaro 4.8 2014.04
+
 * Mon Apr 16 2015 Islam Amer <islam.amer@jolla.com> - 4.8.3
 - More packaging fixes for MER#890
 
