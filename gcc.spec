@@ -85,7 +85,7 @@ BuildRequires: %{cross_deps}
 %define crossextraconfig --disable-libstdcxx-pch
 %endif
 %if "%{crossarch}" == "aarch64"
-%define crossextraconfig --with-arch=armv8-a --disable-libstdcxx-pch
+%define crossextraconfig --with-arch=armv8-a
 %endif
 
 # single target atm.
@@ -95,9 +95,10 @@ ExclusiveArch: %ix86 x86_64
 # end crossbuild / accelerator section
 %endif
 
-%global gcc_version 4.8.3
+%global gcc_version 4.9.4
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
+%global _performance_build 1
 %global include_gappletviewer 0
 %global build_cloog 1
 %global build_libstdcxx_docs 0
@@ -127,7 +128,7 @@ ExclusiveArch: %ix86 x86_64
 %global build_libtsan 0
 %endif
 %ifarch %{ix86} x86_64 %{arm}
-%global build_libasan 1
+%global build_libasan 0
 %else
 %global build_libasan 0
 %endif
@@ -142,10 +143,10 @@ Release: %{gcc_release}
 %endif
 License: GPLv3+, GPLv3+ with exceptions and GPLv2+ with exceptions
 Group: Development/Languages
-URL: http://launchpad.net/gcc-linaro
-Source0: https://launchpad.net/gcc-linaro/4.8/4.8-2014.04/+download/gcc-linaro-4.8-2014.04.tar.xz
-%global isl_version 0.11.1
-Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-0.11.1.tar.bz2
+URL: https://releases.linaro.org/components/toolchain/gcc-linaro/
+Source0: https://releases.linaro.org/components/toolchain/gcc-linaro/4.9-2017.01/gcc-linaro-4.9-2017.01.tar.xz
+%global isl_version 0.12.2
+Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-0.12.2.tar.bz2
 %global cloog_version 0.18.1
 Source2: ftp://gcc.gnu.org/pub/gcc/infrastructure/cloog-0.18.1.tar.gz
 Source3: README.libgcjwebplugin.so
@@ -154,7 +155,7 @@ Source200: baselibs.conf
 Source300: precheckin.sh
 Source301: aaa_README.PACKAGER
 
-BuildRequires: binutils >= 2.22
+BuildRequires: binutils >= 2.25
 BuildRequires: glibc-static
 BuildRequires: zlib-devel, gettext,  bison, flex, texinfo
 BuildRequires: mpc-devel
@@ -172,7 +173,7 @@ Requires: cpp = %{version}-%{release}
 Requires: libgcc >= %{version}-%{release}
 Requires: libgomp = %{version}-%{release}
 Requires: glibc-devel
-Requires: binutils >= 2.22
+Requires: binutils >= 2.25
 %endif
 
 %if !%{crossbuild} 
@@ -189,27 +190,27 @@ AutoReq: true
 # /!crossbuild
 %endif
 
-Patch0: gcc48-hack.patch
-Patch1: gcc48-java-nomulti.patch
-Patch3: gcc48-rh330771.patch
-Patch4: gcc48-i386-libgomp.patch
-Patch6: gcc48-libgomp-omp_h-multilib.patch
-Patch7: gcc48-libtool-no-rpath.patch
-Patch8: gcc48-cloog-dl.patch
-Patch9: gcc48-cloog-dl2.patch
-Patch10: gcc48-pr38757.patch
+Patch0: gcc49-hack.patch
+#Patch1: gcc48-java-nomulti.patch
+Patch3: gcc49-rh330771.patch
+#Patch4: gcc48-i386-libgomp.patch
+Patch6: gcc49-libgomp-omp_h-multilib.patch
+Patch7: gcc49-libtool-no-rpath.patch
+Patch8: gcc49-cloog-dl.patch
+Patch9: gcc49-cloog-dl2.patch
+Patch10: gcc49-pr38757.patch
 Patch11: gcc48-libstdc++-docs.patch
+Patch12: gcc49-no-add-needed.patch
+Patch17: gcc49-pr64336.patch
 
 Patch20: gcc48-x86_64-nolib64.patch
 
-Patch42: gcc46-libiberty-conftest.patch
-Patch44: gcc-hash-style-gnu.diff
-Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
+#Patch42: gcc46-libiberty-conftest.patch
+#Patch44: gcc-hash-style-gnu.diff
+#Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
 
-Patch50: fix-stable-debugtypes.patch
+#Patch50: fix-stable-debugtypes.patch
 Patch51: use-lib-for-aarch64.patch
-
-Patch1100: isl-%{isl_version}-aarch64-config.patch
 
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
@@ -220,15 +221,18 @@ Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 %global gcc_target_platform %{_target_platform}
 
 %description
-The gcc package contains the GNU Compiler Collection version 4.8.
+The gcc package contains the GNU Compiler Collection version 4.9.
 You'll need this package in order to compile C code.
 
 %package -n libgcc
-Summary: GCC version 4.8 shared support library
+Summary: GCC version 4.9 shared support library
 Group: System Environment/Libraries
 Obsoletes: libgcc < %{version}-%{release}
 Obsoletes: libgcc43
 Autoreq: false
+%if "%{version}" != "%{gcc_version}"
+Provides: libgcc = %{gcc_provides}
+%endif
 
 %description -n libgcc
 This package contains GCC shared support library which is needed
@@ -343,28 +347,6 @@ Obsoletes: libgomp43
 %description -n libgomp
 This package contains GCC shared support library which is needed
 for OpenMP v3.0 support.
-
-%package -n libmudflap
-Summary: GCC mudflap shared support library
-Group: System Environment/Libraries
-
-%description -n libmudflap
-This package contains GCC shared support library which is needed
-for mudflap support.
-
-%package -n libmudflap-devel
-Summary: GCC mudflap support
-Group: Development/Libraries
-Requires: libmudflap = %{version}-%{release}
-Requires: gcc = %{version}-%{release}
-
-%description -n libmudflap-devel
-This package contains headers and static libraries for building
-mudflap-instrumented programs.
-
-To instrument a non-threaded program, add -fmudflap
-option to GCC and when linking add -lmudflap, for threaded programs
-also add -fmudflapth and -lmudflapth.
 
 %package -n libquadmath
 Summary: GCC __float128 shared support library
@@ -543,7 +525,7 @@ This is one set of libraries which support 64bit multilib on top of
 Summary: Support for compiling GCC plugins
 Group: Development/Languages
 Requires: gcc = %{version}-%{release}
-Requires: mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
+Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
 
 %description plugin-devel
 This package contains header files and other support files
@@ -551,11 +533,11 @@ for compiling GCC plugins.  The GCC plugin ABI is currently
 not stable, so plugins must be rebuilt any time GCC is updated.
 
 %prep
-%setup -q -n gcc-linaro-4.8-2014.04 -a 1 -a 2
+%setup -q -n gcc-linaro-4.9-2017.01 -a 1 -a 2
 %patch0 -p0 -b .hack~
-%patch1 -p0 -b .java-nomulti~
+#%patch1 -p0 -b .java-nomulti~
 %patch3 -p0 -b .rh330771~
-%patch4 -p0 -b .i386-libgomp~
+#%patch4 -p0 -b .i386-libgomp~
 %patch6 -p0 -b .libgomp-omp_h-multilib~
 %patch7 -p0 -b .libtool-no-rpath~
 %if %{build_cloog}
@@ -566,21 +548,21 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 %if %{build_libstdcxx_docs}
 %patch11 -p0 -b .libstdc++-docs~
 %endif
+%patch12 -p0 -b .no-add-needed~
+%patch17 -p0 -b .pr64336~
 %patch20 -p1
 
 %ifarch %arm aarch64
-%patch42 -p1
+#%patch42 -p1
 %endif
-%patch44 -p1
-%patch45 -p1
+#%patch44 -p1
+#%patch45 -p1
 
-%patch50 -p1
+#%patch50 -p1
 %patch51 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*
-
-%patch1100 -p0 -b .isl-aarch64~
 
 %patch9999 -p1 -b .arm-boehm-gc~
 
@@ -632,7 +614,7 @@ cat >> ../../cloog-%{cloog_version}/source/isl/constraints.c << \EOF
 static void __attribute__((used)) *s1 = (void *) isl_union_map_compute_flow;
 static void __attribute__((used)) *s2 = (void *) isl_map_dump;
 EOF
-sed -i 's|libcloog|libgcc48privatecloog|g' \
+sed -i 's|libcloog|libgcc49privatecloog|g' \
   ../../cloog-%{cloog_version}/{,test/}Makefile.{am,in}
 isl_prefix=`cd ../isl-install; pwd` \
 ../../cloog-%{cloog_version}/configure --with-isl=system \
@@ -645,8 +627,8 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
 make %{?_smp_mflags} install
 cd ../cloog-install/lib
-rm libgcc48privatecloog-isl.so{,.4}
-mv libgcc48privatecloog-isl.so.4.0.0 libcloog-isl.so.4
+rm libgcc49privatecloog-isl.so{,.4}
+mv libgcc49privatecloog-isl.so.4.0.0 libcloog-isl.so.4
 ln -sf libcloog-isl.so.4 libcloog-isl.so
 ln -sf libcloog-isl.so.4 libcloog.so
 cd ../..
@@ -673,38 +655,33 @@ esac
 %endif
 
 %ifarch %arm aarch64
-# gcc 45 fails to bootstrap itself otherwise on insn-attrtab.o
-# issue is bad interaction between ggc and qemu
-# Enable this only if --enable-bootstrap is active for QEMU --cvm
-# export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
 
-# gcc 45 segfaults on O2g.gch generation. (cc1plus)
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch
+%define ARM_EXTRA_CONFIGURE ""
 # for armv7hl reset the gcc specs
 %ifarch armv6l
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-fpu=vfp --with-arch=armv6
+%define ARM_EXTRA_CONFIGURE --with-fpu=vfp --with-arch=armv6
 %endif
 %ifarch armv7l
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-fpu=vfpv3-d16 --with-arch=armv7-a
+%define ARM_EXTRA_CONFIGURE --with-fpu=vfpv3-d16 --with-arch=armv7-a
 %endif
 %ifarch armv7hl
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-mode=thumb --with-arch=armv7-a
+%define ARM_EXTRA_CONFIGURE --with-float=hard --with-fpu=neon --with-mode=thumb --with-arch=armv7-a
 %endif
 # for armv7nhl reset the gcc specs
 %ifarch armv7nhl
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a
+%define ARM_EXTRA_CONFIGURE --with-float=hard --with-fpu=neon --with-arch=armv7-a
 %endif
 # for armv7thl reset the gcc specs
 %ifarch armv7thl
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a --with-mode=thumb
+%define ARM_EXTRA_CONFIGURE --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a --with-mode=thumb
 %endif
 # for armv7tnhl reset the gcc specs
 %ifarch armv7tnhl
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
+%define ARM_EXTRA_CONFIGURE --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
 %endif
 # aarch64
 %ifarch aarch64
-%define ARM_EXTRA_CONFIGURE --disable-libstdcxx-pch --with-arch=armv8-a
+%define ARM_EXTRA_CONFIGURE --with-arch=armv8-a
 %endif
 %endif
 
@@ -753,6 +730,9 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 %ifarch %{arm} aarch64
 	%ARM_EXTRA_CONFIGURE \
 	--disable-sjlj-exceptions \
+        --enable-gold \
+        --enable-plugin \
+        --with-plugin-ld=gold \
 %endif
 %ifarch %{ix86} x86_64
 	--with-tune=generic \
@@ -793,7 +773,6 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--disable-shared \
 	--disable-libssp \
 	--disable-libgomp \
-	--disable-libmudflap \
 	--disable-libquadmath \
 %endif
 %if %{bootstrap} == 2
@@ -801,15 +780,15 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--with-sysroot=%{crosssysroot} \
 	--disable-libssp \
 	--disable-libgomp \
-	--disable-libmudflap \
 	--disable-libquadmath \
 %endif
 	--disable-libgcj \
+        --disable-libsanitizer \
+        --disable-libcilkrts \
 %if %{crossbuild}
 	%{crossextraconfig} \
 %endif
 	--build=%{gcc_target_platform} || ( cat config.log ; exit 1 )
-
 
 GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS"
 
@@ -840,10 +819,10 @@ cd ../..
 cd ..
 mkdir -p rpm.doc/gfortran rpm.doc/objc rpm.doc/libquadmath
 mkdir -p rpm.doc/boehm-gc rpm.doc/fastjar rpm.doc/libffi
-mkdir -p rpm.doc/changelogs/{gcc/cp,libstdc++-v3,libobjc,libmudflap,libgomp}
+mkdir -p rpm.doc/changelogs/{gcc/cp,libstdc++-v3,libobjc,libgomp}
 sed -e 's,@VERSION@,%{gcc_version},' %{SOURCE2} > rpm.doc/README.libgcjwebplugin.so
 
-for i in {gcc,gcc/cp,libstdc++-v3,libobjc,libmudflap,libgomp}/ChangeLog*; do
+for i in {gcc,gcc/cp,libstdc++-v3,libobjc,libgomp}/ChangeLog*; do
 	cp -p $i rpm.doc/changelogs/$i
 done
 
@@ -962,7 +941,7 @@ done
 # 4) it is huge
 # People can always precompile on their own whatever they want, but
 # shipping this for everybody is unnecessary.
-rm -rf %{buildroot}%{_prefix}/include/c++/%{gcc_version}/%{gcc_target_platform}/bits/stdc++.h.gch
+rm -rf %{buildroot}%{_prefix}/include/c++/%{gcc_version}/%{gcc_target_platform}/bits/*.h.gch
 
 %if %{build_libstdcxx_docs}
 libstdcxx_doc_builddir=%{gcc_target_platform}/libstdc++-v3/doc/doxygen
@@ -983,6 +962,7 @@ fi
 find %{buildroot} -name \*.la | xargs rm -f
 
 mkdir -p %{buildroot}/%{_lib}
+
 mv -f %{buildroot}%{_prefix}/%{_lib}/libgcc_s.so.1 %{buildroot}/%{_lib}/libgcc_s-%{gcc_version}.so.1
 chmod 755 %{buildroot}/%{_lib}/libgcc_s-%{gcc_version}.so.1
 ln -sf libgcc_s-%{gcc_version}.so.1 %{buildroot}/%{_lib}/libgcc_s.so.1
@@ -1010,8 +990,6 @@ if [ "%{_lib}" = "lib" ]; then
 ln -sf ../../../libobjc.so.4 libobjc.so
 ln -sf ../../../libstdc++.so.6.* libstdc++.so
 ln -sf ../../../libgomp.so.1.* libgomp.so
-ln -sf ../../../libmudflap.so.0.* libmudflap.so
-ln -sf ../../../libmudflapth.so.0.* libmudflapth.so
 %if %{build_libquadmath}
 ln -sf ../../../libquadmath.so.0.* libquadmath.so
 %endif
@@ -1019,17 +997,21 @@ else
 ln -sf ../../../../%{_lib}/libobjc.so.4 libobjc.so
 ln -sf ../../../../%{_lib}/libstdc++.so.6.* libstdc++.so
 ln -sf ../../../../%{_lib}/libgomp.so.1.* libgomp.so
-ln -sf ../../../../%{_lib}/libmudflap.so.0.* libmudflap.so
-ln -sf ../../../../%{_lib}/libmudflapth.so.0.* libmudflapth.so
 %if %{build_libquadmath}
 ln -sf ../../../../%{_lib}/libquadmath.so.0.* libquadmath.so
+%endif
+%if %{build_libatomic}
+ln -sf ../../../libatomic.so.1.* libatomic.so
+%endif
+%if %{build_libasan}
+ln -sf ../../../libasan.so.1.* libasan.so
+mv ../../../libasan_preinit.o libasan_preinit.o
 %endif
 fi
 mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++.*a $FULLLPATH/
 mv -f %{buildroot}%{_prefix}/%{_lib}/libsupc++.*a .
 mv -f %{buildroot}%{_prefix}/%{_lib}/libobjc.*a .
 mv -f %{buildroot}%{_prefix}/%{_lib}/libgomp.*a .
-mv -f %{buildroot}%{_prefix}/%{_lib}/libmudflap{,th}.*a $FULLLPATH/
 %if %{build_libquadmath}
 mv -f %{buildroot}%{_prefix}/%{_lib}/libquadmath.*a $FULLLPATH/
 %endif
@@ -1040,7 +1022,7 @@ mv -f %{buildroot}%{_prefix}/%{_lib}/libitm.*a $FULLLPATH/
 mv -f %{buildroot}%{_prefix}/%{_lib}/libatomic.*a $FULLLPATH/
 %endif
 %if %{build_libasan}
-mv -f %{buildroot}%{_prefix}/%{_lib}/libasan.*a $FULLLPATH/
+#mv -f %{buildroot}%{_prefix}/%{_lib}/libasan.*a $FULLLPATH/
 %endif
 %if %{build_libtsan}
 mv -f %{buildroot}%{_prefix}/%{_lib}/libtsan.*a $FULLLPATH/
@@ -1052,11 +1034,6 @@ mkdir -p 32
 ln -sf ../../../../libobjc.so.4 32/libobjc.so
 ln -sf ../`echo ../../../../lib64/libstdc++.so.6.* | sed s~/../lib64/~/~` 32/libstdc++.so
 ln -sf ../`echo ../../../../lib64/libgomp.so.1.* | sed s~/../lib64/~/~` 32/libgomp.so
-rm -f libmudflap.so libmudflapth.so
-echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libmudflap.so.0.* | sed 's,^.*libm,libm,'`' )' > libmudflap.so
-echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libmudflapth.so.0.* | sed 's,^.*libm,libm,'`' )' > libmudflapth.so
-echo 'INPUT ( %{_prefix}/lib/'`echo ../../../../lib64/libmudflap.so.0.* | sed 's,^.*libm,libm,'`' )' > 32/libmudflap.so
-echo 'INPUT ( %{_prefix}/lib/'`echo ../../../../lib64/libmudflapth.so.0.* | sed 's,^.*libm,libm,'`' )' > 32/libmudflapth.so
 %if %{build_libquadmath}
 rm -f libquadmath.so
 echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libquadmath.so.0.* | sed 's,^.*libq,libq,'`' )' > libquadmath.so
@@ -1066,8 +1043,6 @@ mv -f %{buildroot}%{_prefix}/lib/libsupc++.*a 32/
 mv -f %{buildroot}%{_prefix}/lib/libobjc.*a 32/
 mv -f %{buildroot}%{_prefix}/lib/libgomp.*a 32/
 ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libstdc++.a 32/libstdc++.a
-ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libmudflap.a 32/libmudflap.a
-ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libmudflapth.a 32/libmudflapth.a
 %if %{build_libquadmath}
 ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libquadmath.a 32/libquadmath.a
 %endif
@@ -1075,15 +1050,18 @@ ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libq
 
 # Strip debug info from Fortran/ObjC/Java static libraries
 strip -g `find . \( -name libobjc.a -o -name libgomp.a \
-		    -o -name libmudflap.a -o -name libmudflapth.a \
 		    -o -name libgcc.a -o -name libgcov.a -name libquadmath.a \) -a -type f`
 popd
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgomp.so.1.*
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libmudflap{,th}.so.0.*
 %if %{build_libquadmath}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libquadmath.so.0.*
 %endif
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libobjc.so.4.*
+
+set -x
+mkdir  %{buildroot}%{_prefix}/%{_lib}/bfd-plugins
+ln -s %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/liblto_plugin.so %{buildroot}%{_prefix}/%{_lib}/bfd-plugins/
+set +x
 
 mv $FULLPATH/include-fixed/syslimits.h $FULLPATH/include/syslimits.h
 mv $FULLPATH/include-fixed/limits.h $FULLPATH/include/limits.h
@@ -1135,6 +1113,7 @@ rm -f %{buildroot}%{_prefix}/lib/{32,64}/libiberty.a
 rm -f %{buildroot}%{_prefix}/%{_lib}/libssp*
 %endif
 %endif
+rm -f %{buildroot}%{_prefix}/%{_lib}/libvtv* || :
 rm -f %{buildroot}%{_prefix}/bin/gnative2ascii
 rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-%{version} || :
 
@@ -1153,10 +1132,14 @@ rm -f %{buildroot}%{_prefix}/lib/lib*.a
 # additional install for cross
 # remove some obsolete files
 ln -sf %{cross_gcc_target_platform}-gcc %{buildroot}%{_prefix}/bin/%{cross_gcc_target_platform}-cc
-#set -x
+set -x
 rm -rRf %buildroot/%{_prefix}/lib/libiberty.a
 rm -rRf %buildroot/%{_prefix}/share
-#set +x
+mkdir  -p %{buildroot}%{_prefix}/lib/bfd-plugins
+ln -s %{_prefix}/libexec/gcc/%{cross_gcc_target_platform}/%{gcc_version}/liblto_plugin.so %{buildroot}%{_prefix}/lib/bfd-plugins/
+mkdir  -p %{buildroot}/usr/lib/bfd-plugins
+ln -s %{_prefix}/libexec/gcc/%{cross_gcc_target_platform}/%{gcc_version}/liblto_plugin.so %{buildroot}/usr/lib/bfd-plugins/
+set +x
 # /\/\/\
 # cross
 %endif
@@ -1250,10 +1233,6 @@ fi
 
 %postun -n libgomp -p /sbin/ldconfig
 
-%post -n libmudflap -p /sbin/ldconfig
-
-%postun -n libmudflap -p /sbin/ldconfig
-
 %post -n libquadmath
 /sbin/ldconfig
 if [ -f %{_infodir}/libquadmath.info.gz ]; then
@@ -1315,6 +1294,7 @@ fi
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/lto1
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/lto-wrapper
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/liblto_plugin.so*
+
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/collect2
 
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/plugin
@@ -1336,6 +1316,7 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/omp.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdint.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdint-gcc.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdatomic.h
 
 %ifarch %{ix86} x86_64
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/xmmintrin.h
@@ -1370,6 +1351,11 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/fxsrintrin.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/xsaveintrin.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/xsaveoptintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512cdintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512erintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512fintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512pfintrin.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/shaintrin.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mm_malloc.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mm3dnow.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/cpuid.h
@@ -1382,6 +1368,11 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include-fixed/README
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/unwind-arm-common.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_neon.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_acle.h
+%endif
+%ifarch aarch64
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_neon.h
+%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_acle.h
 %endif
 %ifnarch mips mipsel aarch64
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mmintrin.h
@@ -1418,10 +1409,6 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgcc_s.so
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgomp.a
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgomp.so
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libmudflap.a
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libmudflapth.a
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libmudflap.so
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libmudflapth.so
 %if %{build_libquadmath}
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libquadmath.a
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libquadmath.so
@@ -1563,24 +1550,6 @@ fi
 %{_infodir}/libgomp.info*
 %doc rpm.doc/changelogs/libgomp/ChangeLog*
 
-%files -n libmudflap
-%defattr(-,root,root,-)
-%{_prefix}/%{_lib}/libmudflap.*
-%{_prefix}/%{_lib}/libmudflapth.*
-
-%files -n libmudflap-devel
-%defattr(-,root,root,-)
-%dir %{_prefix}/lib/gcc
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
-%dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/mf-runtime.h
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libmudflap.a  
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libmudflapth.a  
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libmudflap.so  
-%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libmudflapth.so  
-%doc rpm.doc/changelogs/libmudflap/ChangeLog*
-
 %if %{build_64bit_multilib}
 %files -n gcc-multilib
 %defattr(-,root,root,-)
@@ -1717,6 +1686,8 @@ fi
 %files
 %defattr(-,root,root,-)
 %{_prefix}
+%dir /usr/lib/bfd-plugins
+/usr/lib/bfd-plugins/liblto_plugin.so
 # /\/\/\
 # cross
 %endif

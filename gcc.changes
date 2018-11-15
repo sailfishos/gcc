@@ -1,3 +1,7 @@
+* Thu Nov 15 2018 Niels Breet <niels.breet@jolla.com> - 4.9.4
+- Upgrade to Linaro 4.9 2017.01
+- Fixes MER#1985
+
 * Fri Nov 18 2016 Niels Breet <niels.breet@jolla.com> - 4.8.3-2
 - Fixes for aarch64. MER#1703
 - Upgrade to Linaro 4.8 2014.04
