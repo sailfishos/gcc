@@ -101,7 +101,7 @@ ExclusiveArch: %ix86 x86_64
 %global _performance_build 1
 %global include_gappletviewer 0
 %global build_cloog 1
-%global build_libstdcxx_docs 0
+%global build_libstdcxx_doc 0
 %global multilib_64_archs %{nil}
 %ifarch x86_64
 %global multilib_32_arch i686
@@ -163,7 +163,7 @@ BuildRequires: glibc-devel >= 2.4.90-13
 BuildRequires: elfutils-devel >= 0.72
 BuildRequires: libstdc++-devel
 
-%if %{build_libstdcxx_docs}
+%if %{build_libstdcxx_doc}
 BuildRequires: doxygen
 BuildRequires: graphviz
 %endif
@@ -182,8 +182,6 @@ Requires: binutils >= 2.25
 Requires: glibc64bit-helper
 %endif
 
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
 Obsoletes: gcc < %{version}-%{release}
 Obsoletes: gcc43
 AutoReq: true
@@ -223,6 +221,16 @@ Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 %description
 The gcc package contains the GNU Compiler Collection version 4.9.
 You'll need this package in order to compile C code.
+
+%package doc
+Summary:   Documentation for %{name}
+Group:     Documentation
+Requires:  %{name} = %{version}-%{release}
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
+
+%description doc
+Man and info pages for %{name}.
 
 %package -n libgcc
 Summary: GCC version 4.9 shared support library
@@ -288,14 +296,15 @@ Autoreq: true
 %description -n libstdc++-static
 Static libraries for the GNU standard C++ library.
 
-%package -n libstdc++-docs
+%package -n libstdc++-doc
 Summary: Documentation for the GNU standard C++ library
 Group: Development/Libraries
-Obsoletes: libstdc++-docs < %{version}-%{release}
+Requires:  libstdc++ = %{name}-%{release}
+Obsoletes: libstdc++-docs
 Obsoletes: libstdc++43-doc
 Autoreq: true
 
-%description -n libstdc++-docs
+%description -n libstdc++-doc
 Manual, doxygen generated API information and Frequently Asked Questions
 for the GNU standard C++ library.
 
@@ -348,6 +357,16 @@ Obsoletes: libgomp43
 This package contains GCC shared support library which is needed
 for OpenMP v3.0 support.
 
+%package -n libgomp-doc
+Summary:   Documentation for %{name}
+Group:     Documentation
+Requires:  libgomp = %{version}-%{release}
+Requires(post): /sbin/install-info
+Requires(postun): /sbin/install-info
+
+%description -n libgomp-doc
+Info pages for libgomp.
+
 %package -n libquadmath
 Summary: GCC __float128 shared support library
 Group: System Environment/Libraries
@@ -377,6 +396,16 @@ Requires: libquadmath-devel = %{version}-%{release}
 This package contains static libraries for building Fortran programs
 using REAL*16 and programs using __float128 math.
 
+%package -n libquadmath-doc
+Summary:   Documentation for %{name}
+Group:     Documentation
+Requires:  libquadmath = %{version}-%{release}
+Requires(post): /sbin/install-info
+Requires(postun): /sbin/install-info
+
+%description -n libquadmath-doc
+Info pages for %{name}.
+
 %package -n libitm
 Summary: The GNU Transactional Memory library
 Group: System Environment/Libraries
@@ -404,6 +433,16 @@ Requires: libitm-devel = %{version}-%{release}
 
 %description -n libitm-static
 This package contains GNU Transactional Memory static libraries.
+
+%package -n libitm-doc
+Summary:   Documentation for %{name}
+Group:     Documentation
+Requires:  libitm = %{version}-%{release}
+Requires(post): /sbin/install-info
+Requires(postun): /sbin/install-info
+
+%description -n libitm-doc
+Info pages for %{name}.
 
 %package -n libatomic
 Summary: The GNU Atomic library
@@ -545,7 +584,7 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 %patch9 -p0 -b .cloog-dl2~
 %endif
 %patch10 -p0 -b .pr38757~
-%if %{build_libstdcxx_docs}
+%if %{build_libstdcxx_doc}
 %patch11 -p0 -b .libstdc++-docs~
 %endif
 %patch12 -p0 -b .no-add-needed~
@@ -808,7 +847,7 @@ make -C gcc generated-manpages
 for i in ../gcc/doc/*.texi; do mv -f $i.orig $i; done
 
 # Make generated doxygen pages.
-%if %{build_libstdcxx_docs}
+%if %{build_libstdcxx_doc}
 cd %{gcc_target_platform}/libstdc++-v3
 make doc-html-doxygen
 make doc-man-doxygen
@@ -943,7 +982,7 @@ done
 # shipping this for everybody is unnecessary.
 rm -rf %{buildroot}%{_prefix}/include/c++/%{gcc_version}/%{gcc_target_platform}/bits/*.h.gch
 
-%if %{build_libstdcxx_docs}
+%if %{build_libstdcxx_doc}
 libstdcxx_doc_builddir=%{gcc_target_platform}/libstdc++-v3/doc/doxygen
 mkdir -p ../rpm.doc/libstdc++-v3
 cp -r -p ../libstdc++-v3/doc/html ../rpm.doc/libstdc++-v3/html
@@ -1144,6 +1183,33 @@ set +x
 # cross
 %endif
 
+mkdir -p %{buildroot}%{_docdir}/%{name}-%{version}/{,cp,objc,libobjc}
+install -m0644 -t %{buildroot}%{_docdir}/%{name}-%{version} \
+        gcc/README* rpm.doc/changelogs/gcc/ChangeLog*
+install -m0644 -t %{buildroot}%{_docdir}/%{name}-%{version}/cp \
+        rpm.doc/changelogs/gcc/cp/ChangeLog*
+install -m0644 -t %{buildroot}%{_docdir}/%{name}-%{version}/objc \
+        rpm.doc/objc/*
+install -m0644 -t %{buildroot}%{_docdir}/%{name}-%{version}/libobjc \
+        libobjc/THREADS* rpm.doc/changelogs/libobjc/ChangeLog*
+
+mkdir -p %{buildroot}%{_docdir}/libstdc++-%{version}
+install -m0644 -t %{buildroot}%{_docdir}/libstdc++-%{version} \
+         rpm.doc/changelogs/libstdc++-v3/ChangeLog* libstdc++-v3/README*
+%if %{build_libstdcxx_doc}
+mv rpm.doc/libstdc++-v3/html %{buildroot}%{_docdir}/libstdc++-%{version}/html
+%endif
+
+mkdir -p %{buildroot}%{_docdir}/libgomp-%{version}
+install -m0644 -t %{buildroot}%{_docdir}/libgomp-%{version} \
+        rpm.doc/changelogs/libgomp/ChangeLog*
+
+%if %{build_libquadmath}
+mkdir -p %{buildroot}%{_docdir}/libquadmath-%{version}
+install -m0644 -t %{buildroot}%{_docdir}/libquadmath-%{version} \
+        rpm.doc/libquadmath/ChangeLog*
+%endif
+
 %if !%{crossbuild}
 # checking and split packaging for native ...
 # native
@@ -1170,28 +1236,27 @@ rm -rf testlogs-%{_target_platform}-%{version}-%{release}
 %clean
 rm -rf %{buildroot}
 
-%post
-[ -e %{_infodir}/gcc.info.gz ] && /sbin/install-info \
-  --info-dir=%{_infodir} %{_infodir}/gcc.info.gz || :
+# Don't add %post -p /sbin/ldconfig here, see comment below
 
 %postun -p /sbin/ldconfig
 
-%preun
-if [ $1 = 0 ]; then
-  [ -e %{_infodir}/gcc.info.gz ] && /sbin/install-info --delete \
-    --info-dir=%{_infodir} %{_infodir}/gcc.info.gz || :
-fi
-
-%post -n cpp
+%post doc
+[ -e %{_infodir}/gcc.info.gz ] && /sbin/install-info \
+  --info-dir=%{_infodir} %{_infodir}/gcc.info.gz || :
 [ -e %{_infodir}/cpp.info.gz ] && /sbin/install-info \
   --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
 
-%preun -n cpp
+%preun doc
 if [ $1 = 0 ]; then
+  [ -e %{_infodir}/gcc.info.gz ] && /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/gcc.info.gz || :
   [ -e %{_infodir}/cpp.info.gz ] && /sbin/install-info --delete \
     --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
 fi
 
+# Because glibc Prereq's libgcc and /sbin/ldconfig
+# comes from glibc, it might not exist yet when
+# libgcc is installed
 %post -n libgcc -p <lua>
 if posix.access ("/sbin/ldconfig", "x") then
   local pid = posix.fork ()
@@ -1220,31 +1285,45 @@ end
 
 %postun -n libobjc -p /sbin/ldconfig
 
-%post -n libgomp
-/sbin/ldconfig
+%post -n libgomp -p /sbin/ldconfig
+
+%postun -n libgomp -p /sbin/ldconfig
+
+%post -n libgomp-doc
 [ -e %{_infodir}/libgomp.info.gz ] && /sbin/install-info \
   --info-dir=%{_infodir} %{_infodir}/libgomp.info.gz || :
 
-%preun -n libgomp
+%preun -n libgomp-doc
 if [ $1 = 0 ]; then
   [ -e %{_infodir}/libgomp.info.gz ] && /sbin/install-info --delete \
     --info-dir=%{_infodir} %{_infodir}/libgomp.info.gz || :
 fi
 
-%postun -n libgomp -p /sbin/ldconfig
-
-%post -n libquadmath
-/sbin/ldconfig
+%post -n libquadmath-doc
 if [ -f %{_infodir}/libquadmath.info.gz ]; then
   /sbin/install-info \
     --info-dir=%{_infodir} %{_infodir}/libquadmath.info.gz || :
 fi
 
-%preun -n libquadmath
+%preun -n libquadmath-doc
 if [ $1 = 0 -a -f %{_infodir}/libquadmath.info.gz ]; then
   /sbin/install-info --delete \
     --info-dir=%{_infodir} %{_infodir}/libquadmath.info.gz || :
 fi
+
+%post -n libitm-doc
+if [ -f %{_infodir}/libitm.info.gz ]; then
+  /sbin/install-info \
+    --info-dir=%{_infodir} %{_infodir}/libitm.info.gz || :
+fi
+
+%preun -n libitm-doc
+if [ $1 = 0 -a -f %{_infodir}/libitm.info.gz ]; then
+  /sbin/install-info --delete \
+    --info-dir=%{_infodir} %{_infodir}/libitm.info.gz || :
+fi
+
+%post -n libquadmath -p /sbin/ldconfig
 
 %postun -n libquadmath -p /sbin/ldconfig
 
@@ -1277,10 +1356,6 @@ fi
 %{_prefix}/bin/%{gcc_target_platform}-gcc-nm
 %{_prefix}/bin/%{gcc_target_platform}-gcc-ranlib
 %endif
-%{_mandir}/man1/gcc.1*
-%{_mandir}/man1/gcov.1*
-%{_mandir}/man7/*
-%{_infodir}/gcc*
 %dir %{_prefix}/lib/gcc
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
@@ -1416,14 +1491,23 @@ fi
 %endif
 %dir %{_prefix}/libexec/getconf
 %{_prefix}/libexec/getconf/default
-%doc gcc/README* rpm.doc/changelogs/gcc/ChangeLog* gcc/COPYING*
+%license gcc/COPYING*
+
+%files doc
+%defattr(-,root,root,-)
+%{_docdir}/%{name}-%{version}
+%{_mandir}/man1/cpp.1*
+%{_mandir}/man1/gcc.1*
+%{_mandir}/man1/gcov.1*
+%{_mandir}/man1/g++.1*
+%{_mandir}/man7/*
+%{_infodir}/cpp*
+%{_infodir}/gcc*
 
 %files -n cpp -f cpplib.lang
 %defattr(-,root,root,-)
 /lib/cpp
 %{_prefix}/bin/cpp
-%{_mandir}/man1/cpp.1*
-%{_infodir}/cpp*
 %dir %{_prefix}/libexec/gcc
 %dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
 %dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
@@ -1434,7 +1518,7 @@ fi
 /%{_lib}/libgcc_s-%{gcc_version}.so.1
 /%{_lib}/libgcc_s.*
 /%{_libdir}/libgcc_s.*
-%doc gcc/COPYING.LIB
+%license gcc/COPYING.LIB
 
 # For ARM port
 %ifarch %{arm} aarch64 mipsel
@@ -1448,7 +1532,6 @@ fi
 %endif
 %{_prefix}/bin/g++
 %{_prefix}/bin/c++
-%{_mandir}/man1/g++.1*
 %dir %{_prefix}/lib/gcc
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
@@ -1466,7 +1549,6 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.so
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libsupc++.a
 %endif
-%doc rpm.doc/changelogs/gcc/cp/ChangeLog*
 
 %files -n libstdc++
 %defattr(-,root,root,-)
@@ -1494,7 +1576,6 @@ fi
 %ifnarch  %{multilib_64_archs}
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.so
 %endif
-%doc rpm.doc/changelogs/libstdc++-v3/ChangeLog* libstdc++-v3/README*
 
 %files -n libstdc++-static
 %defattr(-,root,root,-)
@@ -1504,11 +1585,11 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.a
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libsupc++.a
 
-%if %{build_libstdcxx_docs}
-%files -n libstdc++-docs
+%if %{build_libstdcxx_doc}
+%files -n libstdc++-doc
 %defattr(-,root,root)
 %{_mandir}/man3/*
-%doc rpm.doc/libstdc++-v3/html
+%{_docdir}/libstdc++-%{version}
 %endif
 
 %files objc
@@ -1530,8 +1611,6 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libobjc.a
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/32/libobjc.so
 %endif
-%doc rpm.doc/objc/*
-%doc libobjc/THREADS* rpm.doc/changelogs/libobjc/ChangeLog*
 
 %files objc++
 %defattr(-,root,root,-)
@@ -1547,8 +1626,11 @@ fi
 %files -n libgomp
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libgomp.*
+
+%files -n libgomp-doc
+%defattr(-,root,root,-)
+%{_docdir}/libgomp-%{version}
 %{_infodir}/libgomp.info*
-%doc rpm.doc/changelogs/libgomp/ChangeLog*
 
 %if %{build_64bit_multilib}
 %files -n gcc-multilib
@@ -1567,8 +1649,7 @@ fi
 %files -n libquadmath
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libquadmath.so.0*
-%{_infodir}/libquadmath.info*
-%doc rpm.doc/libquadmath/COPYING*
+%license rpm.doc/libquadmath/COPYING*
 
 %files -n libquadmath-devel
 %defattr(-,root,root,-)
@@ -1580,7 +1661,6 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/quadmath.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/quadmath_weak.h
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libquadmath.so
-%doc rpm.doc/libquadmath/ChangeLog*
 
 %files -n libquadmath-static
 %defattr(-,root,root,-)
@@ -1588,14 +1668,17 @@ fi
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libquadmath.a
-%endif
 
+%files -n libquadmath-doc
+%defattr(-,root,root,-)
+%{_docdir}/libquadmath-%{version}
+%{_infodir}/libquadmath.info*
+%endif
 
 %if %{build_libitm}
 %files -n libitm
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libitm.so.1*
-%{_infodir}/libitm.info*
 
 %files -n libitm-devel
 %defattr(-,root,root,-)
@@ -1607,7 +1690,6 @@ fi
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include
 #%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/itm.h
 #%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/include/itm_weak.h
-##%doc rpm.doc/libitm/ChangeLog*
 
 %files -n libitm-static
 %defattr(-,root,root,-)
@@ -1615,6 +1697,10 @@ fi
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.a
+
+%files -n libitm-doc
+%defattr(-,root,root,-)
+%{_infodir}/libitm.info*
 %endif
 
 %if %{build_libatomic}
@@ -1691,4 +1777,3 @@ fi
 # /\/\/\
 # cross
 %endif
-
