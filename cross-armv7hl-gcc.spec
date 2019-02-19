@@ -1090,7 +1090,7 @@ ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libq
 
 # Strip debug info from Fortran/ObjC/Java static libraries
 strip -g `find . \( -name libobjc.a -o -name libgomp.a \
-		    -o -name libgcc.a -o -name libgcov.a -name libquadmath.a \) -a -type f`
+		    -o -name libgcc.a -o -name libgcov.a -o -name libquadmath.a \) -a -type f`
 popd
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgomp.so.1.*
 %if %{build_libquadmath}
