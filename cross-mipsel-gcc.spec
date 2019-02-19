@@ -190,9 +190,7 @@ AutoReq: true
 %endif
 
 Patch0: gcc49-hack.patch
-#Patch1: gcc48-java-nomulti.patch
 Patch3: gcc49-rh330771.patch
-#Patch4: gcc48-i386-libgomp.patch
 Patch6: gcc49-libgomp-omp_h-multilib.patch
 Patch7: gcc49-libtool-no-rpath.patch
 Patch8: gcc49-cloog-dl.patch
@@ -204,11 +202,6 @@ Patch17: gcc49-pr64336.patch
 
 Patch20: gcc48-x86_64-nolib64.patch
 
-#Patch42: gcc46-libiberty-conftest.patch
-#Patch44: gcc-hash-style-gnu.diff
-#Patch45: gcc46-MIPS-boehm-gc-stack-qemu.patch
-
-#Patch50: fix-stable-debugtypes.patch
 Patch51: use-lib-for-aarch64.patch
 
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
