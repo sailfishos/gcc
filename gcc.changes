@@ -1,3 +1,6 @@
+* Wed Fed 20 2019 Tomi Leppänen <tomi.leppanen@jolla.com> - 4.9.4-3
+- Don't build documentation for cross packages. JB#24119
+
 * Wed Feb 20 2019 Matti Kosola <matti.kosola@jolla.com> - 4.9.4-2
 - Fix proper dependency for libstdc++-doc. JB#24119
 
