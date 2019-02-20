@@ -292,7 +292,7 @@ Static libraries for the GNU standard C++ library.
 %package -n libstdc++-doc
 Summary: Documentation for the GNU standard C++ library
 Group: Development/Libraries
-Requires:  libstdc++ = %{name}-%{release}
+Requires:  libstdc++ = %{version}-%{release}
 Obsoletes: libstdc++-docs
 Obsoletes: libstdc++43-doc
 Autoreq: true

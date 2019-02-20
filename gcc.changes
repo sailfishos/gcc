@@ -1,3 +1,6 @@
+* Wed Feb 20 2019 Matti Kosola <matti.kosola@jolla.com> - 4.9.4-2
+- Fix proper dependency for libstdc++-doc. JB#24119
+
 * Thu Nov 15 2018 Niels Breet <niels.breet@jolla.com> - 4.9.4
 - Upgrade to Linaro 4.9 2017.01
 - Fixes MER#1985
