@@ -216,6 +216,7 @@ Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 The gcc package contains the GNU Compiler Collection version 4.9.
 You'll need this package in order to compile C code.
 
+%if !%{crossbuild}
 %package doc
 Summary:   Documentation for %{name}
 Group:     Documentation
@@ -225,6 +226,7 @@ Requires(preun): /sbin/install-info
 
 %description doc
 Man and info pages for %{name}.
+%endif # !crossbuild
 
 %package -n libgcc
 Summary: GCC version 4.9 shared support library
@@ -290,6 +292,7 @@ Autoreq: true
 %description -n libstdc++-static
 Static libraries for the GNU standard C++ library.
 
+%if !%{crossbuild}
 %package -n libstdc++-doc
 Summary: Documentation for the GNU standard C++ library
 Group: Development/Libraries
@@ -301,6 +304,7 @@ Autoreq: true
 %description -n libstdc++-doc
 Manual, doxygen generated API information and Frequently Asked Questions
 for the GNU standard C++ library.
+%endif # !crossbuild
 
 %package objc
 Summary: Objective-C support for GCC
@@ -351,6 +355,7 @@ Obsoletes: libgomp43
 This package contains GCC shared support library which is needed
 for OpenMP v3.0 support.
 
+%if !%{crossbuild}
 %package -n libgomp-doc
 Summary:   Documentation for %{name}
 Group:     Documentation
@@ -360,6 +365,7 @@ Requires(postun): /sbin/install-info
 
 %description -n libgomp-doc
 Info pages for libgomp.
+%endif # !crossbuild
 
 %package -n libquadmath
 Summary: GCC __float128 shared support library
@@ -390,6 +396,7 @@ Requires: libquadmath-devel = %{version}-%{release}
 This package contains static libraries for building Fortran programs
 using REAL*16 and programs using __float128 math.
 
+%if !%{crossbuild}
 %package -n libquadmath-doc
 Summary:   Documentation for %{name}
 Group:     Documentation
@@ -399,6 +406,7 @@ Requires(postun): /sbin/install-info
 
 %description -n libquadmath-doc
 Info pages for %{name}.
+%endif # !crossbuild
 
 %package -n libitm
 Summary: The GNU Transactional Memory library
@@ -428,6 +436,7 @@ Requires: libitm-devel = %{version}-%{release}
 %description -n libitm-static
 This package contains GNU Transactional Memory static libraries.
 
+%if !%{crossbuild}
 %package -n libitm-doc
 Summary:   Documentation for %{name}
 Group:     Documentation
@@ -437,6 +446,7 @@ Requires(postun): /sbin/install-info
 
 %description -n libitm-doc
 Info pages for %{name}.
+%endif # !crossbuild
 
 %package -n libatomic
 Summary: The GNU Atomic library
@@ -1177,6 +1187,7 @@ set +x
 # cross
 %endif
 
+%if !%{crossbuild}
 mkdir -p %{buildroot}%{_docdir}/%{name}-%{version}/{,cp,objc,libobjc}
 install -m0644 -t %{buildroot}%{_docdir}/%{name}-%{version} \
         gcc/README* rpm.doc/changelogs/gcc/ChangeLog*
@@ -1203,6 +1214,7 @@ mkdir -p %{buildroot}%{_docdir}/libquadmath-%{version}
 install -m0644 -t %{buildroot}%{_docdir}/libquadmath-%{version} \
         rpm.doc/libquadmath/ChangeLog*
 %endif
+%endif # !crossbuild
 
 %if !%{crossbuild}
 # checking and split packaging for native ...
@@ -1234,6 +1246,7 @@ rm -rf %{buildroot}
 
 %postun -p /sbin/ldconfig
 
+%if !%{crossbuild}
 %post doc
 [ -e %{_infodir}/gcc.info.gz ] && /sbin/install-info \
   --info-dir=%{_infodir} %{_infodir}/gcc.info.gz || :
@@ -1247,6 +1260,7 @@ if [ $1 = 0 ]; then
   [ -e %{_infodir}/cpp.info.gz ] && /sbin/install-info --delete \
     --info-dir=%{_infodir} %{_infodir}/cpp.info.gz || :
 fi
+%endif # !crossbuild
 
 # Because glibc Prereq's libgcc and /sbin/ldconfig
 # comes from glibc, it might not exist yet when
@@ -1283,6 +1297,7 @@ end
 
 %postun -n libgomp -p /sbin/ldconfig
 
+%if !%{crossbuild}
 %post -n libgomp-doc
 [ -e %{_infodir}/libgomp.info.gz ] && /sbin/install-info \
   --info-dir=%{_infodir} %{_infodir}/libgomp.info.gz || :
@@ -1316,6 +1331,7 @@ if [ $1 = 0 -a -f %{_infodir}/libitm.info.gz ]; then
   /sbin/install-info --delete \
     --info-dir=%{_infodir} %{_infodir}/libitm.info.gz || :
 fi
+%endif # !crossbuild
 
 %post -n libquadmath -p /sbin/ldconfig
 
@@ -1487,6 +1503,7 @@ fi
 %{_prefix}/libexec/getconf/default
 %license gcc/COPYING*
 
+%if !%{crossbuild}
 %files doc
 %defattr(-,root,root,-)
 %{_docdir}/%{name}-%{version}
@@ -1497,6 +1514,7 @@ fi
 %{_mandir}/man7/*
 %{_infodir}/cpp*
 %{_infodir}/gcc*
+%endif # !crossbuild
 
 %files -n cpp -f cpplib.lang
 %defattr(-,root,root,-)
@@ -1579,12 +1597,14 @@ fi
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.a
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libsupc++.a
 
+%if !%{crossbuild}
 %if %{build_libstdcxx_doc}
 %files -n libstdc++-doc
 %defattr(-,root,root)
 %{_mandir}/man3/*
 %{_docdir}/libstdc++-%{version}
 %endif
+%endif # !crossbuild
 
 %files objc
 %defattr(-,root,root,-)
@@ -1621,10 +1641,12 @@ fi
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libgomp.*
 
+%if !%{crossbuild}
 %files -n libgomp-doc
 %defattr(-,root,root,-)
 %{_docdir}/libgomp-%{version}
 %{_infodir}/libgomp.info*
+%endif # !crossbuild
 
 %if %{build_64bit_multilib}
 %files -n gcc-multilib
@@ -1663,10 +1685,12 @@ fi
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libquadmath.a
 
+%if !%{crossbuild}
 %files -n libquadmath-doc
 %defattr(-,root,root,-)
 %{_docdir}/libquadmath-%{version}
 %{_infodir}/libquadmath.info*
+%endif # !crossbuild
 %endif
 
 %if %{build_libitm}
@@ -1692,9 +1716,11 @@ fi
 %dir %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.a
 
+%if !%{crossbuild}
 %files -n libitm-doc
 %defattr(-,root,root,-)
 %{_infodir}/libitm.info*
+%endif # !crossbuild
 %endif
 
 %if %{build_libatomic}
