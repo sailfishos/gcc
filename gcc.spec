@@ -798,7 +798,10 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--enable-checking=release \
         --disable-fixed-point \
 	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
-	--enable-gnu-unique-object --enable-lto \
+	--enable-gnu-unique-object \
+%if !%{crossbuild}
+        --enable-lto \
+%endif
 	--enable-linker-build-id \
 %if %{bootstrap} == 0
 	--enable-languages=c,c++,objc,obj-c++ \
@@ -1177,10 +1180,6 @@ ln -sf %{cross_gcc_target_platform}-gcc %{buildroot}%{_prefix}/bin/%{cross_gcc_t
 set -x
 rm -rRf %buildroot/%{_prefix}/lib/libiberty.a
 rm -rRf %buildroot/%{_prefix}/share
-mkdir  -p %{buildroot}%{_prefix}/lib/bfd-plugins
-ln -s %{_prefix}/libexec/gcc/%{cross_gcc_target_platform}/%{gcc_version}/liblto_plugin.so %{buildroot}%{_prefix}/lib/bfd-plugins/
-mkdir  -p %{buildroot}/usr/lib/bfd-plugins
-ln -s %{_prefix}/libexec/gcc/%{cross_gcc_target_platform}/%{gcc_version}/liblto_plugin.so %{buildroot}/usr/lib/bfd-plugins/
 set +x
 # /\/\/\
 # cross
@@ -1375,9 +1374,11 @@ fi
 
 # Shouldn't include all files under this fold, split to diff pkgs
 #%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/*
+%if !%{crossbuild}
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/lto1
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/lto-wrapper
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/liblto_plugin.so*
+%endif
 
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/collect2
 
@@ -1791,8 +1792,6 @@ fi
 %files
 %defattr(-,root,root,-)
 %{_prefix}
-%dir /usr/lib/bfd-plugins
-/usr/lib/bfd-plugins/liblto_plugin.so
 # /\/\/\
 # cross
 %endif
