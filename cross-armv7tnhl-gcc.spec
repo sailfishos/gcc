@@ -203,6 +203,7 @@ Patch17: gcc49-pr64336.patch
 Patch20: gcc48-x86_64-nolib64.patch
 
 Patch51: use-lib-for-aarch64.patch
+Patch52: gcc49-glibc227.patch
 
 Patch9999: gcc44-ARM-boehm-gc-stack-qemu.patch
 
@@ -603,6 +604,7 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 
 #%patch50 -p1
 %patch51 -p1
+%patch52 -p1
 
 # This testcase doesn't compile.
 rm libjava/testsuite/libjava.lang/PR35020*

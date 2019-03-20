@@ -1,3 +1,6 @@
+* Wed Mar 20 2019 Niels Breet <niels.breet@jolla.com> - 4.9.4-5
+- Fix build issue with glibc 2.27. Contributes to JB#45152
+
 * Mon Feb 25 2019 Niels Breet <niels.breet@jolla.com> - 4.9.4-4
 - Disable lto for cross build for now. Fixes JB#44936
 
