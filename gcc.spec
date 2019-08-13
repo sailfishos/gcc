@@ -154,6 +154,7 @@ Source100: gcc-rpmlintrc
 Source200: baselibs.conf
 Source300: precheckin.sh
 Source301: aaa_README.PACKAGER
+Source400: po.m4
 
 BuildRequires: binutils >= 2.25
 BuildRequires: glibc-static
@@ -629,6 +630,8 @@ perl -pi -e 's/^check: check-recursive/ifeq (\$(MULTISUBDIR),)\ncheck: check-rec
 ./contrib/gcc_update --touch
 
 LC_ALL=C sed -i -e 's/\xa0/ /' gcc/doc/options.texi
+
+cp %{SOURCE400} config/
 
 %build
 

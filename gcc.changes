@@ -1,3 +1,7 @@
+* Tue Aug 13 2019 Niels Breet <niels.breet@jolla.com> - 4.9.4-6
+- Update po.m4 to support newer gettext
+- Contributes JB#46697
+
 * Wed Mar 20 2019 Niels Breet <niels.breet@jolla.com> - 4.9.4-5
 - Fix build issue with glibc 2.27. Contributes to JB#45152
 
