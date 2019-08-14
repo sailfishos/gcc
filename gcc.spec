@@ -647,6 +647,7 @@ ISL_FLAG_PIC=-fPIC
 ISL_FLAG_PIC=-fpic
 %endif
 cd isl-build
+sed -i 's/\#\! \/bin\/sh/\#\! \/bin\/sh\nset \-x/g' ../../isl-%{isl_version}/configure
 ../../isl-%{isl_version}/configure --disable-shared \
   CC=/usr/bin/gcc CXX=/usr/bin/g++ \
   CFLAGS="${CFLAGS:-%optflags} $ISL_FLAG_PIC" --prefix=`cd ..; pwd`/isl-install
@@ -663,6 +664,7 @@ static void __attribute__((used)) *s2 = (void *) isl_map_dump;
 EOF
 sed -i 's|libcloog|libgcc49privatecloog|g' \
   ../../cloog-%{cloog_version}/{,test/}Makefile.{am,in}
+sed -i 's/\#\! \/bin\/sh/\#\! \/bin\/sh\nset \-x/g' ../../cloog-%{cloog_version}/configure
 isl_prefix=`cd ../isl-install; pwd` \
 ../../cloog-%{cloog_version}/configure --with-isl=system \
   --with-isl-prefix=`cd ../isl-install; pwd` \
