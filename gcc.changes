@@ -1,3 +1,6 @@
+* Thu Aug 15 2019 Aapi Hämäläinen <aapi.hamalainen@jolla.com> - 4.9.4-6
+- Add a build dependency on libgomp. Contributes to JB#46697
+
 * Wed Mar 20 2019 Niels Breet <niels.breet@jolla.com> - 4.9.4-5
 - Fix build issue with glibc 2.27. Contributes to JB#45152
 

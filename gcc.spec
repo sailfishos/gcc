@@ -162,6 +162,7 @@ BuildRequires: mpc-devel
 BuildRequires: glibc-devel >= 2.4.90-13
 BuildRequires: elfutils-devel >= 0.72
 BuildRequires: libstdc++-devel
+BuildRequires: libgomp
 
 %if %{build_libstdcxx_doc}
 BuildRequires: doxygen
