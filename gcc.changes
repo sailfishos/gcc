@@ -1,3 +1,6 @@
+* Thu Aug 20 2019 Niels Breet <niels.breet@jolla.com> - 8.3.0
+- Upgrade to ARM gcc 8.3-2019.03. Fixes JB#46923
+
 * Thu Aug 15 2019 Aapi Hämäläinen <aapi.hamalainen@jolla.com> - 4.9.4-6
 - Add a build dependency on libgomp. Contributes to JB#46697
 
