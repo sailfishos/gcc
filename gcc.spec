@@ -838,7 +838,7 @@ TARGET_PLATFORM=%{cross_gcc_target_platform}
 make -C %{cross_gcc_target_platform}/libstdc++-v3
 %endif
 
-make prefix=%{buildroot}%{_prefix} mandir=%{buildroot}%{_mandir} \
+make prefix=%{buildroot}%{_prefix} mandir=%{buildroot}%{_mandir} libdir=%{buildroot}%{_libdir} \
   install
 
 %if !%{crossbuild}
