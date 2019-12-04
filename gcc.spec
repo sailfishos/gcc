@@ -584,7 +584,7 @@ cd isl-build
   CC=/usr/bin/gcc CXX=/usr/bin/g++ \
   CFLAGS="${CFLAGS:-%optflags} $ISL_FLAG_PIC" --prefix=`cd ..; pwd`/isl-install
 make %{?_smp_mflags}
-make install
+make %{?_smp_mflags} install
 cd ..
 %endif
 
@@ -757,7 +757,7 @@ perl -pi -e 's/head3/head2/' ../contrib/texi2pod.pl
 for i in ../gcc/doc/*.texi; do
   cp -a $i $i.orig; sed 's/ftable/table/' $i.orig > $i
 done
-make -C gcc generated-manpages
+make %{?_smp_mflags} -C gcc generated-manpages
 for i in ../gcc/doc/*.texi; do mv -f $i.orig $i; done
 
 # Make generated doxygen pages.
@@ -825,7 +825,7 @@ cd obj-%{gcc_target_platform}
 # native
 TARGET_PLATFORM=%{gcc_target_platform}
 # There are some MP bugs in libstdc++ Makefiles
-make -C %{gcc_target_platform}/libstdc++-v3
+make %{?_smp_mflags} -C %{gcc_target_platform}/libstdc++-v3
 %else
 # cross build
 export PATH=/opt/cross/bin:$PATH
@@ -835,10 +835,10 @@ export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s#\-march=.*##g"`
 echo "$OPT_FLAGS"
 TARGET_PLATFORM=%{cross_gcc_target_platform}
 # There are some MP bugs in libstdc++ Makefiles
-make -C %{cross_gcc_target_platform}/libstdc++-v3
+make %{?_smp_mflags} -C %{cross_gcc_target_platform}/libstdc++-v3
 %endif
 
-make prefix=%{buildroot}%{_prefix} mandir=%{buildroot}%{_mandir} libdir=%{buildroot}%{_libdir} \
+make %{?_smp_mflags} prefix=%{buildroot}%{_prefix} mandir=%{buildroot}%{_mandir} libdir=%{buildroot}%{_libdir} \
   install
 
 %if !%{crossbuild}
