@@ -686,6 +686,8 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--disable-sjlj-exceptions \
         --enable-gold \
         --with-plugin-ld=gold \
+%endif
+%ifarch aarch64
         --libdir=/usr/lib64 \
 %endif
 %ifarch %{ix86} x86_64
