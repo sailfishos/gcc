@@ -1324,6 +1324,9 @@ set +x
 # native
 # \/\/\/
 
+# Clean up info dir
+rm -rf %{buildroot}%{_datadir}info/dir
+
 # Help plugins find out nvra.
 echo gcc-%{version}-%{release}.%{_arch} > $FULLPATH/rpmver
 
@@ -1406,6 +1409,10 @@ end
 %post -n libubsan -p /sbin/ldconfig
 
 %postun -n libubsan -p /sbin/ldconfig
+
+%post -n libtsan -p /sbin/ldconfig
+
+%postun -n libtsan -p /sbin/ldconfig
 
 %post -n liblsan -p /sbin/ldconfig
 
@@ -1709,6 +1716,8 @@ end
 %{_mandir}/man1/cpp.1*
 %{_mandir}/man1/gcc.1*
 %{_mandir}/man1/gcov.1*
+%{_mandir}/man1/gcov-tool.1*
+%{_mandir}/man1/gcov-dump.1*
 %{_mandir}/man1/g++.1*
 %{_mandir}/man7/*
 %endif # !crossbuild
@@ -1762,6 +1771,7 @@ end
 %dir %{_datadir}/gdb/auto-load/%{_prefix}
 %dir %{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
 %{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/libstdc*gdb.py*
+%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/__pycache__
 %dir %{_prefix}/share/gcc-%{gcc_version}
 %{_prefix}/share/gcc-%{gcc_version}/python
 %{_prefix}/share/gcc-%{gcc_version}/python/libstdcxx
