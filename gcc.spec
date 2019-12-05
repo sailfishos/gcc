@@ -305,40 +305,6 @@ Manual, doxygen generated API information and Frequently Asked Questions
 for the GNU standard C++ library.
 %endif # !crossbuild
 
-%package objc
-Summary: Objective-C support for GCC
-Group: Development/Languages
-Requires: gcc = %{version}-%{release}
-Requires: libobjc = %{version}-%{release}
-Obsoletes: gcc-objc < %{version}-%{release}
-Autoreq: true
-
-%description objc
-gcc-objc provides Objective-C support for the GCC.
-Mainly used on systems running NeXTSTEP, Objective-C is an
-object-oriented derivative of the C language.
-
-%package objc++
-Summary: Objective-C++ support for GCC
-Group: Development/Languages
-Requires: gcc-c++ = %{version}-%{release}, gcc-objc = %{version}-%{release}
-Obsoletes: gcc-objc++ < %{version}-%{release}
-Autoreq: true
-
-%description objc++
-gcc-objc++ package provides Objective-C++ support for the GCC.
-
-%package -n libobjc
-Summary: Objective-C runtime
-Group: System Environment/Libraries
-Obsoletes: libobjc < %{version}-%{release}
-Autoreq: true
-
-%description -n libobjc
-This package contains Objective-C shared library which is needed to run
-Objective-C dynamically linked programs.
-
-
 %package -n libgomp
 Summary: GCC OpenMP v4.5 shared support library
 Group: System Environment/Libraries
@@ -717,7 +683,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--enable-linker-build-id \
 	--disable-libmpx \
 %if %{bootstrap} == 0
-	--enable-languages=c,c++,objc,obj-c++,lto \
+	--enable-languages=c,c++,lto \
 	--enable-threads=posix \
 	--enable-shared \
 %endif
@@ -1382,10 +1348,6 @@ end
 
 %postun -n libstdc++ -p /sbin/ldconfig
 
-%post -n libobjc -p /sbin/ldconfig
-
-%postun -n libobjc -p /sbin/ldconfig
-
 %post -n libgomp -p /sbin/ldconfig
 
 %postun -n libgomp -p /sbin/ldconfig
@@ -1807,42 +1769,6 @@ end
 %{_docdir}/libstdc++-%{version}
 %endif
 %endif # !crossbuild
-
-%if %{build_objc}
-%files objc
-%dir %{_prefix}/%{_lib}/gcc
-%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
-%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}
-%dir %{_prefix}/libexec/gcc
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_major}
-%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/include
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/include/objc
-%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_major}/cc1obj
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/libobjc.a
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/libobjc.so
-%ifarch sparcv9 ppc
-%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/64
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/64/libobjc.a
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/64/libobjc.so
-%endif
-%ifarch %{multilib_64_archs}
-%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/32
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/32/libobjc.a
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_major}/32/libobjc.so
-%endif
-%doc rpm.doc/objc/*
-%doc libobjc/THREADS* rpm.doc/changelogs/libobjc/ChangeLog*
-
-%files objc++
-%dir %{_prefix}/libexec/gcc
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
-%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_major}
-%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_major}/cc1objplus
-
-%files -n libobjc
-%{_prefix}/%{_lib}/libobjc.so.4*
-%endif
 
 %files -n libgomp
 %defattr(-,root,root,-)
