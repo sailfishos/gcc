@@ -1733,7 +1733,6 @@ end
 %dir %{_datadir}/gdb/auto-load/%{_prefix}
 %dir %{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
 %{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/libstdc*gdb.py*
-%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/__pycache__
 %dir %{_prefix}/share/gcc-%{gcc_version}
 %{_prefix}/share/gcc-%{gcc_version}/python
 %{_prefix}/share/gcc-%{gcc_version}/python/libstdcxx
