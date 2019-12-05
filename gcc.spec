@@ -715,6 +715,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--enable-gnu-unique-object \
         --enable-lto \
 	--enable-linker-build-id \
+	--disable-libmpx \
 %if %{bootstrap} == 0
 	--enable-languages=c,c++,objc,obj-c++,lto \
 	--enable-threads=posix \
@@ -1660,13 +1661,8 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libquadmath.so
 %endif
 %if %{build_libitm}
-%ifarch aarch64
-%{_prefix}/lib64/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.a
-%{_prefix}/lib64/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.so
-else
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.a
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.so
-%endif
 %endif
 %if %{build_libatomic}
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libatomic.a
