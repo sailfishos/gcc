@@ -914,7 +914,7 @@ chmod 755 %{buildroot}/%{_lib}/libgcc_s-%{gcc_version}.so.1
 ln -sf libgcc_s-%{gcc_version}.so.1 %{buildroot}/%{_lib}/libgcc_s.so.1
 #ln -sf /%{_lib}/libgcc_s.so.1 %{buildroot}/%{_libdir}/libgcc_s.so
 
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64p7 ppc64le %{arm}
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64p7 ppc64le %{arm} aarch64
 rm -f $FULLPATH/libgcc_s.so
 echo '/* GNU ld script
    Use the shared library, but some functions are only in
@@ -963,7 +963,7 @@ mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++*gdb.py* \
       %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
 
 pushd $FULLPATH
-if [ "%{_lib}" = "lib" ]; then
+if [ "%{_lib}" = "lib" ]  || [ "%{_lib}" = "lib64" ]; then
 %if %{build_objc}
 ln -sf ../../../libobjc.so.4 libobjc.so
 %endif
