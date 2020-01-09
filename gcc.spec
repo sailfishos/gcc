@@ -879,8 +879,8 @@ find ../rpm.doc/libstdc++-v3 -name \*~ | xargs rm
 %endif
 
 #Debug
-#set -x
-#find %{buildroot}%{_prefix}/
+set -x
+find %{buildroot}%{_prefix}/
 
 FULLLSUBDIR=
 %ifarch sparcv9 ppc
