@@ -1,3 +1,6 @@
+* Fri Jan 10 2020 Niels Breet <niels.breet@jolla.com> - 8.3.0-2
+- aarch64 fixes. Contributes JB#47986
+
 * Thu Aug 20 2019 Niels Breet <niels.breet@jolla.com> - 8.3.0
 - Upgrade to ARM gcc 8.3-2019.03. Fixes JB#46923
 
