@@ -1,0 +1,11 @@
+--- gcc/config.gcc-orig	2020-01-13 13:13:06.995350047 +0200
++++ gcc/config.gcc	2020-01-13 13:43:58.682641320 +0200
+@@ -3852,7 +3852,7 @@
+ 		  fpu=`awk -f ${srcdir}/config/arm/parsecpu.awk \
+ 			-v cmd="chkfpu $with_fpu" \
+ 			${srcdir}/config/arm/arm-cpus.in`
+-		  if [ "$fpu" = "error"]
++		  if [ "$fpu" = "error" ];
+ 		  then
+ 		    echo "Unknown target in --with-$which=$val" 1>&2
+ 		    exit 1

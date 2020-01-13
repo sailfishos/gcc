@@ -1,3 +1,6 @@
+* Thu Jan 23 2020 Niels Breet <niels.breet@jolla.com> - 8.3.0-3
+- Tune armv7hl optimizations. Contributes to JB#48210 
+
 * Fri Jan 10 2020 Niels Breet <niels.breet@jolla.com> - 8.3.0-2
 - aarch64 fixes. Contributes JB#47986
 

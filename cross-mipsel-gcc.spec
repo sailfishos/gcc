@@ -65,7 +65,7 @@ BuildRequires: %{cross_deps}
 %define crossextraconfig --with-fpu=vfpv3-d16 --with-arch=armv7-a
 %endif
 %if "%{crossarch}" == "armv7hl"
-%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
+%define crossextraconfig --with-float=hard --with-fpu=neon-vfpv4 --with-arch=armv7-a+neon-vfpv4 --with-mode=thumb --with-tune=cortex-a15 --with-abi=aapcs-linux
 %endif
 %if "%{crossarch}" == "armv7nhl"
 %define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a
@@ -74,7 +74,7 @@ BuildRequires: %{cross_deps}
 %define crossextraconfig --with-float=hard --with-fpu=vfpv3-d16 --with-arch=armv7-a --with-mode=thumb
 %endif
 %if "%{crossarch}" == "armv7tnhl"
-%define crossextraconfig --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
+%define crossextraconfig --with-float=hard --with-fpu=neon-vfpv4 --with-arch=armv7-a+neon-vfpv4 --with-mode=thumb --with-tune=cortex-a15 --with-abi=aapcs-linux
 %endif
 %if "%{crossarch}" == "mipsel"
 %define crossextraconfig --disable-fixed-point --disable-ssp --disable-libstdcxx-pch --with-arch=mips32
@@ -97,7 +97,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 %global gcc_version 8.3.0
-%global gcc_release 2
+%global gcc_release 3
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
 %global build_ada 0
@@ -179,6 +179,7 @@ Patch10: gcc8-Wno-format-security.patch
 #Enabling CET blows up on x86 atm, if we really want this then we need to debug the glibc/binutils etc issues.
 #Patch12: gcc8-mcet.patch
 Patch13: libcc1.patch
+Patch14: gcc8-syntax-fix.patch
 
 BuildRequires: binutils >= 2.31
 BuildRequires: glibc-static
@@ -512,6 +513,7 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 %ifarch aarch64
 %patch13 -p0
 %endif
+%patch14 -p0
 
 echo 'Sailfish OS gcc %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
@@ -576,7 +578,7 @@ esac
 # export OPT_FLAGS="$OPT_FLAGS --param ggc-min-expand=0 --param ggc-min-heapsize=65536" 
 %endif
 
-%ifarch %arm aarch64
+%ifarch %{arm} aarch64
 
 %define ARM_EXTRA_CONFIGURE ""
 # for armv7hl reset the gcc specs
@@ -587,7 +589,7 @@ esac
 %define ARM_EXTRA_CONFIGURE --with-fpu=vfpv3-d16 --with-arch=armv7-a
 %endif
 %ifarch armv7hl
-%define ARM_EXTRA_CONFIGURE --with-float=hard --with-fpu=neon --with-mode=thumb --with-arch=armv7-a
+%define ARM_EXTRA_CONFIGURE --with-float=hard --with-fpu=neon-vfpv4 --with-arch=armv7-a+neon-vfpv4 --with-mode=thumb --with-tune=cortex-a15 --with-abi=aapcs-linux
 %endif
 # for armv7nhl reset the gcc specs
 %ifarch armv7nhl
@@ -599,7 +601,7 @@ esac
 %endif
 # for armv7tnhl reset the gcc specs
 %ifarch armv7tnhl
-%define ARM_EXTRA_CONFIGURE --with-float=hard --with-fpu=neon --with-arch=armv7-a --with-mode=thumb
+%define ARM_EXTRA_CONFIGURE --with-float=hard --with-fpu=neon-vfpv4 --with-arch=armv7-a+neon-vfpv4 --with-mode=thumb --with-tune=cortex-a15 --with-abi=aapcs-linux
 %endif
 # aarch64
 %ifarch aarch64
@@ -616,6 +618,12 @@ export PATH=/opt/cross/bin:$PATH
 # strip all after -march . no arch specific options in cross-compiler build .
 # -march=core2 -mssse3 -mtune=atom -mfpmath=sse -fasynchronous-unwi
 export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s#\-march=.*##g" | sed -e 's#\-mtune=.*##g`
+%endif
+
+%ifarch %{arm}
+# Experiment: Enable tree vectorize using neon
+# Fast math is tricky ;)
+export OPT_FLAGS="$OPT_FLAGS -ftree-vectorize -ffast-math"
 %endif
 
 CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
