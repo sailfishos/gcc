@@ -1,3 +1,6 @@
+* Tue Jan 28 2020 Niels Breet <niels.breet@jolla.com> - 8.3.0-3
+- Remove stray .la files in cross gcc. Contributes JB#48690
+
 * Fri Jan 10 2020 Niels Breet <niels.breet@jolla.com> - 8.3.0-2
 - aarch64 fixes. Contributes JB#47986
 
