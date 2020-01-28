@@ -97,7 +97,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 %global gcc_version 8.3.0
-%global gcc_release 2
+%global gcc_release 3
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
 %global build_ada 0
@@ -1252,6 +1252,8 @@ ln -sf %{cross_gcc_target_platform}-gcc %{buildroot}%{_prefix}/bin/%{cross_gcc_t
 set -x
 rm -rRf %buildroot/%{_prefix}/lib/libiberty.a
 rm -rRf %buildroot/%{_prefix}/share
+find %{buildroot} -name \*.la | xargs rm -f
+rm -rRf %buildroot/%{_prefix}/lib/libcc1*
 set +x
 # /\/\/\
 # cross
