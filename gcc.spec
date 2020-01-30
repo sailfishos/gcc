@@ -561,6 +561,7 @@ OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-m64//g;s/-m32//g;s/-m31//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/ -pipe / /g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=format-security/-Wformat-security/g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Wl,-z,defs -Wl,-z,now -Wl,-z,relro//g'`
+OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=implicit-function-declaration//g'`
 %ifarch %{ix86}
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-march=i.86//g'`
 %endif
