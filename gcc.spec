@@ -563,6 +563,7 @@ OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=format-security//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Wl,-z,defs -Wl,-z,now -Wl,-z,relro//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=implicit-function-declaration//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-grecord-gcc-switches//g'`
+OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-strong//g'`
 %ifarch %{ix86}
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-march=i.86//g'`
 %endif
