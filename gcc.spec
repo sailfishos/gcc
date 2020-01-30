@@ -560,10 +560,6 @@ OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/\(-Wp,\)\?-D_GLIBCXX_ASSERTIONS//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-m64//g;s/-m32//g;s/-m31//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/ -pipe / /g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=format-security//g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Wl,-z,defs -Wl,-z,now -Wl,-z,relro//g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=implicit-function-declaration//g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-grecord-gcc-switches//g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-strong//g'`
 %ifarch %{ix86}
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-march=i.86//g'`
 %endif
@@ -613,7 +609,7 @@ esac
 %endif
 
 #export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s/-O2/-O2 -fkeep-inline-functions/g"`
-export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s/-fstack-protector//g"`
+export OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e "s/-fstack-protector-strong//g"`
 
 %if %{crossbuild}
 # cross build
