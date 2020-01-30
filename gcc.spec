@@ -558,14 +558,14 @@ CC=gcc
 OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-m64//g;s/-m32//g;s/-m31//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/ -pipe / /g'`
+OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=format-security/-Wformat-security/g'`
 %ifarch %{ix86}
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-march=i.86//g'`
 %endif
 OPT_FLAGS=`echo $OPT_FLAGS| sed -e 's/[[:blank:]]\+/ /g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=format-security/-Wformat-security/g'`
 case "$OPT_FLAGS" in
   *-fasynchronous-unwind-tables*)
-    sed -i -e 's/-fno-exceptions /-fno-exceptions -fno-asynchronous-unwind-tables/' \
+    sed -i -e 's/-fno-exceptions /-fno-exceptions -fno-asynchronous-unwind-tables /' \
       ../libgcc/Makefile.in
     ;;
 esac
