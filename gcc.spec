@@ -566,7 +566,7 @@ OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=format-security/-Wformat-security/g
 case "$OPT_FLAGS" in
   *-fasynchronous-unwind-tables*)
     sed -i -e 's/-fno-exceptions /-fno-exceptions -fno-asynchronous-unwind-tables/' \
-      libgcc/Makefile.in
+      ../libgcc/Makefile.in
     ;;
 esac
 
