@@ -538,28 +538,12 @@ rm -fr obj-%{gcc_target_platform}
 mkdir obj-%{gcc_target_platform}
 cd obj-%{gcc_target_platform}
 
-%if %{build_isl}
-mkdir isl-build isl-install
-%ifarch s390 s390x
-ISL_FLAG_PIC=-fPIC
-%else
-ISL_FLAG_PIC=-fpic
-%endif
-cd isl-build
-../../../isl/configure --disable-shared \
-  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
-  CFLAGS="${CFLAGS:-%optflags} $ISL_FLAG_PIC" --prefix=`cd ..; pwd`/isl-install
-make %{?_smp_mflags}
-make %{?_smp_mflags} install
-cd ..
-%endif
-
-CC=gcc
 OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/\(-Wp,\)\?-D_GLIBCXX_ASSERTIONS//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-m64//g;s/-m32//g;s/-m31//g'`
 #OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/ -pipe / /g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=format-security//g'`
+OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=implicit-function-declaration//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Wl,-z,defs -Wl,-z,now -Wl,-z,relro//g'`
 %ifarch %{ix86}
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-march=i.86//g'`
@@ -571,6 +555,25 @@ case "$OPT_FLAGS" in
       ../libgcc/Makefile.in
     ;;
 esac
+
+
+%if %{build_isl}
+mkdir isl-build isl-install
+%ifarch s390 s390x
+ISL_FLAG_PIC=-fPIC
+%else
+ISL_FLAG_PIC=-fpic
+%endif
+cd isl-build
+../../../isl/configure --disable-shared \
+  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
+  CFLAGS="${CFLAGS:-%OPT_FLAGS} $ISL_FLAG_PIC" --prefix=`cd ..; pwd`/isl-install
+make %{?_smp_mflags}
+make %{?_smp_mflags} install
+cd ..
+%endif
+
+CC=gcc
 
 %ifarch mipsel
 # Apply this in case you ever need to qemu bootstrap --cvm
