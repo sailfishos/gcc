@@ -968,7 +968,7 @@ mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++*gdb.py* \
       %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
 
 pushd $FULLPATH
-if [ "%{_lib}" = "lib" ]  || [ "%{_lib}" = "lib64" ]; then
+if [ "%{_lib}" = "lib" ]; then
 %if %{build_objc}
 ln -sf ../../../libobjc.so.4 libobjc.so
 %endif
