@@ -10,6 +10,11 @@ Name: gcc
 %endif
 %endif
 
+%ifarch aarch64
+%define _libdir /usr/lib64
+%define _lib lib64
+%endif
+
 # crossbuild / accelerator section
 # \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 %define crossbuild 0
