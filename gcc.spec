@@ -135,7 +135,7 @@ ExclusiveArch: %ix86 x86_64
 %else
 %global build_libasan 0
 %endif
-%ifarch x86_64 ppc64 ppc64le
+%ifarch x86_64 ppc64 ppc64le aarch64
 %global build_liblsan 1
 %else
 %global build_liblsan 0
