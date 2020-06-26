@@ -101,7 +101,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 %global gcc_version 8.3.0
-%global gcc_release 3
+%global gcc_release 4
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
 %global build_ada 0
