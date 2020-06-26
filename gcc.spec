@@ -10,6 +10,11 @@ Name: gcc
 %endif
 %endif
 
+%ifarch aarch64
+%define _libdir /usr/lib64
+%define _lib lib64
+%endif
+
 # crossbuild / accelerator section
 # \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 %define crossbuild 0
@@ -96,7 +101,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 %global gcc_version 8.3.0
-%global gcc_release 3
+%global gcc_release 4
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
 %global build_ada 0
@@ -135,7 +140,7 @@ ExclusiveArch: %ix86 x86_64
 %else
 %global build_libasan 0
 %endif
-%ifarch x86_64 ppc64 ppc64le
+%ifarch x86_64 ppc64 ppc64le aarch64
 %global build_liblsan 1
 %else
 %global build_liblsan 0
@@ -486,7 +491,7 @@ This is one set of libraries which support 64bit multilib on top of
 Summary: Support for compiling GCC plugins
 Group: Development/Languages
 Requires: gcc = %{version}-%{release}
-Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
+Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, mpc-devel >= 0.8.1
 
 %description plugin-devel
 This package contains header files and other support files
@@ -963,7 +968,7 @@ mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++*gdb.py* \
       %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
 
 pushd $FULLPATH
-if [ "%{_lib}" = "lib" ]  || [ "%{_lib}" = "lib64" ]; then
+if [ "%{_lib}" = "lib" ]; then
 %if %{build_objc}
 ln -sf ../../../libobjc.so.4 libobjc.so
 %endif
