@@ -10,7 +10,7 @@ Name: gcc
 %endif
 %endif
 
-%ifarch aarch64
+%ifarch aarch64 x86_64
 %define _libdir /usr/lib64
 %define _lib lib64
 %endif
@@ -513,7 +513,7 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 # This is a patch which is put in place because libcc1 uses the current gcc
 # to determine the lib path. As we're changing behaviour for aarch64, this
 # temporary patch is needed.
-%ifarch aarch64
+%ifarch aarch64 x86_64
 %patch13 -p0
 %endif
 
@@ -658,7 +658,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
         --enable-gold \
         --with-plugin-ld=gold \
 %endif
-%ifarch aarch64
+%ifarch aarch64 x86_64
         --libdir=/usr/lib64 \
 %endif
 %ifarch %{ix86} x86_64
@@ -1560,7 +1560,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.a
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.so
 %if %{build_libitm}
-%ifarch aarch64
+%ifarch aarch64 x86_64
 %{_prefix}/lib64/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.spec
 %else
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.spec
