@@ -166,7 +166,6 @@ Release: 0.%{bootstrap}.%{gcc_release}
 Release: %{gcc_release}
 %endif
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
-Group: Development/Languages
 URL: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
 Source0: https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/srcrel/gcc-arm-src-snapshot-8.3-2019.03.tar.xz
 Source2: README.libgcjwebplugin.so
@@ -230,7 +229,6 @@ You'll need this package in order to compile C code.
 %if !%{crossbuild}
 %package doc
 Summary:   Documentation for %{name}
-Group:     Documentation
 Requires:  %{name} = %{version}-%{release}
 
 %description doc
@@ -239,7 +237,6 @@ Man and info pages for %{name}.
 
 %package -n libgcc
 Summary: GCC version 8.3 shared support library
-Group: System Environment/Libraries
 Obsoletes: libgcc < %{version}-%{release}
 Autoreq: false
 %if "%{version}" != "%{gcc_version}"
@@ -252,7 +249,6 @@ e.g. for exception handling support.
 
 %package c++
 Summary: C++ support for GCC
-Group: Development/Languages
 Requires: gcc = %{version}-%{release}
 Requires: libstdc++ = %{version}-%{release}
 Requires: libstdc++-devel = %{version}-%{release}
@@ -266,7 +262,6 @@ including templates and exception handling.
 
 %package -n libstdc++
 Summary: GNU Standard C++ Library
-Group: System Environment/Libraries
 Obsoletes: libstdc++ < %{version}-%{release}
 Obsoletes: libstdc++6 < %{version}-%{release}
 Autoreq: true
@@ -278,7 +273,6 @@ C++ Library.
 
 %package -n libstdc++-devel
 Summary: Header files and libraries for C++ development
-Group: Development/Libraries
 Requires: libstdc++ = %{version}-%{release}
 Obsoletes: libstdc++-devel < %{version}-%{release}
 Autoreq: true
@@ -290,7 +284,6 @@ development. This includes rewritten implementation of STL.
 
 %package -n libstdc++-static
 Summary: Static libraries for the GNU standard C++ library
-Group: Development/Libraries
 Requires: libstdc++-devel = %{version}-%{release}
 Autoreq: true
 
@@ -300,7 +293,6 @@ Static libraries for the GNU standard C++ library.
 %if !%{crossbuild}
 %package -n libstdc++-doc
 Summary: Documentation for the GNU standard C++ library
-Group: Development/Libraries
 Requires:  libstdc++ = %{version}-%{release}
 Obsoletes: libstdc++-docs
 Autoreq: true
@@ -312,7 +304,6 @@ for the GNU standard C++ library.
 
 %package -n libgomp
 Summary: GCC OpenMP v4.5 shared support library
-Group: System Environment/Libraries
 Obsoletes: libgomp < %{version}-%{release}
 
 %description -n libgomp
@@ -321,7 +312,6 @@ for OpenMP v3.0 support.
 
 %package -n libquadmath
 Summary: GCC __float128 shared support library
-Group: System Environment/Libraries
 
 %description -n libquadmath
 This package contains GCC shared support library which is needed
@@ -329,7 +319,6 @@ for __float128 math support and for Fortran REAL*16 support.
 
 %package -n libquadmath-devel
 Summary: GCC __float128 support
-Group: Development/Libraries
 Requires: libquadmath = %{version}-%{release}
 Requires: gcc = %{version}-%{release}
 
@@ -339,7 +328,6 @@ REAL*16 and programs using __float128 math.
 
 %package -n libquadmath-static
 Summary: Static libraries for __float128 support
-Group: Development/Libraries
 Requires: libquadmath-devel = %{version}-%{release}
 
 %description -n libquadmath-static
@@ -348,7 +336,6 @@ using REAL*16 and programs using __float128 math.
 
 %package -n libitm
 Summary: The GNU Transactional Memory library
-Group: System Environment/Libraries
 
 %description -n libitm
 This package contains the GNU Transactional Memory library
@@ -356,7 +343,6 @@ which is a GCC transactional memory support runtime library.
 
 %package -n libitm-devel
 Summary: The GNU Transactional Memory support
-Group: Development/Libraries
 Requires: libitm = %{version}-%{release}
 Requires: gcc = %{version}-%{release}
 
@@ -366,7 +352,6 @@ GNU Transactional Memory library.
 
 %package -n libitm-static
 Summary: The GNU Transactional Memory static library
-Group: Development/Libraries
 Requires: libitm-devel = %{version}-%{release}
 
 %description -n libitm-static
@@ -374,7 +359,6 @@ This package contains GNU Transactional Memory static libraries.
 
 %package -n libatomic
 Summary: The GNU Atomic library
-Group: System Environment/Libraries
 
 %description -n libatomic
 This package contains the GNU Atomic library
@@ -383,7 +367,6 @@ by hardware.
 
 %package -n libatomic-static
 Summary: The GNU Atomic static library
-Group: Development/Libraries
 Requires: libatomic = %{version}-%{release}
 
 %description -n libatomic-static
@@ -391,7 +374,6 @@ This package contains GNU Atomic static libraries.
 
 %package -n libasan
 Summary: The Address Sanitizer runtime library
-Group: System Environment/Libraries
 
 %description -n libasan
 This package contains the Address Sanitizer library
@@ -399,7 +381,6 @@ which is used for -fsanitize=address instrumented programs.
 
 %package -n libasan-static
 Summary: The Address Sanitizer static library
-Group: Development/Libraries
 Requires: libasan = %{version}-%{release}
 
 %description -n libasan-static
@@ -407,7 +388,6 @@ This package contains Address Sanitizer static runtime library.
 
 %package -n libtsan
 Summary: The Thread Sanitizer runtime library
-Group: System Environment/Libraries
 
 %description -n libtsan
 This package contains the Thread Sanitizer library
@@ -415,7 +395,6 @@ which is used for -fsanitize=thread instrumented programs.
 
 %package -n libtsan-static
 Summary: The Thread Sanitizer static library
-Group: Development/Libraries
 Requires: libtsan = %{version}-%{release}
 
 %description -n libtsan-static
@@ -451,7 +430,6 @@ This package contains Leak Sanitizer static runtime library.
 
 %package -n cpp
 Summary: The C Preprocessor
-Group: Development/Languages
 Requires: mpc
 Obsoletes: cpp < %{version}-%{release}
 Autoreq: true
@@ -480,7 +458,6 @@ macros.
 
 %package -n gcc-multilib
 Summary: for 64bit multilib support
-Group: System Environment/Libraries
 Autoreq: true
 
 %description -n gcc-multilib
@@ -489,7 +466,6 @@ This is one set of libraries which support 64bit multilib on top of
 
 %package plugin-devel
 Summary: Support for compiling GCC plugins
-Group: Development/Languages
 Requires: gcc = %{version}-%{release}
 Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, mpc-devel >= 0.8.1
 
@@ -1301,7 +1277,7 @@ set +x
 rm -rf %{buildroot}%{_datadir}info/dir
 
 # Help plugins find out nvra.
-echo gcc-%{version}-%{release}.%{_arch} > $FULLPATH/rpmver
+echo gcc-%{version}.%{_arch} > $FULLPATH/rpmver
 
 %check
 %if 0
