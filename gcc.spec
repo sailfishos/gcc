@@ -182,6 +182,8 @@ Patch10: gcc8-Wno-format-security.patch
 #Enabling CET blows up on x86 atm, if we really want this then we need to debug the glibc/binutils etc issues.
 #Patch12: gcc8-mcet.patch
 Patch13: libcc1.patch
+Patch14: gcc8-reproducible-builds.patch
+Patch15: gcc8-reproducible-builds-buildid-for-checksum.patch
 
 BuildRequires: binutils >= 2.31
 BuildRequires: glibc-static
@@ -492,6 +494,9 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 %ifarch aarch64 x86_64
 %patch13 -p0
 %endif
+
+%patch14 -p0 -b .reproducible-builds~
+%patch15 -p0 -b .reproducible-builds-buildid-for-checksum~
 
 echo 'Sailfish OS gcc %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
