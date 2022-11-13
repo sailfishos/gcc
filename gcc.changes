@@ -1,5 +1,10 @@
+* Sun Nov 13 2022 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 8.3.0-6
+- Add patches from OpenSUSE to make builds reproducible. JB#59303
+- Remove release version from rpmver file. JB#59303
+
 * Thu Jul 15 2021 Niels Breet <niels.breet@jolla.com> - 8.3.0-5
 - x86_64 fixes for libdir. JB#54766
+
 * Fri Jun 26 2020 Matti Kosola <matti.kosola@jolla.com> - 8.3.0-4
 - Aarch64 path fix. Contributes to JB#49681
 - Enable lsan for aarch64. Contributes to JB#49681
