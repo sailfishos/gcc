@@ -11,6 +11,11 @@ Name: cross-i486-gcc
 %endif
 %endif
 
+%ifarch aarch64 x86_64
+%define _libdir /usr/lib64
+%define _lib lib64
+%endif
+
 # crossbuild / accelerator section
 # \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 %define crossbuild 0
@@ -97,7 +102,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 %global gcc_version 8.3.0
-%global gcc_release 3
+%global gcc_release 7
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
 %global build_ada 0
@@ -136,7 +141,7 @@ ExclusiveArch: %ix86 x86_64
 %else
 %global build_libasan 0
 %endif
-%ifarch x86_64 ppc64 ppc64le
+%ifarch x86_64 ppc64 ppc64le aarch64
 %global build_liblsan 1
 %else
 %global build_liblsan 0
@@ -162,7 +167,6 @@ Release: 0.%{bootstrap}.%{gcc_release}
 Release: %{gcc_release}
 %endif
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
-Group: Development/Languages
 URL: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
 Source0: https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/srcrel/gcc-arm-src-snapshot-8.3-2019.03.tar.xz
 Source2: README.libgcjwebplugin.so
@@ -179,6 +183,8 @@ Patch10: gcc8-Wno-format-security.patch
 #Enabling CET blows up on x86 atm, if we really want this then we need to debug the glibc/binutils etc issues.
 #Patch12: gcc8-mcet.patch
 Patch13: libcc1.patch
+Patch14: gcc8-reproducible-builds.patch
+Patch15: gcc8-reproducible-builds-buildid-for-checksum.patch
 
 BuildRequires: binutils >= 2.31
 BuildRequires: glibc-static
@@ -226,7 +232,6 @@ You'll need this package in order to compile C code.
 %if !%{crossbuild}
 %package doc
 Summary:   Documentation for %{name}
-Group:     Documentation
 Requires:  %{name} = %{version}-%{release}
 
 %description doc
@@ -235,7 +240,6 @@ Man and info pages for %{name}.
 
 %package -n libgcc
 Summary: GCC version 8.3 shared support library
-Group: System Environment/Libraries
 Obsoletes: libgcc < %{version}-%{release}
 Autoreq: false
 %if "%{version}" != "%{gcc_version}"
@@ -248,7 +252,6 @@ e.g. for exception handling support.
 
 %package c++
 Summary: C++ support for GCC
-Group: Development/Languages
 Requires: gcc = %{version}-%{release}
 Requires: libstdc++ = %{version}-%{release}
 Requires: libstdc++-devel = %{version}-%{release}
@@ -262,7 +265,6 @@ including templates and exception handling.
 
 %package -n libstdc++
 Summary: GNU Standard C++ Library
-Group: System Environment/Libraries
 Obsoletes: libstdc++ < %{version}-%{release}
 Obsoletes: libstdc++6 < %{version}-%{release}
 Autoreq: true
@@ -274,7 +276,6 @@ C++ Library.
 
 %package -n libstdc++-devel
 Summary: Header files and libraries for C++ development
-Group: Development/Libraries
 Requires: libstdc++ = %{version}-%{release}
 Obsoletes: libstdc++-devel < %{version}-%{release}
 Autoreq: true
@@ -286,7 +287,6 @@ development. This includes rewritten implementation of STL.
 
 %package -n libstdc++-static
 Summary: Static libraries for the GNU standard C++ library
-Group: Development/Libraries
 Requires: libstdc++-devel = %{version}-%{release}
 Autoreq: true
 
@@ -296,7 +296,6 @@ Static libraries for the GNU standard C++ library.
 %if !%{crossbuild}
 %package -n libstdc++-doc
 Summary: Documentation for the GNU standard C++ library
-Group: Development/Libraries
 Requires:  libstdc++ = %{version}-%{release}
 Obsoletes: libstdc++-docs
 Autoreq: true
@@ -308,7 +307,6 @@ for the GNU standard C++ library.
 
 %package -n libgomp
 Summary: GCC OpenMP v4.5 shared support library
-Group: System Environment/Libraries
 Obsoletes: libgomp < %{version}-%{release}
 
 %description -n libgomp
@@ -317,7 +315,6 @@ for OpenMP v3.0 support.
 
 %package -n libquadmath
 Summary: GCC __float128 shared support library
-Group: System Environment/Libraries
 
 %description -n libquadmath
 This package contains GCC shared support library which is needed
@@ -325,7 +322,6 @@ for __float128 math support and for Fortran REAL*16 support.
 
 %package -n libquadmath-devel
 Summary: GCC __float128 support
-Group: Development/Libraries
 Requires: libquadmath = %{version}-%{release}
 Requires: gcc = %{version}-%{release}
 
@@ -335,7 +331,6 @@ REAL*16 and programs using __float128 math.
 
 %package -n libquadmath-static
 Summary: Static libraries for __float128 support
-Group: Development/Libraries
 Requires: libquadmath-devel = %{version}-%{release}
 
 %description -n libquadmath-static
@@ -344,7 +339,6 @@ using REAL*16 and programs using __float128 math.
 
 %package -n libitm
 Summary: The GNU Transactional Memory library
-Group: System Environment/Libraries
 
 %description -n libitm
 This package contains the GNU Transactional Memory library
@@ -352,7 +346,6 @@ which is a GCC transactional memory support runtime library.
 
 %package -n libitm-devel
 Summary: The GNU Transactional Memory support
-Group: Development/Libraries
 Requires: libitm = %{version}-%{release}
 Requires: gcc = %{version}-%{release}
 
@@ -362,7 +355,6 @@ GNU Transactional Memory library.
 
 %package -n libitm-static
 Summary: The GNU Transactional Memory static library
-Group: Development/Libraries
 Requires: libitm-devel = %{version}-%{release}
 
 %description -n libitm-static
@@ -370,7 +362,6 @@ This package contains GNU Transactional Memory static libraries.
 
 %package -n libatomic
 Summary: The GNU Atomic library
-Group: System Environment/Libraries
 
 %description -n libatomic
 This package contains the GNU Atomic library
@@ -379,7 +370,6 @@ by hardware.
 
 %package -n libatomic-static
 Summary: The GNU Atomic static library
-Group: Development/Libraries
 Requires: libatomic = %{version}-%{release}
 
 %description -n libatomic-static
@@ -387,7 +377,6 @@ This package contains GNU Atomic static libraries.
 
 %package -n libasan
 Summary: The Address Sanitizer runtime library
-Group: System Environment/Libraries
 
 %description -n libasan
 This package contains the Address Sanitizer library
@@ -395,7 +384,6 @@ which is used for -fsanitize=address instrumented programs.
 
 %package -n libasan-static
 Summary: The Address Sanitizer static library
-Group: Development/Libraries
 Requires: libasan = %{version}-%{release}
 
 %description -n libasan-static
@@ -403,7 +391,6 @@ This package contains Address Sanitizer static runtime library.
 
 %package -n libtsan
 Summary: The Thread Sanitizer runtime library
-Group: System Environment/Libraries
 
 %description -n libtsan
 This package contains the Thread Sanitizer library
@@ -411,7 +398,6 @@ which is used for -fsanitize=thread instrumented programs.
 
 %package -n libtsan-static
 Summary: The Thread Sanitizer static library
-Group: Development/Libraries
 Requires: libtsan = %{version}-%{release}
 
 %description -n libtsan-static
@@ -447,7 +433,6 @@ This package contains Leak Sanitizer static runtime library.
 
 %package -n cpp
 Summary: The C Preprocessor
-Group: Development/Languages
 Requires: mpc
 Obsoletes: cpp < %{version}-%{release}
 Autoreq: true
@@ -476,7 +461,6 @@ macros.
 
 %package -n gcc-multilib
 Summary: for 64bit multilib support
-Group: System Environment/Libraries
 Autoreq: true
 
 %description -n gcc-multilib
@@ -485,9 +469,8 @@ This is one set of libraries which support 64bit multilib on top of
 
 %package plugin-devel
 Summary: Support for compiling GCC plugins
-Group: Development/Languages
 Requires: gcc = %{version}-%{release}
-Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
+Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, mpc-devel >= 0.8.1
 
 %description plugin-devel
 This package contains header files and other support files
@@ -509,9 +492,12 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 # This is a patch which is put in place because libcc1 uses the current gcc
 # to determine the lib path. As we're changing behaviour for aarch64, this
 # temporary patch is needed.
-%ifarch aarch64
+%ifarch aarch64 x86_64
 %patch13 -p0
 %endif
+
+%patch14 -p0 -b .reproducible-builds~
+%patch15 -p0 -b .reproducible-builds-buildid-for-checksum~
 
 echo 'Sailfish OS gcc %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
@@ -654,7 +640,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
         --enable-gold \
         --with-plugin-ld=gold \
 %endif
-%ifarch aarch64
+%ifarch aarch64 x86_64
         --libdir=/usr/lib64 \
 %endif
 %ifarch %{ix86} x86_64
@@ -964,7 +950,7 @@ mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++*gdb.py* \
       %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
 
 pushd $FULLPATH
-if [ "%{_lib}" = "lib" ]  || [ "%{_lib}" = "lib64" ]; then
+if [ "%{_lib}" = "lib" ]; then
 %if %{build_objc}
 ln -sf ../../../libobjc.so.4 libobjc.so
 %endif
@@ -1297,7 +1283,7 @@ set +x
 rm -rf %{buildroot}%{_datadir}info/dir
 
 # Help plugins find out nvra.
-echo gcc-%{version}-%{release}.%{_arch} > $FULLPATH/rpmver
+echo gcc-%{version}.%{_arch} > $FULLPATH/rpmver
 
 %check
 %if 0
@@ -1556,7 +1542,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.a
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgomp.so
 %if %{build_libitm}
-%ifarch aarch64
+%ifarch aarch64 x86_64
 %{_prefix}/lib64/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.spec
 %else
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libitm.spec

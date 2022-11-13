@@ -1,3 +1,6 @@
+* Fri Nov 25 2022 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 8.3.0-7
+- Update cross spec files. JB#59303
+
 * Sun Nov 13 2022 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 8.3.0-6
 - Add patches from OpenSUSE to make builds reproducible. JB#59303
 - Remove release version from rpmver file. JB#59303
