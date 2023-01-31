@@ -188,6 +188,9 @@ Patch15: gcc8-reproducible-builds-buildid-for-checksum.patch
 Patch16: gcc8-copyscanf.patch
 Patch17: gcc8-backport-re-PR-rtl-optimization-90756-g-ICE-in-conve.patch
 Patch18: gcc8-backport-re-PR-middle-end-90139-ICE-in-emit_block_mo.patch
+Patch19: gcc8-backport-re-PR-sanitizer-92154-new-glibc-breaks-arm1.patch
+Patch20: gcc8-backport-re-PR-sanitizer-92154-new-glibc-breaks-arm2.patch
+Patch21: gcc8-sanitizer-Fix-asan-against-glibc-2.34-PR100114.patch
 
 BuildRequires: binutils >= 2.31
 BuildRequires: glibc-static
@@ -504,6 +507,9 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 %patch16 -p1 -b .copyscanf~
 %patch17 -p1 -b .convert_move~
 %patch18 -p1 -b .emit_block_move_hints~
+%patch19 -p1 -b .backport-re-PR-sanitizer-92154-new-glibc-breaks-arm1~
+%patch20 -p1 -b .backport-re-PR-sanitizer-92154-new-glibc-breaks-arm2~
+%patch21 -p1 -b .sanitizer-Fix-asan-against-glibc-2.34-PR100114~
 
 echo 'Sailfish OS gcc %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
