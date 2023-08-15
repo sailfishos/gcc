@@ -40,7 +40,7 @@ AutoReq: false
 # prefix for cross compiler
 %define _prefix /opt/cross
 # strip of 'foreign arch' symbols fails
-%define __strip /bin/true
+%define __strip %{_prefix}/bin/%{cross_gcc_target_platform}-strip
 # sysroot for cross-compiler
 %define crosssysroot %{_prefix}/%{cross_gcc_target_platform}/sys-root
 # flag
