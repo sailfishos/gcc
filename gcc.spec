@@ -184,6 +184,7 @@ Patch10: gcc8-Wno-format-security.patch
 Patch13: libcc1.patch
 Patch14: gcc8-reproducible-builds.patch
 Patch15: gcc8-reproducible-builds-buildid-for-checksum.patch
+Patch16: gcc8-copyscanf.patch
 
 BuildRequires: binutils >= 2.31
 BuildRequires: glibc-static
@@ -497,6 +498,7 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 
 %patch14 -p0 -b .reproducible-builds~
 %patch15 -p0 -b .reproducible-builds-buildid-for-checksum~
+%patch16 -p1 -b .copyscanf~
 
 echo 'Sailfish OS gcc %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
