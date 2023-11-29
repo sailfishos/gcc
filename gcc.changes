@@ -1,3 +1,7 @@
+* Tue Nov 28 2023 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 8.3.0-9
+- Fix ICE in emit_block_move_hints. (backport GCC-8). JB#61045
+- Fix ICE in convert_move. (backport GCC-8). JB#61045
+
 * Sun Sep 17 2023 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 8.3.0-8
 - Prefer bsl/bit/bif for copysignf. (backport GCC-8). JB#61045
 
