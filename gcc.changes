@@ -1,3 +1,6 @@
+* Thu Mar 7 2024 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 10.3.1
+- Upgrade to ARM gcc 10.3-2021.07. Fixes JB#60722
+
 * Tue Nov 28 2023 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 8.3.0-9
 - Fix ICE in emit_block_move_hints. (backport GCC-8). JB#61045
 - Fix ICE in convert_move. (backport GCC-8). JB#61045
