@@ -247,7 +247,8 @@ Man and info pages for %{name}.
 %package -n libgcc
 Summary: GCC version 8.3 shared support library
 Obsoletes: libgcc < %{version}-%{release}
-Autoreq: false
+# Enable Autoreq for glibc update
+#Autoreq: false
 %if "%{version}" != "%{gcc_version}"
 Provides: libgcc = %{gcc_provides}
 %endif
