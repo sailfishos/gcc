@@ -48,10 +48,10 @@ AutoReq: false
 %define crossbuild 1
 # macros in buildrequires is hard to expand for the scheduler (e.g. crossarch) which would make this easier.
 %if %{bootstrap} == 2
-%define cross_deps cross-%{crossarch}-glibc-headers cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
+%define cross_deps cross-%{crossarch}-glibc-headers cross-%{crossarch}-libxcrypt-devel cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
 %endif
 %if %{bootstrap} == 0
-%define cross_deps cross-%{crossarch}-glibc cross-%{crossarch}-glibc-devel cross-%{crossarch}-glibc-headers cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
+%define cross_deps cross-%{crossarch}-glibc cross-%{crossarch}-glibc-devel cross-%{crossarch}-libxcrypt cross-%{crossarch}-libxcrypt-devel cross-%{crossarch}-glibc-headers cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
 %endif
 %if %{bootstrap} == 1
 %define cross_deps cross-%{crossarch}-kernel-headers cross-%{crossarch}-binutils
@@ -101,8 +101,8 @@ ExclusiveArch: %ix86 x86_64
 # end crossbuild / accelerator section
 %endif
 
-%global gcc_version 8.3.0
-%global gcc_release 8
+%global gcc_version 10.3.1
+%global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
 %global build_ada 0
@@ -121,25 +121,15 @@ ExclusiveArch: %ix86 x86_64
 %else
 %global build_libquadmath 0
 %endif
-%ifarch %{ix86} x86_64 %{arm} alpha ppc ppc64 ppc64le ppc64p7 s390 s390x aarch64
-%global build_libitm 1
-%else
-%global build_libitm 0
-%endif
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64 %{mips}
-%global build_libatomic 1
-%else
-%global build_libatomic 0
-%endif
-%ifarch x86_64 ppc64 ppc64le
-%global build_libtsan 1
-%else
-%global build_libtsan 0
-%endif
 %ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64
 %global build_libasan 1
 %else
 %global build_libasan 0
+%endif
+%ifarch x86_64 ppc64 ppc64le aarch64
+%global build_libtsan 1
+%else
+%global build_libtsan 0
 %endif
 %ifarch x86_64 ppc64 ppc64le aarch64
 %global build_liblsan 1
@@ -150,6 +140,16 @@ ExclusiveArch: %ix86 x86_64
 %global build_libubsan 1
 %else
 %global build_libubsan 0
+%endif
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64 %{mips}
+%global build_libatomic 1
+%else
+%global build_libatomic 0
+%endif
+%ifarch %{ix86} x86_64 %{arm} alpha ppc ppc64 ppc64le ppc64p7 s390 s390x aarch64
+%global build_libitm 1
+%else
+%global build_libitm 0
 %endif
 %ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64 %{mips}
 %global attr_ifunc 1
@@ -167,27 +167,29 @@ Release: 0.%{bootstrap}.%{gcc_release}
 Release: %{gcc_release}
 %endif
 License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
-URL: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
-Source0: https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/srcrel/gcc-arm-src-snapshot-8.3-2019.03.tar.xz
-Source2: README.libgcjwebplugin.so
+URL: https://developer.arm.com/downloads/-/gnu-a
+Source0: https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/srcrel/gcc-arm-src-snapshot-10.3-2021.07.tar.xz
 Source3: gcc-rpmlintrc
 Source4: baselibs.conf
 Source5: precheckin.sh
 Source6: aaa_README.PACKAGER
-Patch0: gcc8-hack.patch
-Patch2: gcc8-i386-libgomp.patch
-Patch5: gcc8-libtool-no-rpath.patch
-Patch6: gcc8-isl-dl.patch
-Patch9: gcc8-foffload-default.patch
-Patch10: gcc8-Wno-format-security.patch
-#Enabling CET blows up on x86 atm, if we really want this then we need to debug the glibc/binutils etc issues.
-#Patch12: gcc8-mcet.patch
-Patch13: libcc1.patch
-Patch14: gcc8-reproducible-builds.patch
-Patch15: gcc8-reproducible-builds-buildid-for-checksum.patch
-Patch16: gcc8-copyscanf.patch
-Patch17: gcc8-backport-re-PR-rtl-optimization-90756-g-ICE-in-conve.patch
-Patch18: gcc8-backport-re-PR-middle-end-90139-ICE-in-emit_block_mo.patch
+Patch0: gcc10-hack.patch
+Patch1: gcc10-i386-libgomp.patch
+Patch3: gcc10-libgomp-omp_h-multilib.patch
+Patch4: gcc10-libtool-no-rpath.patch
+Patch5: gcc10-isl-dl.patch
+Patch6: gcc10-libstdc++-docs.patch
+Patch7: gcc10-no-add-needed.patch
+Patch8: gcc10-foffload-default.patch
+Patch9: gcc10-Wno-format-security.patch
+Patch10: gcc10-rh1574936.patch
+Patch11: gcc10-d-shared-libphobos.patch
+Patch12: gcc10-pr96383.patch
+Patch13: gcc10-pr96939.patch
+Patch14: gcc10-pr96939-2.patch
+Patch15: gcc10-pr96939-3.patch
+Patch16: gcc10-reproducible-builds.patch
+Patch17: gcc10-reproducible-builds-buildid-for-checksum.patch
 
 BuildRequires: binutils >= 2.31
 BuildRequires: glibc-static
@@ -197,6 +199,8 @@ BuildRequires: glibc-devel >= 2.4.90-13
 BuildRequires: elfutils-devel >= 0.147
 BuildRequires: libstdc++-devel
 BuildRequires: libgomp
+BuildRequires: libxcrypt-devel
+BuildRequires: libzstd-devel
 
 %if %{build_libstdcxx_doc}
 BuildRequires: doxygen
@@ -242,9 +246,9 @@ Man and info pages for %{name}.
 %endif # !crossbuild
 
 %package -n libgcc
-Summary: GCC version 8.3 shared support library
+Summary: GCC version 10.3 shared support library
 Obsoletes: libgcc < %{version}-%{release}
-Autoreq: false
+Autoreq: true
 %if "%{version}" != "%{gcc_version}"
 Provides: libgcc = %{gcc_provides}
 %endif
@@ -473,7 +477,7 @@ This is one set of libraries which support 64bit multilib on top of
 %package plugin-devel
 Summary: Support for compiling GCC plugins
 Requires: gcc = %{version}-%{release}
-Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, mpc-devel >= 0.8.1
+Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 3.1.0, libmpc-devel >= 0.8.1
 
 %description plugin-devel
 This package contains header files and other support files
@@ -481,45 +485,33 @@ for compiling GCC plugins.  The GCC plugin ABI is currently
 not stable, so plugins must be rebuilt any time GCC is updated.
 
 %prep
-%setup -q -n gcc-arm-src-snapshot-8.3-2019.03
+%setup -q -n gcc-arm-src-snapshot-10.3-2021.07
 %patch0 -p0 -b .hack~
-%patch2 -p0 -b .i386-libgomp~
-%patch5 -p0 -b .libtool-no-rpath~
+%patch1 -p0 -b .i386-libgomp~
+%patch3 -p0 -b .libgomp-omp_h-multilib~
+%patch4 -p0 -b .libtool-no-rpath~
 %if %{build_isl}
-%patch6 -p0 -b .isl-dl~
+%patch5 -p0 -b .isl-dl~
 %endif
-%patch9 -p0 -b .foffload-default~
-%patch10 -p0 -b .Wno-format-security~
-#%patch12 -p0 -b .mcet~
-
-# This is a patch which is put in place because libcc1 uses the current gcc
-# to determine the lib path. As we're changing behaviour for aarch64, this
-# temporary patch is needed.
-%ifarch aarch64 x86_64
-%patch13 -p0
+%if %{build_libstdcxx_doc}
+%patch6 -p0 -b .libstdc++-docs~
 %endif
+%patch7 -p0 -b .no-add-needed~
+%patch8 -p0 -b .foffload-default~
+%patch9 -p0 -b .Wno-format-security~
+%patch10 -p0 -b .rh1574936~
+%patch11 -p0 -b .d-shared-libphobos~
+%patch12 -p0 -b .pr96383~
+%patch13 -p0 -b .pr96939~
+%patch14 -p0 -b .pr96939-2~
+%patch15 -p0 -b .pr96939-3~
+%patch16 -p0 -b .reproducible-builds~
+%patch17 -p1 -b .reproducible-builds-buildid-for-checksum~
 
-%patch14 -p0 -b .reproducible-builds~
-%patch15 -p0 -b .reproducible-builds-buildid-for-checksum~
-%patch16 -p1 -b .copyscanf~
-%patch17 -p1 -b .convert_move~
-%patch18 -p1 -b .emit_block_move_hints~
 
 echo 'Sailfish OS gcc %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
-# Default to -gdwarf-4 rather than -gdwarf-2
-sed -i '/UInteger Var(dwarf_version)/s/Init(2)/Init(4)/' gcc/common.opt
-sed -i 's/\(may be either 2 or 3 or 4; the default version is \)2\./\14./' gcc/doc/invoke.texi
-
 cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
-
-# Hack to avoid building multilib libjava
-perl -pi -e 's/^all: all-redirect/ifeq (\$(MULTISUBDIR),)\nall: all-redirect\nelse\nall:\n\techo Multilib libjava build disabled\nendif/' libjava/Makefile.in
-perl -pi -e 's/^install: install-redirect/ifeq (\$(MULTISUBDIR),)\ninstall: install-redirect\nelse\ninstall:\n\techo Multilib libjava install disabled\nendif/' libjava/Makefile.in
-perl -pi -e 's/^check: check-redirect/ifeq (\$(MULTISUBDIR),)\ncheck: check-redirect\nelse\ncheck:\n\techo Multilib libjava check disabled\nendif/' libjava/Makefile.in
-perl -pi -e 's/^all: all-recursive/ifeq (\$(MULTISUBDIR),)\nall: all-recursive\nelse\nall:\n\techo Multilib libjava build disabled\nendif/' libjava/Makefile.in
-perl -pi -e 's/^install: install-recursive/ifeq (\$(MULTISUBDIR),)\ninstall: install-recursive\nelse\ninstall:\n\techo Multilib libjava install disabled\nendif/' libjava/Makefile.in
-perl -pi -e 's/^check: check-recursive/ifeq (\$(MULTISUBDIR),)\ncheck: check-recursive\nelse\ncheck:\n\techo Multilib libjava check disabled\nendif/' libjava/Makefile.in
 
 ./contrib/gcc_update --touch
 
@@ -740,8 +732,6 @@ for i in {gcc,gcc/cp,gcc/ada,gcc/jit,libstdc++-v3,libobjc,libgomp,libcc1,libatom
 	cp -p $i rpm.doc/changelogs/$i
 done
 
-sed -e 's,@VERSION@,%{gcc_version},' %{SOURCE2} > rpm.doc/README.libgcjwebplugin.so
-
 %if %{build_objc}
 (cd libobjc; for i in README*; do
 	cp -p $i ../rpm.doc/objc/$i.libobjc
@@ -779,7 +769,8 @@ rm -f rpm.doc/changelogs/gcc/ChangeLog.[1-9]
 find rpm.doc -name \*ChangeLog\* | xargs bzip2 -9
 
 %install
-rm -fr %{buildroot}
+rm -rf %{buildroot}
+mkdir -p %{buildroot}
 
 cd obj-%{gcc_target_platform}
 
@@ -905,7 +896,6 @@ mkdir -p %{buildroot}/%{_lib}
 mv -f %{buildroot}%{_prefix}/%{_lib}/libgcc_s.so.1 %{buildroot}/%{_lib}/libgcc_s-%{gcc_version}.so.1
 chmod 755 %{buildroot}/%{_lib}/libgcc_s-%{gcc_version}.so.1
 ln -sf libgcc_s-%{gcc_version}.so.1 %{buildroot}/%{_lib}/libgcc_s.so.1
-#ln -sf /%{_lib}/libgcc_s.so.1 %{buildroot}/%{_libdir}/libgcc_s.so
 
 %ifarch %{ix86} x86_64 ppc ppc64 ppc64p7 ppc64le %{arm} aarch64
 rm -f $FULLPATH/libgcc_s.so
@@ -963,14 +953,14 @@ ln -sf ../../../libobjc.so.4 libobjc.so
 ln -sf ../../../libstdc++.so.6.*[0-9] libstdc++.so
 ln -sf ../../../libgomp.so.1.* libgomp.so
 %if %{build_go}
-ln -sf ../../../libgo.so.14.* libgo.so
+ln -sf ../../../libgo.so.16.* libgo.so
 %endif
 %if %{build_libquadmath}
 ln -sf ../../../libquadmath.so.0.* libquadmath.so
 %endif
 %if %{build_d}
-ln -sf ../../../libgdruntime.so.76.* libgdruntime.so
-ln -sf ../../../libgphobos.so.76.* libgphobos.so
+ln -sf ../../../libgdruntime.so.1.* libgdruntime.so
+ln -sf ../../../libgphobos.so.1.* libgphobos.so
 %endif
 %if %{build_libitm}
 ln -sf ../../../libitm.so.1.* libitm.so
@@ -979,7 +969,7 @@ ln -sf ../../../libitm.so.1.* libitm.so
 ln -sf ../../../libatomic.so.1.* libatomic.so
 %endif
 %if %{build_libasan}
-ln -sf ../../../libasan.so.5.* libasan.so
+ln -sf ../../../libasan.so.6.* libasan.so
 mv ../../../libasan_preinit.o libasan_preinit.o
 %endif
 %if %{build_libubsan}
@@ -992,14 +982,14 @@ ln -sf ../../../../%{_lib}/libobjc.so.4 libobjc.so
 ln -sf ../../../../%{_lib}/libstdc++.so.6.*[0-9] libstdc++.so
 ln -sf ../../../../%{_lib}/libgomp.so.1.* libgomp.so
 %if %{build_go}
-ln -sf ../../../../%{_lib}/libgo.so.14.* libgo.so
+ln -sf ../../../../%{_lib}/libgo.so.16.* libgo.so
 %endif
 %if %{build_libquadmath}
 ln -sf ../../../../%{_lib}/libquadmath.so.0.* libquadmath.so
 %endif
 %if %{build_d}
-ln -sf ../../../../%{_lib}/libgdruntime.so.76.* libgdruntime.so
-ln -sf ../../../../%{_lib}/libgphobos.so.76.* libgphobos.so
+ln -sf ../../../../%{_lib}/libgdruntime.so.1.* libgdruntime.so
+ln -sf ../../../../%{_lib}/libgphobos.so.1.* libgphobos.so
 %endif
 %if %{build_libitm}
 ln -sf ../../../../%{_lib}/libitm.so.1.* libitm.so
@@ -1008,7 +998,7 @@ ln -sf ../../../../%{_lib}/libitm.so.1.* libitm.so
 ln -sf ../../../../%{_lib}/libatomic.so.1.* libatomic.so
 %endif
 %if %{build_libasan}
-ln -sf ../../../../%{_lib}/libasan.so.5.* libasan.so
+ln -sf ../../../../%{_lib}/libasan.so.6.* libasan.so
 mv ../../../../%{_lib}/libasan_preinit.o libasan_preinit.o
 %endif
 %if %{build_libubsan}
@@ -1075,7 +1065,9 @@ echo 'INPUT ( %{_prefix}/lib64/'`echo ../../../../lib64/libquadmath.so.0.* | sed
 echo 'INPUT ( %{_prefix}/lib/'`echo ../../../../lib64/libquadmath.so.0.* | sed 's,^.*libq,libq,'`' )' > 32/libquadmath.so
 %endif
 mv -f %{buildroot}%{_prefix}/lib/libsupc++.*a 32/
+%if %{build_objc}
 mv -f %{buildroot}%{_prefix}/lib/libobjc.*a 32/
+%endif
 mv -f %{buildroot}%{_prefix}/lib/libgomp.*a 32/
 ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libstdc++.a 32/libstdc++.a
 %if %{build_libquadmath}
@@ -1115,8 +1107,8 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/libcc1.so.0.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libquadmath.so.0.*
 %endif
 %if %{build_d}
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgdruntime.so.76.*
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgphobos.so.76.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgdruntime.so.1.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgphobos.so.1.*
 %endif
 %if %{build_libitm}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libitm.so.1.*
@@ -1125,7 +1117,7 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/libitm.so.1.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libatomic.so.1.*
 %endif
 %if %{build_libasan}
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libasan.so.5.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libasan.so.6.*
 %endif
 %if %{build_libubsan}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libubsan.so.1.*
@@ -1138,7 +1130,7 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/liblsan.so.0.*
 %endif
 %if %{build_go}
 # Avoid stripping these libraries and binaries.
-chmod 644 %{buildroot}%{_prefix}/%{_lib}/libgo.so.14.*
+chmod 644 %{buildroot}%{_prefix}/%{_lib}/libgo.so.16.*
 chmod 644 %{buildroot}%{_prefix}/bin/go.gcc
 chmod 644 %{buildroot}%{_prefix}/bin/gofmt.gcc
 chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cgo
@@ -1309,9 +1301,6 @@ tar cf - testlogs-%{_target_platform}-%{version}-%{release} | bzip2 -9c \
 rm -rf testlogs-%{_target_platform}-%{version}-%{release}
 %endif
 
-%clean
-rm -rf %{buildroot}
-
 # Don't add %post -p /sbin/ldconfig here, see comment below
 
 %postun -p /sbin/ldconfig
@@ -1387,6 +1376,7 @@ end
 %{_prefix}/bin/gcc-ar
 %{_prefix}/bin/gcc-nm
 %{_prefix}/bin/gcc-ranlib
+%{_prefix}/bin/lto-dump
 #%ifnarch %{arm} aarch64 mipsel
 #%{_prefix}/bin/%{gcc_target_platform}-gcc
 #%{_prefix}/bin/%{gcc_target_platform}-gcc-ar
@@ -1430,6 +1420,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/unwind.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/omp.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/openacc.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/acc_prof.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdint.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdint-gcc.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdalign.h
@@ -1513,6 +1504,13 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/pconfigintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/wbnoinvdintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/movdirintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/waitpkgintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/cldemoteintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512bf16vlintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512bf16intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/enqcmdintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512vp2intersectintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512vp2intersectvlintrin.h
 %endif
 
 # For ARM port
@@ -1525,11 +1523,14 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_acle.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_cmse.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_fp16.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_bf16.h
 %endif
 %ifarch aarch64
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_neon.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_acle.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_fp16.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_bf16.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_sve.h
 %endif
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/ssp.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/stdio.h
@@ -1676,6 +1677,7 @@ end
 %{_mandir}/man1/gcov-tool.1*
 %{_mandir}/man1/gcov-dump.1*
 %{_mandir}/man1/g++.1*
+%{_mandir}/man1/lto-dump.1*
 %{_mandir}/man7/*
 %endif # !crossbuild
 
@@ -1841,7 +1843,7 @@ end
 %if %{build_libasan}
 %files -n libasan
 %defattr(-,root,root,-)
-%{_prefix}/%{_lib}/libasan.so.5*
+%{_prefix}/%{_lib}/libasan.so.6*
 
 %files -n libasan-static
 %defattr(-,root,root,-)
