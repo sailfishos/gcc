@@ -1,0 +1,3 @@
+[submodule "upstream"]
+	path = upstream
+	url = https://gcc.gnu.org/git/gcc.git
