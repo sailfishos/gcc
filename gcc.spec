@@ -236,6 +236,7 @@ AutoReq: true
 %endif
 %global gcc_target_platform %{_target_platform}
 
+%if !%{crossbuild}
 %if %{build_go}
 # Avoid stripping these libraries and binaries.
 %global __os_install_post \
@@ -255,6 +256,7 @@ chmod 755 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_versio
 chmod 755 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/test2json \
 chmod 755 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/vet \
 %{nil}
+%endif
 %endif
 
 %description
