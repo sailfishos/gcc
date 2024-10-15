@@ -190,6 +190,7 @@ Patch14: gcc10-pr96939-2.patch
 Patch15: gcc10-pr96939-3.patch
 Patch16: gcc10-reproducible-builds.patch
 Patch17: gcc10-reproducible-builds-buildid-for-checksum.patch
+Patch18: gcc10-compiler-correct-condition-for-calling-memclrHasPoin.patch
 
 BuildRequires: binutils >= 2.31
 BuildRequires: glibc-static
@@ -569,6 +570,7 @@ not stable, so plugins must be rebuilt any time GCC is updated.
 %patch15 -p0 -b .pr96939-3~
 %patch16 -p0 -b .reproducible-builds~
 %patch17 -p1 -b .reproducible-builds-buildid-for-checksum~
+%patch18 -p1 -b .correct-condition-for-calling-memclrHasPointers~
 
 
 echo 'Sailfish OS gcc %{version}-%{gcc_release}' > gcc/DEV-PHASE
