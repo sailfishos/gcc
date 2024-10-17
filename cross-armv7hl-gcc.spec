@@ -1368,6 +1368,12 @@ rm -rf %{buildroot}%{_datadir}info/dir
 # Help plugins find out nvra.
 echo gcc-%{version}.%{_arch} > $FULLPATH/rpmver
 
+%if %{build_go}
+pushd %{buildroot}%{_bindir}
+ln -s go.gcc go
+popd
+%endif
+
 %check
 %if 0
 cd obj-%{gcc_target_platform}
@@ -1991,7 +1997,7 @@ end
 
 %if %{build_go}
 %files go
-%ghost %{_prefix}/bin/go
+%{_prefix}/bin/go
 %attr(755,root,root) %{_prefix}/bin/go.gcc
 %{_prefix}/bin/gccgo
 %ghost %{_prefix}/bin/gofmt
