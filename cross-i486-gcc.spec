@@ -237,29 +237,6 @@ AutoReq: true
 %endif
 %global gcc_target_platform %{_target_platform}
 
-%if !%{crossbuild}
-%if %{build_go}
-# Avoid stripping these libraries and binaries.
-%global __os_install_post \
-chmod 644 %{buildroot}%{_prefix}/%{_lib}/libgo.so.16.* \
-chmod 644 %{buildroot}%{_prefix}/bin/go.gcc \
-chmod 644 %{buildroot}%{_prefix}/bin/gofmt.gcc \
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cgo \
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/buildid \
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/test2json \
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/vet \
-%__os_install_post \
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgo.so.16.* \
-chmod 755 %{buildroot}%{_prefix}/bin/go.gcc \
-chmod 755 %{buildroot}%{_prefix}/bin/gofmt.gcc \
-chmod 755 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cgo \
-chmod 755 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/buildid \
-chmod 755 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/test2json \
-chmod 755 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/vet \
-%{nil}
-%endif
-%endif
-
 %description
 The gcc package contains the GNU Compiler Collection version 4.9.
 You'll need this package in order to compile C code.
@@ -1212,16 +1189,6 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/libtsan.so.0.*
 %endif
 %if %{build_liblsan}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/liblsan.so.0.*
-%endif
-%if %{build_go}
-# Avoid stripping these libraries and binaries.
-chmod 644 %{buildroot}%{_prefix}/%{_lib}/libgo.so.16.*
-chmod 644 %{buildroot}%{_prefix}/bin/go.gcc
-chmod 644 %{buildroot}%{_prefix}/bin/gofmt.gcc
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cgo
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/buildid
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/test2json
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/vet
 %endif
 %if %{build_objc}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libobjc.so.4.*
