@@ -1119,8 +1119,8 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/libcc1.so.0.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libquadmath.so.0.*
 %endif
 %if %{build_d}
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgdruntime.so.1.*
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgphobos.so.1.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgdruntime.so.4.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgphobos.so.4.*
 %endif
 %if %{build_libitm}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libitm.so.1.*
