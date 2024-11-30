@@ -93,7 +93,7 @@ ExclusiveArch: %ix86 x86_64
 %global _performance_build 1
 %global build_ada 0
 %global build_objc 0
-%global build_go 0
+%global build_go %{?_gcc_build_go}%{!?_gcc_build_go:1}
 %global build_d 0
 %global include_gappletviewer 0
 %global multilib_64_archs %{nil}
@@ -191,6 +191,10 @@ Requires: binutils >= 2.31
 %endif
 
 %if !%{crossbuild}
+
+%if %{build_go}
+BuildRequires: net-tools, procps
+%endif
 
 Obsoletes: gcc < %{version}-%{release}
 AutoReq: true
@@ -472,6 +476,43 @@ compiler about where each source line originated).
 You should install this package if you are a C programmer and you use
 macros.
 
+%package go
+Summary: Go support
+Requires: gcc = %{version}-%{release}
+Requires: libgo = %{version}-%{release}
+Requires: libgo-devel = %{version}-%{release}
+Provides: gccgo = %{version}-%{release}
+Autoreq: true
+
+%description go
+The gcc-go package provides support for compiling Go programs
+with the GNU Compiler Collection.
+
+%package -n libgo
+Summary: Go runtime
+Autoreq: true
+
+%description -n libgo
+This package contains Go shared library which is needed to run
+Go dynamically linked programs.
+
+%package -n libgo-devel
+Summary: Go development libraries
+Requires: libgo = %{version}-%{release}
+Autoreq: true
+
+%description -n libgo-devel
+This package includes libraries and support files for compiling
+Go programs.
+
+%package -n libgo-static
+Summary: Static Go libraries
+Requires: libgo = %{version}-%{release}
+Requires: gcc = %{version}-%{release}
+
+%description -n libgo-static
+This package contains static Go libraries.
+
 %package plugin-devel
 Summary: Support for compiling GCC plugins
 Requires: gcc = %{version}-%{release}
@@ -569,6 +610,12 @@ esac
 %endif
 %endif
 
+%if %{build_go}
+enablelgo=,go
+%else
+enablelgo=
+%endif
+
 %if %{crossbuild}
 # cross build
 export PATH=/opt/cross/bin:$PATH
@@ -642,7 +689,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
 	--enable-linker-build-id \
 	--disable-libmpx \
 %if %{bootstrap} == 0
-	--enable-languages=c,c++,lto \
+	--enable-languages=c,c++${enablelgo},lto \
 	--enable-threads=posix \
 	--enable-shared \
 %endif
@@ -692,6 +739,11 @@ make doc-html-doxygen
 make doc-man-doxygen
 cd ../..
 %endif
+
+# Clean any old compressed docs
+if [ -d rpm.doc ]; then
+  find rpm.doc -name "*.bz2" -delete
+fi
 
 # Copy various doc files here and there
 cd ..
@@ -790,6 +842,11 @@ mkdir -p $FULLEPATH
 ln -sf gcc %{buildroot}%{_prefix}/bin/cc
 mkdir -p %{buildroot}/%{_lib}
 ln -sf ..%{_prefix}/bin/cpp %{buildroot}/%{_lib}/cpp
+
+%if %{build_go}
+mv %{buildroot}%{_prefix}/bin/go{,.gcc}
+mv %{buildroot}%{_prefix}/bin/gofmt{,.gcc}
+%endif
 
 cxxconfig="`find %{gcc_target_platform}/libstdc++-v3/include -name c++config.h`"
 for i in `find %{gcc_target_platform}/[36]*/libstdc++-v3/include -name c++config.h 2>/dev/null`; do
@@ -988,6 +1045,9 @@ mv ../../../../%{_lib}/libasan_preinit.o libasan_preinit.o
 %if %{build_libubsan}
 ln -sf ../../../../%{_lib}/libubsan.so.1.* libubsan.so
 %endif
+%if %{build_go}
+ln -sf ../../../../%{_lib}/libgo.so.22.* libgo.so
+%endif
 %if %{build_libtsan}
 rm -f libtsan.so
 echo 'INPUT ( %{_prefix}/%{_lib}/'`echo ../../../../%{_lib}/libtsan.so.2.* | sed 's,^.*libt,libt,'`' )' > libtsan.so
@@ -1067,6 +1127,11 @@ ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libs
 %if %{build_libquadmath}
 ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libquadmath.a 32/libquadmath.a
 %endif
+%if %{build_go}
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libgo.a 32/libgo.a
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libgobegin.a 32/libgobegin.a
+ln -sf ../../../%{multilib_32_arch}-%{_vendor}-%{_target_os}/%{gcc_version}/libgolibbegin.a 32/libgolibbegin.a
+%endif
 %endif
 
 # If we are building a debug package then copy all of the static archives
@@ -1092,9 +1157,9 @@ for d in . $FULLLSUBDIR; do
 done
 %endif
 
-# Strip debug info from Fortran/ObjC/Java static libraries
+# Strip debug info from Fortran/ObjC/Java/Go static libraries
 strip -g `find . \( -name libobjc.a -o -name libgomp.a \
-		    -o -name libgcc.a -o -name libgcov.a -o -name libquadmath.a \) -a -type f`
+		    -o -name libgcc.a -o -name libgcov.a -o -name libquadmath.a -o -name libgo.a \) -a -type f`
 popd
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgomp.so.1.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libcc1.so.0.*
@@ -1125,16 +1190,6 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/libhwasan.so.0.*
 %endif
 %if %{build_liblsan}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/liblsan.so.0.*
-%endif
-%if %{build_go}
-# Avoid stripping these libraries and binaries.
-chmod 644 %{buildroot}%{_prefix}/%{_lib}/libgo.so.22.*
-chmod 644 %{buildroot}%{_prefix}/bin/go.gcc
-chmod 644 %{buildroot}%{_prefix}/bin/gofmt.gcc
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cgo
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/buildid
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/test2json
-chmod 644 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/vet
 %endif
 %if %{build_objc}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libobjc.so.4.*
@@ -1862,6 +1917,70 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/liblsan.a
 %{!?_licensedir:%global license %%doc}
 %license libsanitizer/LICENSE.TXT
+%endif
+
+%if %{build_go}
+%files go
+%attr(755,root,root) %{_prefix}/bin/go.gcc
+%{_prefix}/bin/gccgo
+%attr(755,root,root) %{_prefix}/bin/gofmt.gcc
+%{_mandir}/man1/gccgo.1*
+%{_mandir}/man1/go.1*
+%{_mandir}/man1/gofmt.1*
+%dir %{_prefix}/%{_lib}/gcc
+%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
+%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/libexec/gcc
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
+%dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
+%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/go1
+%attr(755,root,root) %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cgo
+%attr(755,root,root) %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/buildid
+%attr(755,root,root) %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/test2json
+%attr(755,root,root) %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/vet
+%ifarch %{multilib_64_archs}
+%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgo.so
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgo.a
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgobegin.a
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libgolibbegin.a
+%endif
+%ifarch sparcv9 ppc %{multilib_64_archs}
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgo.so
+%endif
+%doc rpm.doc/go/*
+
+%files -n libgo
+%attr(755,root,root) %{_prefix}/%{_lib}/libgo.so.22*
+%doc rpm.doc/libgo/*
+
+%files -n libgo-devel
+%dir %{_prefix}/%{_lib}/gcc
+%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
+%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
+%dir %{_prefix}/%{_lib}/go
+%dir %{_prefix}/%{_lib}/go/%{gcc_version}
+%{_prefix}/%{_lib}/go/%{gcc_version}/%{gcc_target_platform}
+%ifarch %{multilib_64_archs}
+%ifnarch sparc64 ppc64 ppc64p7
+%dir %{_prefix}/%{_lib}/go
+%dir %{_prefix}/%{_lib}/go/%{gcc_version}
+%{_prefix}/%{_lib}/go/%{gcc_version}/%{gcc_target_platform}
+%endif
+%endif
+%ifnarch sparcv9 sparc64 ppc ppc64 ppc64p7
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgobegin.a
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgolibbegin.a
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgo.so
+%endif
+
+%files -n libgo-static
+%dir %{_prefix}/%{_lib}/gcc
+%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
+%dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
+%ifnarch sparcv9 sparc64 ppc ppc64 ppc64p7
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgo.a
+%endif
 %endif
 
 %files plugin-devel
