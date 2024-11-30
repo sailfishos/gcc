@@ -37,7 +37,7 @@
 * Fri Jan 10 2020 Niels Breet <niels.breet@jolla.com> - 8.3.0-2
 - aarch64 fixes. Contributes JB#47986
 
-* Thu Aug 20 2019 Niels Breet <niels.breet@jolla.com> - 8.3.0
+* Tue Aug 20 2019 Niels Breet <niels.breet@jolla.com> - 8.3.0
 - Upgrade to ARM gcc 8.3-2019.03. Fixes JB#46923
 
 * Thu Aug 15 2019 Aapi Hämäläinen <aapi.hamalainen@jolla.com> - 4.9.4-6
@@ -64,7 +64,7 @@
 - Fixes for aarch64. MER#1703
 - Upgrade to Linaro 4.8 2014.04
 
-* Mon Apr 16 2015 Islam Amer <islam.amer@jolla.com> - 4.8.3
+* Thu Apr 16 2015 Islam Amer <islam.amer@jolla.com> - 4.8.3
 - More packaging fixes for MER#890
 
 * Mon Apr 13 2015 Islam Amer <islam.amer@jolla.com> - 4.8.3
@@ -89,10 +89,10 @@
 * Thu Mar 13 2014 Davide Bettio <davide.bettio@ispirata.com> - 4.8.3
 - Upgrade to Linaro 4.8 2014.01 (based on GCC 4.8.3+svn206350)
 
-* Sun Jan 23 2014 Oleg Girko <oleg.girko@jolla.com> - 4.8.2
+* Thu Jan 23 2014 Oleg Girko <oleg.girko@jolla.com> - 4.8.2
 - Add aarch64 support.
 
-* Fri Sep 5 2013 Davide Bettio <davide.bettio@ispirata.com> - 4.8.2
+* Thu Sep 5 2013 Davide Bettio <davide.bettio@ispirata.com> - 4.8.2
 - Upgrade to Linaro 4.8 2013.10 (based on 4.8.1+svn203510)
 
 * Wed Jun 12 2013 D Wadsworth <letters.random13@gmail.com> - 4.6.4
@@ -167,7 +167,7 @@
 * Fri Jul 01 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.1
 - Update to 4.6.1.
 
-* Thu Jun 29 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
+* Wed Jun 29 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
 - patch gcc46-arm-volatile.patch should be applied on cross toolchain too.
 
 * Thu Jun 09 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
@@ -177,7 +177,7 @@
 - Add gcc46-libiberty-conftest.patch to make gcc build on arm.
   (contribute by juha.kallioinen@nokia.com.)
 
-* Wed May 05 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
+* Thu May 05 2011 Junfeng Dong <junfeng.dong@intel.com> - 4.6.0-20110419
 - Update to 4.6.0, from svn on 20110419.
 
 * Sun Apr 24 2011 - Jan-Simon Möller <jsmoeller@linuxfoundation.org> - 4.5.2
@@ -226,7 +226,7 @@
 * Fri Dec 10 2010 Jan-Simon Möller <jsmoeller@linuxfoudnation.org> - 4.5.1
 - Added Linaro patchset based on GCC4.5.1 (BMC#10510)
 
-* Tue Dec 09 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
+* Thu Dec 09 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
 - Update to 4.5.1 (BMC#FEA10510):Need to update gcc to 4.5.1 with 
   linaro patchset for hardfp support 
 - Change format to tar.gz for SDK convenience
@@ -238,7 +238,7 @@
 * Fri Oct 15 2010 Jan-Simon Möller <jsmoeller@linuxfoundation.org> - 4.5.1
 - Merged/fixed devel:toolchain with devel:base
 
-* Tue Oct 14 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
+* Thu Oct 14 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.1
 - Applied 4.5.0 branch patch for fixing PR#45112 (BMC#8034)
 
 * Sat Sep 25 2010 Roger Wang <roger.wang@intel.com> - 4.5.1
@@ -267,7 +267,7 @@
   PR#43698 (BMC#3936)
 - Add missing dependency to fix BMC#4046
 
-* Tue Jul 08 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
+* Thu Jul 08 2010 Austin Zhang <austin.zhang@intel.com> - 4.5.0
 - Applied 4.5.0 mainline branch patch for fixing PR#43572(PR#43904)
 - Added missing symbolic link
 
@@ -315,10 +315,10 @@
 * Thu Nov 26 2009 Arjan van de Ven <arjan@linux.intel.com> - 4.4.1
 - default to atom tuning
 
-* Thu Oct 16 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
+* Fri Oct 16 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
 - Add 'provides: gcc-fortran' for compatibility (MB#6798)
 
-* Thu Sep 16 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
+* Wed Sep 16 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
 - Updated to 20090911 snapshot
 - Added patches from fedora:
 	gcc44-powerpc-libgcc_s_so.patch
@@ -327,7 +327,7 @@
 	gcc44-vta-cfgexpand-ptr-mode-pr41248.patch
 - Removed obsoleted patches
 
-* Thu Aug 26 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
+* Wed Aug 26 2009 Austin Zhang <austin.zhang@intel.com> - 4.4.1
 - Fix bug 5649 (libstdc++ conflication with 'gcc update')
 
 * Sat Aug 22 2009 Anas Nashif <anas.nashif@intel.com> - 4.4.1
