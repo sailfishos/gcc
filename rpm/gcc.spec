@@ -245,14 +245,15 @@ Requires:  %{name} = %{version}-%{release}
 
 %description doc
 Man and info pages for %{name}.
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %package -n libgcc
 Summary: GCC version 13.3 shared support library
 Obsoletes: libgcc < %{version}-%{release}
 Autoreq: true
 %if "%{version}" != "%{gcc_version}"
-Provides: libgcc = %{gcc_provides}
+Provides: libgcc = %{gcc_version}
 %endif
 
 %description -n libgcc
@@ -312,7 +313,8 @@ Autoreq: true
 %description -n libstdc++-doc
 Manual, doxygen generated API information and Frequently Asked Questions
 for the GNU standard C++ library.
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %package -n libgomp
 Summary: GCC OpenMP v4.5 shared support library
@@ -1278,7 +1280,8 @@ set +x
 #install -m0644 -t %{buildroot}%{_docdir}/libquadmath-%{version} \
 #        rpm.doc/libquadmath/ChangeLog*
 #%endif
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %if !%{crossbuild}
 # checking and split packaging for native ...
@@ -1385,11 +1388,11 @@ end
 %{_prefix}/bin/gcc-nm
 %{_prefix}/bin/gcc-ranlib
 %{_prefix}/bin/lto-dump
-#%ifnarch %{arm} aarch64 mipsel
-#%{_prefix}/bin/%{gcc_target_platform}-gcc
-#%{_prefix}/bin/%{gcc_target_platform}-gcc-ar
-#%{_prefix}/bin/%{gcc_target_platform}-gcc-nm
-#%{_prefix}/bin/%{gcc_target_platform}-gcc-ranlib
+#%ifnarch %%{arm} aarch64 mipsel
+#%%{_prefix}/bin/%%{gcc_target_platform}-gcc
+#%%{_prefix}/bin/%%{gcc_target_platform}-gcc-ar
+#%%{_prefix}/bin/%%{gcc_target_platform}-gcc-nm
+#%%{_prefix}/bin/%%{gcc_target_platform}-gcc-ranlib
 #%endif
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
@@ -1400,8 +1403,8 @@ end
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include
 
 # Shouldn't include all files under this fold, split to diff pkgs
-#%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/*
-#%if !%{crossbuild}
+#%%{_prefix}/libexec/gcc/%%{gcc_target_platform}/%%{gcc_version}/*
+#%if !%%{crossbuild}
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/lto1
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/lto-wrapper
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/liblto_plugin.so*
@@ -1414,7 +1417,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/plugin/include/*
 
 # Shouldn't include all files under this fold, split to diff pkgs
-#%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/*
+#%%{_prefix}/%%{_lib}/gcc/%%{gcc_target_platform}/%%{gcc_version}/include/*
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/rpmver
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/stddef.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdarg.h
@@ -1708,7 +1711,8 @@ end
 %{_mandir}/man1/g++.1*
 %{_mandir}/man1/lto-dump.1*
 %{_mandir}/man7/*
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %files -n cpp -f cpplib.lang
 %defattr(-,root,root,-)
@@ -1798,7 +1802,8 @@ end
 %{_mandir}/man3/*
 %{_docdir}/libstdc++-%{version}
 %endif
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %files -n libgomp
 %defattr(-,root,root,-)
