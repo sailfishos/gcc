@@ -231,14 +231,15 @@ Requires:  %{name} = %{version}-%{release}
 
 %description doc
 Man and info pages for %{name}.
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %package -n libgcc
 Summary: GCC version 13 shared support library
 Obsoletes: libgcc < %{version}-%{release}
 Autoreq: false
 %if "%{version}" != "%{gcc_version}"
-Provides: libgcc = %{gcc_provides}
+Provides: libgcc = %{gcc_version}
 %endif
 
 %description -n libgcc
@@ -298,7 +299,8 @@ Autoreq: true
 %description -n libstdc++-doc
 Manual, doxygen generated API information and Frequently Asked Questions
 for the GNU standard C++ library.
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %package -n libgomp
 Summary: GCC OpenMP v4.5 shared support library
@@ -1643,7 +1645,8 @@ end
 %{_mandir}/man1/g++.1*
 %{_mandir}/man1/lto-dump.1*
 %{_mandir}/man7/*
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %files -n cpp -f cpplib.lang
 /%{_lib}/cpp
@@ -1726,7 +1729,8 @@ end
 %{_mandir}/man3/*
 %{_docdir}/libstdc++-%{version}
 %endif
-%endif # !crossbuild
+# !crossbuild
+%endif
 
 %files -n libgomp
 %{_prefix}/%{_lib}/libgomp.so.1*
