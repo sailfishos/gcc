@@ -1,5 +1,6 @@
-# Combined gcc / cross-armv*-gcc) specfile
-Name: gcc
+# Combined gcc / cross-armv*-gccNN) specfile
+Name: cross-i486-gcc13
+%define crossarch i486
 # Keep Name on top !
 
 %if "%{?bootstrap}" == ""
@@ -20,8 +21,8 @@ Name: gcc
 # crossbuild / accelerator section
 # \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 %define crossbuild 0
-%if "%{name}" != "gcc"
-# this is the ix86 -> arm cross compiler (cross-armv*-gcc)
+%if "%{name}" != "gcc13"
+# this is the ix86 -> arm cross compiler (cross-armv*-gccNN)
 #
 # We set requires/provides by hand and disable post-build-checks.
 # Captain Trunk: Sledge, you cannot disarm that nuclear bomb!
@@ -102,6 +103,8 @@ ExclusiveArch: %ix86 x86_64
 # end crossbuild / accelerator section
 %endif
 
+%global binsuffix -13
+%global pkgsuffix 13
 %global gcc_version 13.3.1
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
@@ -171,7 +174,7 @@ License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2
 URL: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
 Source0: %{name}-%{version}.tar.xz
 Source1: isl-0.24.tar.bz2
-Source3: gcc-rpmlintrc
+Source3: gcc13-rpmlintrc
 Source4: baselibs.conf
 Source5: precheckin.sh
 Source6: aaa_README.PACKAGER
@@ -210,9 +213,9 @@ BuildRequires: graphviz
 %endif
 
 %if !%{crossbuild}
-Requires: cpp = %{version}-%{release}
-Requires: libgcc >= %{version}-%{release}
-Requires: libgomp = %{version}-%{release}
+Requires: (cpp%{pkgsuffix} = %{version}-%{release} or cpp = %{version}-%{release})
+Requires: (libgcc%{pkgsuffix} >= %{version}-%{release} or libgcc >= %{version}-%{release})
+Requires: (libgomp%{pkgsuffix} = %{version}-%{release} or libgomp = %{version}-%{release})
 Requires: glibc-devel
 Requires: binutils >= 2.25
 %endif
@@ -227,7 +230,7 @@ Requires: glibc64bit-helper
 BuildRequires: net-tools, procps
 %endif
 
-Obsoletes: gcc < %{version}-%{release}
+Obsoletes: gcc%{pkgsuffix} < %{version}-%{release}
 AutoReq: true
 # /!crossbuild
 %endif
@@ -252,24 +255,24 @@ Man and info pages for %{name}.
 # !crossbuild
 %endif
 
-%package -n libgcc
+%package -n libgcc%{pkgsuffix}
 Summary: GCC version 13.3 shared support library
-Obsoletes: libgcc < %{version}-%{release}
+Obsoletes: libgcc%{pkgsuffix} < %{version}-%{release}
 Autoreq: true
 %if "%{version}" != "%{gcc_version}"
-Provides: libgcc = %{gcc_version}
+Provides: libgcc%{pkgsuffix} = %{gcc_version}
 %endif
 
-%description -n libgcc
+%description -n libgcc%{pkgsuffix}
 This package contains GCC shared support library which is needed
 e.g. for exception handling support.
 
 %package c++
 Summary: C++ support for GCC
-Requires: gcc = %{version}-%{release}
-Requires: libstdc++ = %{version}-%{release}
-Requires: libstdc++-devel = %{version}-%{release}
-Obsoletes: gcc-c++ < %{version}-%{release}
+Requires: (gcc%{pkgsuffix} = %{version}-%{release} or gcc = %{version}-%{release})
+Requires: (libstdc++%{pkgsuffix} = %{version}-%{release} or libstdc++ = %{version}-%{release})
+Requires: (libstdc++%{pkgsuffix}-devel = %{version}-%{release} or libstdc++-devel = %{version}-%{release})
+Obsoletes: gcc%{pkgsuffix}-c++ < %{version}-%{release}
 Autoreq: true
 
 %description c++
@@ -277,182 +280,181 @@ This package adds C++ support to the GNU Compiler Collection.
 It includes support for most of the current C++ specification,
 including templates and exception handling.
 
-%package -n libstdc++
+%package -n libstdc++%{pkgsuffix}
 Summary: GNU Standard C++ Library
-Obsoletes: libstdc++ < %{version}-%{release}
-Obsoletes: libstdc++6 < %{version}-%{release}
+Obsoletes: libstdc++%{pkgsuffix} < %{version}-%{release}
 Autoreq: true
 Requires: glibc 
 
-%description -n libstdc++
+%description -n libstdc++%{pkgsuffix}
 The libstdc++ package contains a rewritten standard compliant GCC Standard
 C++ Library.
 
-%package -n libstdc++-devel
+%package -n libstdc++%{pkgsuffix}-devel
 Summary: Header files and libraries for C++ development
-Requires: libstdc++ = %{version}-%{release}
-Obsoletes: libstdc++-devel < %{version}-%{release}
+Requires: libstdc++%{pkgsuffix} = %{version}-%{release}
+Obsoletes: libstdc++%{pkgsuffix}-devel < %{version}-%{release}
 Autoreq: true
 
-%description -n libstdc++-devel
+%description -n libstdc++%{pkgsuffix}-devel
 This is the GNU implementation of the standard C++ libraries.  This
 package includes the header files and libraries needed for C++
 development. This includes rewritten implementation of STL.
 
-%package -n libstdc++-static
+%package -n libstdc++%{pkgsuffix}-static
 Summary: Static libraries for the GNU standard C++ library
-Requires: libstdc++-devel = %{version}-%{release}
+Requires: libstdc++%{pkgsuffix}-devel = %{version}-%{release}
 Autoreq: true
 
-%description -n libstdc++-static
+%description -n libstdc++%{pkgsuffix}-static
 Static libraries for the GNU standard C++ library.
 
 %if !%{crossbuild}
-%package -n libstdc++-doc
+%package -n libstdc++%{pkgsuffix}-doc
 Summary: Documentation for the GNU standard C++ library
-Requires:  libstdc++ = %{version}-%{release}
-Obsoletes: libstdc++-docs
+Requires:  libstdc++%{pkgsuffix} = %{version}-%{release}
+Obsoletes: libstdc++%{pkgsuffix}-docs
 Autoreq: true
 
-%description -n libstdc++-doc
+%description -n libstdc++%{pkgsuffix}-doc
 Manual, doxygen generated API information and Frequently Asked Questions
 for the GNU standard C++ library.
 # !crossbuild
 %endif
 
-%package -n libgomp
+%package -n libgomp%{pkgsuffix}
 Summary: GCC OpenMP v4.5 shared support library
-Obsoletes: libgomp < %{version}-%{release}
+Obsoletes: libgomp%{pkgsuffix} < %{version}-%{release}
 
-%description -n libgomp
+%description -n libgomp%{pkgsuffix}
 This package contains GCC shared support library which is needed
 for OpenMP v3.0 support.
 
-%package -n libquadmath
+%package -n libquadmath%{pkgsuffix}
 Summary: GCC __float128 shared support library
 
-%description -n libquadmath
+%description -n libquadmath%{pkgsuffix}
 This package contains GCC shared support library which is needed
 for __float128 math support and for Fortran REAL*16 support.
 
-%package -n libquadmath-devel
+%package -n libquadmath%{pkgsuffix}-devel
 Summary: GCC __float128 support
-Requires: libquadmath = %{version}-%{release}
-Requires: gcc = %{version}-%{release}
+Requires: libquadmath%{pkgsuffix} = %{version}-%{release}
+Requires: gcc%{pkgsuffix} = %{version}-%{release}
 
-%description -n libquadmath-devel
+%description -n libquadmath%{pkgsuffix}-devel
 This package contains headers for building Fortran programs using
 REAL*16 and programs using __float128 math.
 
-%package -n libquadmath-static
+%package -n libquadmath%{pkgsuffix}-static
 Summary: Static libraries for __float128 support
-Requires: libquadmath-devel = %{version}-%{release}
+Requires: libquadmath%{pkgsuffix}-devel = %{version}-%{release}
 
-%description -n libquadmath-static
+%description -n libquadmath%{pkgsuffix}-static
 This package contains static libraries for building Fortran programs
 using REAL*16 and programs using __float128 math.
 
-%package -n libitm
+%package -n libitm%{pkgsuffix}
 Summary: The GNU Transactional Memory library
 
-%description -n libitm
+%description -n libitm%{pkgsuffix}
 This package contains the GNU Transactional Memory library
 which is a GCC transactional memory support runtime library.
 
-%package -n libitm-devel
+%package -n libitm%{pkgsuffix}-devel
 Summary: The GNU Transactional Memory support
-Requires: libitm = %{version}-%{release}
-Requires: gcc = %{version}-%{release}
+Requires: libitm%{pkgsuffix} = %{version}-%{release}
+Requires: gcc%{pkgsuffix} = %{version}-%{release}
 
-%description -n libitm-devel
+%description -n libitm%{pkgsuffix}-devel
 This package contains headers and support files for the
 GNU Transactional Memory library.
 
-%package -n libitm-static
+%package -n libitm%{pkgsuffix}-static
 Summary: The GNU Transactional Memory static library
-Requires: libitm-devel = %{version}-%{release}
+Requires: libitm%{pkgsuffix}-devel = %{version}-%{release}
 
-%description -n libitm-static
+%description -n libitm%{pkgsuffix}-static
 This package contains GNU Transactional Memory static libraries.
 
-%package -n libatomic
+%package -n libatomic%{pkgsuffix}
 Summary: The GNU Atomic library
 
-%description -n libatomic
+%description -n libatomic%{pkgsuffix}
 This package contains the GNU Atomic library
 which is a GCC support runtime library for atomic operations not supported
 by hardware.
 
-%package -n libatomic-static
+%package -n libatomic%{pkgsuffix}-static
 Summary: The GNU Atomic static library
-Requires: libatomic = %{version}-%{release}
+Requires: libatomic%{pkgsuffix} = %{version}-%{release}
 
-%description -n libatomic-static
+%description -n libatomic%{pkgsuffix}-static
 This package contains GNU Atomic static libraries.
 
-%package -n libasan
+%package -n libasan%{pkgsuffix}
 Summary: The Address Sanitizer runtime library
 
-%description -n libasan
+%description -n libasan%{pkgsuffix}
 This package contains the Address Sanitizer library
 which is used for -fsanitize=address instrumented programs.
 
-%package -n libasan-static
+%package -n libasan%{pkgsuffix}-static
 Summary: The Address Sanitizer static library
-Requires: libasan = %{version}-%{release}
+Requires: libasan%{pkgsuffix} = %{version}-%{release}
 
-%description -n libasan-static
+%description -n libasan%{pkgsuffix}-static
 This package contains Address Sanitizer static runtime library.
 
-%package -n libtsan
+%package -n libtsan%{pkgsuffix}
 Summary: The Thread Sanitizer runtime library
 
-%description -n libtsan
+%description -n libtsan%{pkgsuffix}
 This package contains the Thread Sanitizer library
 which is used for -fsanitize=thread instrumented programs.
 
-%package -n libtsan-static
+%package -n libtsan%{pkgsuffix}-static
 Summary: The Thread Sanitizer static library
-Requires: libtsan = %{version}-%{release}
+Requires: libtsan%{pkgsuffix} = %{version}-%{release}
 
-%description -n libtsan-static
+%description -n libtsan%{pkgsuffix}-static
 This package contains Thread Sanitizer static runtime library.
 
-%package -n libubsan
+%package -n libubsan%{pkgsuffix}
 Summary: The Undefined Behavior Sanitizer runtime library
 
-%description -n libubsan
+%description -n libubsan%{pkgsuffix}
 This package contains the Undefined Behavior Sanitizer library
 which is used for -fsanitize=undefined instrumented programs.
 
-%package -n libubsan-static
+%package -n libubsan%{pkgsuffix}-static
 Summary: The Undefined Behavior Sanitizer static library
-Requires: libubsan = %{version}-%{release}
+Requires: libubsan%{pkgsuffix} = %{version}-%{release}
 
-%description -n libubsan-static
+%description -n libubsan%{pkgsuffix}-static
 This package contains Undefined Behavior Sanitizer static runtime library.
 
-%package -n liblsan
+%package -n liblsan%{pkgsuffix}
 Summary: The Leak Sanitizer runtime library
 
-%description -n liblsan
+%description -n liblsan%{pkgsuffix}
 This package contains the Leak Sanitizer library
 which is used for -fsanitize=leak instrumented programs.
 
-%package -n liblsan-static
+%package -n liblsan%{pkgsuffix}-static
 Summary: The Leak Sanitizer static library
-Requires: liblsan = %{version}-%{release}
+Requires: liblsan%{pkgsuffix} = %{version}-%{release}
 
-%description -n liblsan-static
+%description -n liblsan%{pkgsuffix}-static
 This package contains Leak Sanitizer static runtime library.
 
-%package -n cpp
+%package -n cpp%{pkgsuffix}
 Summary: The C Preprocessor
 Requires: mpc
-Obsoletes: cpp < %{version}-%{release}
+Obsoletes: cpp%{pkgsuffix} < %{version}-%{release}
 Autoreq: true
 
-%description -n cpp
+%description -n cpp%{pkgsuffix}
 Cpp is the GNU C-Compatible Compiler Preprocessor.
 Cpp is a macro processor which is used automatically
 by the C compiler to transform your program before actual
@@ -474,19 +476,19 @@ compiler about where each source line originated).
 You should install this package if you are a C programmer and you use
 macros.
 
-%package -n gcc-multilib
+%package -n gcc%{pkgsuffix}-multilib
 Summary: for 64bit multilib support
 Autoreq: true
 
-%description -n gcc-multilib
+%description -n gcc%{pkgsuffix}-multilib
 This is one set of libraries which support 64bit multilib on top of
 32bit enviroment from compiler side.
 
 %package go
 Summary: Go support
-Requires: gcc = %{version}-%{release}
-Requires: libgo = %{version}-%{release}
-Requires: libgo-devel = %{version}-%{release}
+Requires: gcc%{pkgsuffix} = %{version}-%{release}
+Requires: libgo%{pkgsuffix} = %{version}-%{release}
+Requires: libgo%{pkgsuffix}-devel = %{version}-%{release}
 Provides: gccgo = %{version}-%{release}
 Autoreq: true
 
@@ -494,34 +496,34 @@ Autoreq: true
 The gcc-go package provides support for compiling Go programs
 with the GNU Compiler Collection.
 
-%package -n libgo
+%package -n libgo%{pkgsuffix}
 Summary: Go runtime
 Autoreq: true
 
-%description -n libgo
+%description -n libgo%{pkgsuffix}
 This package contains Go shared library which is needed to run
 Go dynamically linked programs.
 
-%package -n libgo-devel
+%package -n libgo%{pkgsuffix}-devel
 Summary: Go development libraries
-Requires: libgo = %{version}-%{release}
+Requires: libgo%{pkgsuffix} = %{version}-%{release}
 Autoreq: true
 
-%description -n libgo-devel
+%description -n libgo%{pkgsuffix}-devel
 This package includes libraries and support files for compiling
 Go programs.
 
-%package -n libgo-static
+%package -n libgo%{pkgsuffix}-static
 Summary: Static Go libraries
-Requires: libgo = %{version}-%{release}
-Requires: gcc = %{version}-%{release}
+Requires: libgo%{pkgsuffix} = %{version}-%{release}
+Requires: gcc%{pkgsuffix} = %{version}-%{release}
 
-%description -n libgo-static
+%description -n libgo%{pkgsuffix}-static
 This package contains static Go libraries.
 
 %package plugin-devel
 Summary: Support for compiling GCC plugins
-Requires: gcc = %{version}-%{release}
+Requires: gcc%{pkgsuffix} = %{version}-%{release}
 Requires: gmp-devel >= 4.1.2-8, mpfr-devel >= 3.1.0, libmpc-devel >= 0.8.1
 
 %description plugin-devel
@@ -723,6 +725,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" CXXFLAGS="`echo $OPT_FLAGS | sed 's/ -Wall / /g'`" 
         --enable-lto \
 	--enable-linker-build-id \
 	--disable-libmpx \
+  --program-suffix=%{binsuffix} \
 %if %{bootstrap} == 0
 	--enable-languages=c,c++${enablelgo},lto \
 	--enable-threads=posix \
@@ -864,13 +867,13 @@ FULLEPATH=%{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_versio
 mkdir -p $FULLPATH
 mkdir -p $FULLEPATH
 
-ln -sf gcc %{buildroot}%{_prefix}/bin/cc
+ln -sf gcc%{binsuffix} %{buildroot}%{_prefix}/bin/cc%{binsuffix}
 mkdir -p %{buildroot}/%{_lib}
-ln -sf ..%{_prefix}/bin/cpp %{buildroot}/%{_lib}/cpp
+ln -sf ..%{_prefix}/bin/cpp%{binsuffix} %{buildroot}/%{_lib}/cpp%{binsuffix}
 
 %if %{build_go}
-mv %{buildroot}%{_prefix}/bin/go{,.gcc}
-mv %{buildroot}%{_prefix}/bin/gofmt{,.gcc}
+mv %{buildroot}%{_prefix}/bin/go{,.gcc}%{binsuffix}
+mv %{buildroot}%{_prefix}/bin/gofmt{,.gcc}%{binsuffix}
 %endif
 
 cxxconfig="`find %{gcc_target_platform}/libstdc++-v3/include -name c++config.h`"
@@ -1029,7 +1032,7 @@ ln -sf ../../../libgdruntime.so.4.* libgdruntime.so
 ln -sf ../../../libgphobos.so.4.* libgphobos.so
 %endif
 %if %{build_libitm}
-ln -sf ../../../libitm.so.1.* libitm.so
+ln -sf ../../../libitm.so.1.* libitm%{binsuffix}.so
 %endif
 %if %{build_libatomic}
 ln -sf ../../../libatomic.so.1.* libatomic.so
@@ -1222,7 +1225,7 @@ for h in `find $FULLPATH/include -name \*.h`; do
   fi
 done
 
-cat > %{buildroot}%{_prefix}/bin/c89 <<"EOF"
+cat > %{buildroot}%{_prefix}/bin/c89%{binsuffix} <<"EOF"
 #!/bin/sh
 fl="-std=c89"
 for opt; do
@@ -1232,9 +1235,9 @@ for opt; do
 	    exit 1;;
   esac
 done
-exec gcc $fl ${1+"$@"}
+exec gcc%{binsuffix} $fl ${1+"$@"}
 EOF
-cat > %{buildroot}%{_prefix}/bin/c99 <<"EOF"
+cat > %{buildroot}%{_prefix}/bin/c99%{binsuffix} <<"EOF"
 #!/bin/sh
 fl="-std=c99"
 for opt; do
@@ -1244,28 +1247,33 @@ for opt; do
 	    exit 1;;
   esac
 done
-exec gcc $fl ${1+"$@"}
+exec gcc%{binsuffix} $fl ${1+"$@"}
 EOF
-chmod 755 %{buildroot}%{_prefix}/bin/c?9
+chmod 755 %{buildroot}%{_prefix}/bin/c?9%{binsuffix}
 
 cd ..
-%find_lang %{name}
+
+for lc_messages in `ls -d %{buildroot}/%{_prefix}/share/locale/*/LC_MESSAGES/`; do
+  mv $lc_messages/gcc.mo $lc_messages/gcc13.mo || :
+  mv $lc_messages/libstdc++.mo $lc_messages/libstdc++13.mo || :
+done
+%find_lang gcc13
 %find_lang cpplib
 
 # Remove binaries we will not be including, so that they don't end up in
 # gcc-debuginfo
 rm -f %{buildroot}%{_prefix}/%{_lib}/{libffi*,libiberty.a} || :
-rm -f $FULLEPATH/install-tools/{mkheaders,fixincl}
+rm -f $FULLEPATH/install-tools/*
 rm -f %{buildroot}%{_prefix}/lib/{32,64}/libiberty.a
 rm -f %{buildroot}%{_prefix}/%{_lib}/libssp*
 rm -f %{buildroot}%{_prefix}/%{_lib}/libvtv* || :
-rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gfortran || :
-rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gccgo || :
-rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcj || :
-rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-ar || :
-rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-nm || :
-rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-ranlib || :
-rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gdc || :
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gfortran%{binsuffix} || :
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gccgo%{binsuffix} || :
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcj%{binsuffix} || :
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-ar%{binsuffix} || :
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-nm%{binsuffix} || :
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gcc-ranlib%{binsuffix} || :
+rm -f %{buildroot}%{_prefix}/bin/%{_target_platform}-gdc%{binsuffix} || :
 
 %ifarch %{multilib_64_archs}
 # Remove libraries for the other arch on multilib arches
@@ -1297,7 +1305,7 @@ rm -f %{buildroot}%{mandir}/man3/ffi*
 # \/\/\/
 # additional install for cross
 # remove some obsolete files
-ln -sf %{cross_gcc_target_platform}-gcc %{buildroot}%{_prefix}/bin/%{cross_gcc_target_platform}-cc
+ln -sf %{cross_gcc_target_platform}-gcc%{binsuffix} %{buildroot}%{_prefix}/bin/%{cross_gcc_target_platform}-cc%{binsuffix}
 set -x
 rm -rRf %buildroot/%{_prefix}/lib/libiberty.a
 rm -rRf %buildroot/%{_prefix}/share
@@ -1374,7 +1382,7 @@ rm -rf testlogs-%{_target_platform}-%{version}-%{release}
 # Because glibc Prereq's libgcc and /sbin/ldconfig
 # comes from glibc, it might not exist yet when
 # libgcc is installed
-%post -n libgcc -p <lua>
+%post -n libgcc%{pkgsuffix} -p <lua>
 if posix.access ("/sbin/ldconfig", "x") then
   local pid = posix.fork ()
   if pid == 0 then
@@ -1384,7 +1392,7 @@ if posix.access ("/sbin/ldconfig", "x") then
   end
 end
 
-%postun -n libgcc -p <lua>
+%postun -n libgcc%{pkgsuffix} -p <lua>
 if posix.access ("/sbin/ldconfig", "x") then
   local pid = posix.fork ()
   if pid == 0 then
@@ -1394,55 +1402,75 @@ if posix.access ("/sbin/ldconfig", "x") then
   end
 end
 
-%post -n libstdc++ -p /sbin/ldconfig
+%post go
+pushd %{_bindir}
+if [ ! -f go%{binsuffix} ] ; then
+  ln -s go.gcc%{binsuffix} go%{binsuffix}
+fi
+if [ ! -f gofmt%{binsuffix} ] ; then
+  ln -s gofmt.gcc%{binsuffix} gofmt%{binsuffix}
+fi
+popd
 
-%postun -n libstdc++ -p /sbin/ldconfig
+%preun go
+pushd %{_bindir}
+if [ -L go%{binsuffix} ]; then
+  rm go%{binsuffix}
+fi
+if [ -L gofmt%{binsuffix} ]; then
+  rm gofmt%{binsuffix}
+fi
+popd
 
-%post -n libgomp -p /sbin/ldconfig
+%post -n libstdc++%{pkgsuffix} -p /sbin/ldconfig
 
-%postun -n libgomp -p /sbin/ldconfig
+%postun -n libstdc++%{pkgsuffix} -p /sbin/ldconfig
 
-%post -n libquadmath -p /sbin/ldconfig
+%post -n libgomp%{pkgsuffix} -p /sbin/ldconfig
 
-%postun -n libquadmath -p /sbin/ldconfig
+%postun -n libgomp%{pkgsuffix} -p /sbin/ldconfig
 
-%post -n libitm -p /sbin/ldconfig
+%post -n libquadmath%{pkgsuffix} -p /sbin/ldconfig
 
-%postun -n libitm -p /sbin/ldconfig
+%postun -n libquadmath%{pkgsuffix} -p /sbin/ldconfig
 
-%post -n libatomic -p /sbin/ldconfig
+%post -n libitm%{pkgsuffix} -p /sbin/ldconfig
 
-%postun -n libatomic -p /sbin/ldconfig
+%postun -n libitm%{pkgsuffix} -p /sbin/ldconfig
 
-%post -n libasan -p /sbin/ldconfig
+%post -n libatomic%{pkgsuffix} -p /sbin/ldconfig
 
-%postun -n libasan -p /sbin/ldconfig
+%postun -n libatomic%{pkgsuffix} -p /sbin/ldconfig
 
-%post -n libubsan -p /sbin/ldconfig
+%post -n libasan%{pkgsuffix} -p /sbin/ldconfig
 
-%postun -n libubsan -p /sbin/ldconfig
+%postun -n libasan%{pkgsuffix} -p /sbin/ldconfig
 
-%post -n libtsan -p /sbin/ldconfig
+%post -n libubsan%{pkgsuffix} -p /sbin/ldconfig
 
-%postun -n libtsan -p /sbin/ldconfig
+%postun -n libubsan%{pkgsuffix} -p /sbin/ldconfig
 
-%post -n liblsan -p /sbin/ldconfig
+%post -n libtsan%{pkgsuffix} -p /sbin/ldconfig
 
-%postun -n liblsan -p /sbin/ldconfig
+%postun -n libtsan%{pkgsuffix} -p /sbin/ldconfig
+
+%post -n liblsan%{pkgsuffix} -p /sbin/ldconfig
+
+%postun -n liblsan%{pkgsuffix} -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
-%{_prefix}/bin/cc
-%{_prefix}/bin/c89
-%{_prefix}/bin/c99
-%{_prefix}/bin/gcc
-%{_prefix}/bin/gcov
-%{_prefix}/bin/gcov-tool
-%{_prefix}/bin/gcov-dump
-%{_prefix}/bin/gcc-ar
-%{_prefix}/bin/gcc-nm
-%{_prefix}/bin/gcc-ranlib
-%{_prefix}/bin/lto-dump
+%{_prefix}/bin/cc%{binsuffix}
+%{_prefix}/bin/c89%{binsuffix}
+%{_prefix}/bin/c99%{binsuffix}
+%{_prefix}/bin/gcc%{binsuffix}
+%{_prefix}/bin/gcov%{binsuffix}
+%{_prefix}/bin/gcov-tool%{binsuffix}
+%{_prefix}/bin/gcov-dump%{binsuffix}
+%{_prefix}/bin/gcc-ar%{binsuffix}
+%{_prefix}/bin/gcc-nm%{binsuffix}
+%{_prefix}/bin/gcc-ranlib%{binsuffix}
+%{_prefix}/bin/lto-dump%{binsuffix}
 #%ifnarch %%{arm} aarch64 mipsel
 #%%{_prefix}/bin/%%{gcc_target_platform}-gcc
 #%%{_prefix}/bin/%%{gcc_target_platform}-gcc-ar
@@ -1758,27 +1786,27 @@ end
 %files doc
 %defattr(-,root,root,-)
 %{_docdir}/%{name}-%{version}
-%{_mandir}/man1/cpp.1*
-%{_mandir}/man1/gcc.1*
-%{_mandir}/man1/gcov.1*
-%{_mandir}/man1/gcov-tool.1*
-%{_mandir}/man1/gcov-dump.1*
-%{_mandir}/man1/g++.1*
-%{_mandir}/man1/lto-dump.1*
+%{_mandir}/man1/cpp%{binsuffix}.1*
+%{_mandir}/man1/gcc%{binsuffix}.1*
+%{_mandir}/man1/gcov%{binsuffix}.1*
+%{_mandir}/man1/gcov-tool%{binsuffix}.1*
+%{_mandir}/man1/gcov-dump%{binsuffix}.1*
+%{_mandir}/man1/g++%{binsuffix}.1*
+%{_mandir}/man1/lto-dump%{binsuffix}.1*
 %{_mandir}/man7/*
 # !crossbuild
 %endif
 
-%files -n cpp -f cpplib.lang
+%files -n cpp%{pkgsuffix} -f cpplib.lang
 %defattr(-,root,root,-)
-/%{_lib}/cpp
-%{_prefix}/bin/cpp
+/%{_lib}/cpp%{binsuffix}
+%{_prefix}/bin/cpp%{binsuffix}
 %dir %{_prefix}/libexec/gcc
 %dir %{_prefix}/libexec/gcc/%{gcc_target_platform}
 %dir %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}
 %{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_version}/cc1
 
-%files -n libgcc
+%files -n libgcc%{pkgsuffix}
 %defattr(-,root,root,-)
 /%{_lib}/libgcc_s-%{gcc_version}.so.1
 /%{_lib}/libgcc_s.*
@@ -1787,10 +1815,10 @@ end
 %files c++
 %defattr(-,root,root,-)
 %ifnarch %{arm} aarch64 mipsel
-%{_prefix}/bin/%{gcc_target_platform}-*++
+%{_prefix}/bin/%{gcc_target_platform}-*++%{binsuffix}
 %endif
-%{_prefix}/bin/g++
-%{_prefix}/bin/c++
+%{_prefix}/bin/g++%{binsuffix}
+%{_prefix}/bin/c++%{binsuffix}
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
@@ -1815,7 +1843,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libsupc++.a
 %endif
 
-%files -n libstdc++
+%files -n libstdc++%{pkgsuffix}
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libstdc++.so.6*
 %dir %{_datadir}/gdb
@@ -1827,7 +1855,7 @@ end
 %{_prefix}/share/gcc-%{gcc_version}/python
 %{_prefix}/share/gcc-%{gcc_version}/python/libstdcxx
 
-%files -n libstdc++-devel
+%files -n libstdc++%{pkgsuffix}-devel
 %defattr(-,root,root,-)
 %dir %{_prefix}/include/c++
 %dir %{_prefix}/include/c++/%{gcc_version}
@@ -1842,7 +1870,7 @@ end
 %endif
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++fs.a
 
-%files -n libstdc++-static
+%files -n libstdc++%{pkgsuffix}-static
 %defattr(-,root,root,-)
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
@@ -1852,7 +1880,7 @@ end
 
 %if !%{crossbuild}
 %if %{build_libstdcxx_doc}
-%files -n libstdc++-doc
+%files -n libstdc++%{pkgsuffix}-doc
 %defattr(-,root,root)
 %{_mandir}/man3/*
 %{_docdir}/libstdc++-%{version}
@@ -1860,12 +1888,12 @@ end
 # !crossbuild
 %endif
 
-%files -n libgomp
+%files -n libgomp%{pkgsuffix}
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libgomp.*
 
 %if %{build_64bit_multilib}
-%files -n gcc-multilib
+%files -n gcc%{pkgsuffix}-multilib
 %defattr(-,root,root,-)
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/64
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/64/crt*.o
@@ -1877,12 +1905,12 @@ end
 %endif
 
 %if %{build_libquadmath}
-%files -n libquadmath
+%files -n libquadmath%{pkgsuffix}
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libquadmath.so.0*
 %license rpm.doc/libquadmath/COPYING*
 
-%files -n libquadmath-devel
+%files -n libquadmath%{pkgsuffix}-devel
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libquadmath.so
 %dir %{_prefix}/%{_lib}/gcc
@@ -1893,7 +1921,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/quadmath_weak.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libquadmath.so
 
-%files -n libquadmath-static
+%files -n libquadmath%{pkgsuffix}-static
 %defattr(-,root,root,-)
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
@@ -1902,18 +1930,18 @@ end
 %endif
 
 %if %{build_libitm}
-%files -n libitm
+%files -n libitm%{pkgsuffix}
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libitm.so.1*
 
-%files -n libitm-devel
+%files -n libitm%{pkgsuffix}-devel
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include
 %doc rpm.doc/libitm/ChangeLog*
 
-%files -n libitm-static
+%files -n libitm%{pkgsuffix}-static
 %defattr(-,root,root,-)
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
@@ -1922,11 +1950,11 @@ end
 %endif
 
 %if %{build_libatomic}
-%files -n libatomic
+%files -n libatomic%{pkgsuffix}
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libatomic.so.1*
 
-%files -n libatomic-static
+%files -n libatomic%{pkgsuffix}-static
 %defattr(-,root,root,-)
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
@@ -1935,11 +1963,11 @@ end
 %endif
 
 %if %{build_libasan}
-%files -n libasan
+%files -n libasan%{pkgsuffix}
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libasan.so.8*
 
-%files -n libasan-static
+%files -n libasan%{pkgsuffix}-static
 %defattr(-,root,root,-)
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
@@ -1948,10 +1976,10 @@ end
 %endif
 
 %if %{build_libubsan}
-%files -n libubsan
+%files -n libubsan%{pkgsuffix}
 %{_prefix}/%{_lib}/libubsan.so.1*
 
-%files -n libubsan-static
+%files -n libubsan%{pkgsuffix}-static
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
@@ -1971,11 +1999,11 @@ end
 %endif
 
 %if %{build_libtsan}
-%files -n libtsan
+%files -n libtsan%{pkgsuffix}
 %defattr(-,root,root,-)
 %{_prefix}/%{_lib}/libtsan.so.2*
 
-%files -n libtsan-static
+%files -n libtsan%{pkgsuffix}-static
 %defattr(-,root,root,-)
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
@@ -1986,10 +2014,10 @@ end
 %endif
 
 %if %{build_liblsan}
-%files -n liblsan
+%files -n liblsan%{pkgsuffix}
 %{_prefix}/%{_lib}/liblsan.so.0*
 
-%files -n liblsan-static
+%files -n liblsan%{pkgsuffix}-static
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
@@ -2000,12 +2028,14 @@ end
 
 %if %{build_go}
 %files go
-%attr(755,root,root) %{_prefix}/bin/go.gcc
-%{_prefix}/bin/gccgo
-%attr(755,root,root) %{_prefix}/bin/gofmt.gcc
-%{_mandir}/man1/gccgo.1*
-%{_mandir}/man1/go.1*
-%{_mandir}/man1/gofmt.1*
+%{_prefix}/bin/gccgo%{binsuffix}
+%ghost %{_prefix}/bin/go%{binsuffix}
+%{_prefix}/bin/go.gcc%{binsuffix}
+%ghost %{_prefix}/bin/gofmt%{binsuffix}
+%{_prefix}/bin/gofmt.gcc%{binsuffix}
+%{_mandir}/man1/gccgo%{binsuffix}.1*
+%{_mandir}/man1/go%{binsuffix}.1*
+%{_mandir}/man1/gofmt%{binsuffix}.1*
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
@@ -2029,11 +2059,12 @@ end
 %endif
 %doc rpm.doc/go/*
 
-%files -n libgo
+%files -n libgo%{pkgsuffix}
+%{_prefix}/%{_lib}/libgo.so
 %attr(755,root,root) %{_prefix}/%{_lib}/libgo.so.22*
 %doc rpm.doc/libgo/*
 
-%files -n libgo-devel
+%files -n libgo%{pkgsuffix}-devel
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}
@@ -2053,7 +2084,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libgo.so
 %endif
 
-%files -n libgo-static
+%files -n libgo%{pkgsuffix}-static
 %dir %{_prefix}/%{_lib}/gcc
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}

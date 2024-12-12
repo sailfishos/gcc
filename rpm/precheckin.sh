@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=gcc
+NAME=gcc13
 SPECNAME=${NAME}.spec
 ARCHES="armv7hl i486 x86_64 aarch64"
 # If your %_vendor changes, please edit this too --cvm
