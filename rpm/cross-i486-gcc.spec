@@ -1395,26 +1395,6 @@ if posix.access ("/sbin/ldconfig", "x") then
   end
 end
 
-%post go
-pushd %{_bindir}
-if [ ! -f go ] ; then
-  ln -s go.gcc go
-fi
-if [ ! -f gofmt ] ; then
-  ln -s gofmt.gcc gofmt
-fi
-popd
-
-%preun go
-pushd %{_bindir}
-if [ -L go ]; then
-  rm go
-fi
-if [ -L gofmt ]; then
-  rm gofmt
-fi
-popd
-
 %post -n libstdc++ -p /sbin/ldconfig
 
 %postun -n libstdc++ -p /sbin/ldconfig
@@ -2021,10 +2001,8 @@ popd
 
 %if %{build_go}
 %files go
-%ghost %{_prefix}/bin/go
 %attr(755,root,root) %{_prefix}/bin/go.gcc
 %{_prefix}/bin/gccgo
-%ghost %{_prefix}/bin/gofmt
 %attr(755,root,root) %{_prefix}/bin/gofmt.gcc
 %{_mandir}/man1/gccgo.1*
 %{_mandir}/man1/go.1*
