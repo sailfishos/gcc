@@ -29,7 +29,7 @@ diff --git a/gcc/fortran/lang.opt b/gcc/fortran/lang.opt
 index 2b1977c523b..52bd522051e 100644
 --- a/gcc/fortran/lang.opt
 +++ b/gcc/fortran/lang.opt
-@@ -482,6 +482,10 @@ Fortran Var(flag_dec_char_conversions)
+@@ -469,6 +469,10 @@ Fortran Var(flag_dec_char_conversions)
  Enable the use of character literals in assignments and data statements
  for non-character variables.
  
@@ -56,7 +56,7 @@ diff --git a/gcc/fortran/symbol.cc b/gcc/fortran/symbol.cc
 index 3b988d1be22..9843175cc2a 100644
 --- a/gcc/fortran/symbol.cc
 +++ b/gcc/fortran/symbol.cc
-@@ -2002,6 +2002,8 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
+@@ -1995,6 +1995,8 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
    if (sym->attr.result && type == BT_UNKNOWN && sym->ns->proc_name)
      type = sym->ns->proc_name->ts.type;
  
@@ -65,7 +65,7 @@ index 3b988d1be22..9843175cc2a 100644
    if (type != BT_UNKNOWN && !(sym->attr.function && sym->attr.implicit_type)
        && !(gfc_state_stack->previous && gfc_state_stack->previous->previous
  	   && gfc_state_stack->previous->previous->state == COMP_SUBMODULE)
-@@ -2014,6 +2016,23 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
+@@ -2007,6 +2009,23 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
        else if (sym->attr.function && sym->attr.result)
  	gfc_error ("Symbol %qs at %L already has basic type of %s",
  		   sym->ns->proc_name->name, where, gfc_basic_typename (type));
@@ -89,7 +89,7 @@ index 3b988d1be22..9843175cc2a 100644
        else
  	gfc_error ("Symbol %qs at %L already has basic type of %s", sym->name,
  		   where, gfc_basic_typename (type));
-@@ -2027,8 +2046,6 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
+@@ -2020,8 +2039,6 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
        return false;
      }
  

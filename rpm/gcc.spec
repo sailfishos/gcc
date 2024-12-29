@@ -86,7 +86,7 @@ ExclusiveArch: %ix86 x86_64
 # end crossbuild / accelerator section
 %endif
 
-%global gcc_version 13.4.0
+%global gcc_version 14.3.0
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
@@ -150,7 +150,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 Summary: Various compilers (C, C++, Objective-C, Java, ...)
-Version: 13.4.0
+Version: 14.3.0
 %if %{bootstrap}
 Release: 0.%{bootstrap}.%{gcc_release}
 %else
@@ -200,23 +200,24 @@ AutoReq: true
 # /!crossbuild
 %endif
 
-Patch0: gcc13-hack.patch
-Patch2: gcc13-sparc-config-detection.patch
-Patch3: gcc13-libgomp-omp_h-multilib.patch
-Patch4: gcc13-libtool-no-rpath.patch
-Patch5: gcc13-isl-dl.patch
-Patch6: gcc13-isl-dl2.patch
-Patch7: gcc13-libstdc++-docs.patch
-Patch8: gcc13-no-add-needed.patch
-Patch9: gcc13-Wno-format-security.patch
-Patch10: gcc13-rh1574936.patch
-Patch11: gcc13-d-shared-libphobos.patch
-Patch12: gcc13-reproducible-builds.patch
-Patch13: gcc13-reproducible-builds-buildid-for-checksum.patch
+Patch0: gcc14-hack.patch
+Patch2: gcc14-sparc-config-detection.patch
+Patch3: gcc14-libgomp-omp_h-multilib.patch
+Patch4: gcc14-libtool-no-rpath.patch
+Patch5: gcc14-isl-dl.patch
+Patch6: gcc14-isl-dl2.patch
+Patch7: gcc14-libstdc++-docs.patch
+Patch8: gcc14-no-add-needed.patch
+Patch9: gcc14-Wno-format-security.patch
+Patch10: gcc14-rh1574936.patch
+Patch11: gcc14-d-shared-libphobos.patch
+Patch12: gcc14-pr101523.patch
+Patch13: gcc14-reproducible-builds.patch
+Patch14: gcc14-reproducible-builds-buildid-for-checksum.patch
 
 Patch50: isl-rh2155127.patch
 
-Patch100: gcc13-fortran-fdec-duplicates.patch
+Patch100: gcc14-fortran-fdec-duplicates.patch
 
 #We need -gnueabi indicator for ARM
 %ifnarch %{arm} aarch64
@@ -225,7 +226,7 @@ Patch100: gcc13-fortran-fdec-duplicates.patch
 %global gcc_target_platform %{_target_platform}
 
 %description
-The gcc package contains the GNU Compiler Collection version 13.
+The gcc package contains the GNU Compiler Collection version 14.
 You'll need this package in order to compile C code.
 
 %if !%{crossbuild}
@@ -239,7 +240,7 @@ Man and info pages for %{name}.
 %endif
 
 %package -n libgcc
-Summary: GCC version 13 shared support library
+Summary: GCC version 14 shared support library
 Obsoletes: libgcc < %{version}-%{release}
 Autoreq: true
 %if "%{version}" != "%{gcc_version}"
@@ -539,8 +540,9 @@ tar xfj %{SOURCE1}
 %patch9 -p0 -b .Wno-format-security~
 %patch10 -p0 -b .rh1574936~
 %patch11 -p0 -b .d-shared-libphobos~
-%patch12 -p0 -b .reproducible-builds~
-%patch13 -p1 -b .reproducible-builds-buildid-for-checksum~
+%patch12 -p1 -b .pr101523~
+%patch13 -p0 -b .reproducible-builds~
+%patch14 -p1 -b .reproducible-builds-buildid-for-checksum~
 
 %patch50 -p0 -b .rh2155127~
 touch -r isl-0.24/m4/ax_prog_cxx_for_build.m4 isl-0.24/m4/ax_prog_cc_for_build.m4
@@ -993,14 +995,14 @@ ln -sf ../../../libobjc.so.4 libobjc.so
 ln -sf ../../../libstdc++.so.6.*[0-9] libstdc++.so
 ln -sf ../../../libgomp.so.1.* libgomp.so
 %if %{build_go}
-ln -sf ../../../libgo.so.22.* libgo.so
+ln -sf ../../../libgo.so.23.* libgo.so
 %endif
 %if %{build_libquadmath}
 ln -sf ../../../libquadmath.so.0.* libquadmath.so
 %endif
 %if %{build_d}
-ln -sf ../../../libgdruntime.so.4.* libgdruntime.so
-ln -sf ../../../libgphobos.so.4.* libgphobos.so
+ln -sf ../../../libgdruntime.so.5.* libgdruntime.so
+ln -sf ../../../libgphobos.so.5.* libgphobos.so
 %endif
 %if %{build_libitm}
 ln -sf ../../../libitm.so.1.* libitm.so
@@ -1022,14 +1024,14 @@ ln -sf ../../../../%{_lib}/libobjc.so.4 libobjc.so
 ln -sf ../../../../%{_lib}/libstdc++.so.6.*[0-9] libstdc++.so
 ln -sf ../../../../%{_lib}/libgomp.so.1.* libgomp.so
 %if %{build_go}
-ln -sf ../../../../%{_lib}/libgo.so.22.* libgo.so
+ln -sf ../../../../%{_lib}/libgo.so.23.* libgo.so
 %endif
 %if %{build_libquadmath}
 ln -sf ../../../../%{_lib}/libquadmath.so.0.* libquadmath.so
 %endif
 %if %{build_d}
-ln -sf ../../../../%{_lib}/libgdruntime.so.4.* libgdruntime.so
-ln -sf ../../../../%{_lib}/libgphobos.so.4.* libgphobos.so
+ln -sf ../../../../%{_lib}/libgdruntime.so.5.* libgdruntime.so
+ln -sf ../../../../%{_lib}/libgphobos.so.5.* libgphobos.so
 %endif
 %if %{build_libitm}
 ln -sf ../../../../%{_lib}/libitm.so.1.* libitm.so
@@ -1045,7 +1047,7 @@ mv ../../../../%{_lib}/libasan_preinit.o libasan_preinit.o
 ln -sf ../../../../%{_lib}/libubsan.so.1.* libubsan.so
 %endif
 %if %{build_go}
-ln -sf ../../../../%{_lib}/libgo.so.22.* libgo.so
+ln -sf ../../../../%{_lib}/libgo.so.23.* libgo.so
 %endif
 %if %{build_libtsan}
 rm -f libtsan.so
@@ -1066,7 +1068,6 @@ fi
 mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++.*a $FULLLPATH/
 mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++fs.*a $FULLLPATH/
 mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++exp.*a $FULLLPATH/
-mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++_libbacktrace.*a $FULLLPATH/
 mv -f %{buildroot}%{_prefix}/%{_lib}/libsupc++.*a $FULLLPATH/
 %if %{build_objc}
 mv -f %{buildroot}%{_prefix}/%{_lib}/libobjc.*a .
@@ -1149,7 +1150,7 @@ for d in . $FULLLSUBDIR; do
 		-o -name libobjc.a -o -name libgdruntime.a -o -name libgphobos.a \
 		-o -name libm2\*.a -o -name libquadmath.a -o -name libstdc++.a \
 		-o -name libstdc++fs.a -o -name libstdc++exp.a \
-		-o -name libstdc++_libbacktrace.a -o -name libsupc++.a \
+		-o -name libsupc++.a \
 		-o -name libtsan.a -o -name libubsan.a \) -a -type f`; do
     cp -a $f $RPM_BUILD_ROOT%{_prefix}/%{_lib}/debug%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/$d/
   done
@@ -1166,8 +1167,8 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/libcc1.so.0.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libquadmath.so.0.*
 %endif
 %if %{build_d}
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgdruntime.so.4.*
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgphobos.so.4.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgdruntime.so.5.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgphobos.so.5.*
 %endif
 %if %{build_libitm}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libitm.so.1.*
@@ -1430,6 +1431,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdnoreturn.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdatomic.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/gcov.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/stdckdint.h
 %ifarch %{ix86} x86_64
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/mmintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/xmmintrin.h
@@ -1535,6 +1537,12 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/prfchiintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/raointintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/amxcomplexintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512bitalgvlintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avxvnniint16intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/sha512intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/sm3intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/sm4intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/usermsrintrin.h
 %endif
 %ifarch %{arm}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include-fixed
@@ -1736,13 +1744,11 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libstdc++.a
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libstdc++fs.a
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libstdc++exp.a
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libstdc++_libbacktrace.a
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/32/libsupc++.a
 %endif
 %ifarch %{multilib_64_archs}
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.so
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++exp.a
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/stdc++fslibstdc++_libbacktrace.a
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libsupc++.a
 %endif
 
@@ -1950,7 +1956,7 @@ end
 %doc rpm.doc/go/*
 
 %files -n libgo
-%attr(755,root,root) %{_prefix}/%{_lib}/libgo.so.22*
+%attr(755,root,root) %{_prefix}/%{_lib}/libgo.so.23*
 %doc rpm.doc/libgo/*
 
 %files -n libgo-devel
