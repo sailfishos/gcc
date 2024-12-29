@@ -7,7 +7,7 @@
 
 --- gcc/toplev.cc.jj	2008-12-09 23:59:10.000000000 +0100
 +++ gcc/toplev.cc	2009-01-27 14:33:52.000000000 +0100
-@@ -105,6 +105,8 @@ static void finalize (bool);
+@@ -113,6 +113,8 @@ static void finalize (bool);
  static void crash_signal (int) ATTRIBUTE_NORETURN;
  static void compile_file (void);
  
@@ -16,7 +16,7 @@
  /* Decoded options, and number of such options.  */
  struct cl_decoded_option *save_decoded_options;
  unsigned int save_decoded_options_count;
-@@ -2206,6 +2208,8 @@ toplev::main (int argc, char **argv)
+@@ -2239,6 +2241,8 @@ toplev::main (int argc, char **argv)
  
    expandargv (&argc, &argv);
  
@@ -27,7 +27,7 @@
  
 --- gcc/graphite.cc.jj	2010-12-01 10:24:32.000000000 -0500
 +++ gcc/graphite.cc	2010-12-01 11:46:07.832118193 -0500
-@@ -65,11 +65,39 @@ __typeof (isl_pointers__) isl_pointers__
+@@ -64,11 +64,39 @@ __typeof (isl_pointers__) isl_pointers__
  static bool
  init_isl_pointers (void)
  {

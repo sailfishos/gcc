@@ -4,7 +4,7 @@
 
 --- libgomp/omp.h.in.jj	2008-06-09 13:34:05.000000000 +0200
 +++ libgomp/omp.h.in	2008-06-09 13:34:48.000000000 +0200
-@@ -52,8 +52,8 @@ typedef struct
+@@ -42,8 +42,8 @@ typedef struct
  
  typedef struct
  {

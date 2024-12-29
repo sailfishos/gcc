@@ -1,6 +1,6 @@
 --- gcc/Makefile.in.jj	2015-06-06 10:00:25.000000000 +0200
 +++ gcc/Makefile.in	2015-11-04 14:56:02.643536437 +0100
-@@ -1098,7 +1098,7 @@ BUILD_LIBDEPS= $(BUILD_LIBIBERTY)
+@@ -1063,7 +1063,7 @@ BUILD_LIBDEPS= $(BUILD_LIBIBERTY)
  # and the system's installed libraries.
  LIBS = @LIBS@ libcommon.a $(CPPLIB) $(LIBINTL) $(LIBICONV) $(LIBBACKTRACE) \
  	$(LIBIBERTY) $(LIBDECNUMBER) $(HOST_LIBS)
@@ -9,7 +9,7 @@
  	$(ZLIB) $(ZSTD_LIB)
  # Any system libraries needed just for GNAT.
  SYSLIBS = @GNAT_LIBEXC@
-@@ -2413,6 +2413,15 @@ $(out_object_file): $(out_file)
+@@ -2302,6 +2302,15 @@ $(out_object_file): $(out_file)
  $(common_out_object_file): $(common_out_file)
  	$(COMPILE) $<
  	$(POSTCOMPILE)
@@ -697,7 +697,7 @@
  static void
 --- gcc/toplev.cc.jj	2017-02-19 13:02:31.000000000 +0100
 +++ gcc/toplev.cc	2017-02-19 16:50:25.536301350 +0100
-@@ -93,6 +93,7 @@ along with GCC; see the file COPYING3.
+@@ -94,6 +94,7 @@ along with GCC; see the file COPYING3.
  
  #ifdef HAVE_isl
  #include <isl/version.h>
@@ -705,7 +705,7 @@
  #endif
  
  static void general_init (const char *, bool);
-@@ -644,7 +645,7 @@ print_version (FILE *file, const char *i
+@@ -683,7 +684,7 @@ print_version (FILE *file, const char *i
  #ifndef HAVE_isl
  	   "none"
  #else
