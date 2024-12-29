@@ -10,7 +10,7 @@
 
 --- gcc/configure.ac.jj	2017-02-13 12:20:53.000000000 +0100
 +++ gcc/configure.ac	2017-02-25 12:42:32.859175403 +0100
-@@ -593,7 +593,7 @@ AC_ARG_ENABLE(build-format-warnings,
+@@ -570,7 +570,7 @@ AC_ARG_ENABLE(build-format-warnings,
    AS_HELP_STRING([--disable-build-format-warnings],[don't use -Wformat while building GCC]),
    [],[enable_build_format_warnings=yes])
  AS_IF([test $enable_build_format_warnings = no],
@@ -21,7 +21,7 @@
  		       [-Wcast-qual $wf_opt])),
 --- gcc/configure.jj	2017-02-13 12:20:52.000000000 +0100
 +++ gcc/configure	2017-02-25 12:42:50.041946391 +0100
-@@ -7118,7 +7118,7 @@ else
+@@ -7077,7 +7077,7 @@ else
  fi
  
  if test $enable_build_format_warnings = no; then :
@@ -30,33 +30,33 @@
  else
    wf_opt=
  fi
---- Makefile.tpl.jj	2021-12-30 15:12:42.188164847 +0100
-+++ Makefile.tpl	2022-01-07 12:06:12.115550714 +0100
-@@ -446,9 +446,9 @@ LDFLAGS = @LDFLAGS@
+--- Makefile.tpl.jj	2023-11-29 13:21:41.680292662 +0100
++++ Makefile.tpl	2023-11-29 13:23:24.677839321 +0100
+@@ -448,9 +448,9 @@ LDFLAGS = @LDFLAGS@
  LIBCFLAGS = $(CFLAGS)
  CXXFLAGS = @CXXFLAGS@
  LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
 -GOCFLAGS = $(CFLAGS)
--GDCFLAGS = $(CFLAGS)
+-GDCFLAGS = @GDCFLAGS@
 -GM2FLAGS = $(CFLAGS)
 +GOCFLAGS = $(filter-out -Wformat-security,$(CFLAGS))
-+GDCFLAGS = $(filter-out -Wformat-security,$(CFLAGS))
++GDCFLAGS = $(filter-out -Wformat-security,@GDCFLAGS@)
 +GM2FLAGS = $(filter-out -Wformat-security,$(CFLAGS))
  
- # Pass additional PGO and LTO compiler options to the PGO build.
- BUILD_CFLAGS = $(PGO_BUILD_CFLAGS) $(PGO_BUILD_LTO_CFLAGS)
---- Makefile.in.jj	2021-12-30 15:12:42.188164847 +0100
-+++ Makefile.in	2022-01-07 12:06:27.335334561 +0100
-@@ -443,9 +443,9 @@ LDFLAGS = @LDFLAGS@
+ PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ 
+--- Makefile.in.jj	2023-11-29 13:21:41.691292507 +0100
++++ Makefile.in	2023-11-29 13:24:01.254323180 +0100
+@@ -445,9 +445,9 @@ LDFLAGS = @LDFLAGS@
  LIBCFLAGS = $(CFLAGS)
  CXXFLAGS = @CXXFLAGS@
  LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
 -GOCFLAGS = $(CFLAGS)
--GDCFLAGS = $(CFLAGS)
+-GDCFLAGS = @GDCFLAGS@
 -GM2FLAGS = $(CFLAGS)
 +GOCFLAGS = $(filter-out -Wformat-security,$(CFLAGS))
-+GDCFLAGS = $(filter-out -Wformat-security,$(CFLAGS))
++GDCFLAGS = $(filter-out -Wformat-security,@GDCFLAGS@)
 +GM2FLAGS = $(filter-out -Wformat-security,$(CFLAGS))
  
- # Pass additional PGO and LTO compiler options to the PGO build.
- BUILD_CFLAGS = $(PGO_BUILD_CFLAGS) $(PGO_BUILD_LTO_CFLAGS)
+ PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ 
