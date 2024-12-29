@@ -32,11 +32,11 @@ The termio ioctls are no longer used after commit 59978b21ad9c
  .../sanitizer_common/sanitizer_platform_limits_posix.h        | 4 ----
  2 files changed, 8 deletions(-)
 
-diff --git libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
-index c13811e39a4478e5da953bf5dc12881fd7676b2f..cb50a272c42226edf61466df523232d55d50d5bd 100644
---- libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
-+++ libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
-@@ -743,13 +743,9 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
+diff --git a/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp b/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
+index ba3eca82dc888f618a93d35d9bc7895d72dfe7f0..3fb5a40ba852bc71ae97583dfe7f8b9191d28eab 100644
+--- a/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
++++ b/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
+@@ -755,13 +755,9 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
    unsigned IOCTL_SOUND_PCM_WRITE_FILTER = SOUND_PCM_WRITE_FILTER;
  #endif // SOUND_VERSION
    unsigned IOCTL_TCFLSH = TCFLSH;
@@ -50,11 +50,11 @@ index c13811e39a4478e5da953bf5dc12881fd7676b2f..cb50a272c42226edf61466df523232d5
    unsigned IOCTL_TCSETS = TCSETS;
    unsigned IOCTL_TCSETSF = TCSETSF;
    unsigned IOCTL_TCSETSW = TCSETSW;
-diff --git libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h
-index 45c1e1302f8f2f9acafc7fdc4f7b38d56a66e2a7..70ea7e3c1bc235b32c6a4b6737d83019809bfb7e 100644
---- libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h
-+++ libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h
-@@ -1242,13 +1242,9 @@ extern unsigned IOCTL_SNDCTL_COPR_SENDMSG;
+diff --git a/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h b/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h
+index 28e5bbbc371bc0d5c0bbc5035ce42387a8f4424e..9e4ab50dbaa0763a28f9171e85b2d154daf60421 100644
+--- a/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h
++++ b/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h
+@@ -1256,13 +1256,9 @@ extern unsigned IOCTL_SNDCTL_COPR_SENDMSG;
  extern unsigned IOCTL_SNDCTL_COPR_WCODE;
  extern unsigned IOCTL_SNDCTL_COPR_WDATA;
  extern unsigned IOCTL_TCFLSH;
