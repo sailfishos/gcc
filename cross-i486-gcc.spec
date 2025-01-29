@@ -11,11 +11,6 @@ Name: cross-i486-gcc
 %endif
 %endif
 
-%ifarch aarch64 x86_64
-%define _libdir /usr/lib64
-%define _lib lib64
-%endif
-
 # crossbuild / accelerator section
 # \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 %define crossbuild 0
@@ -88,7 +83,7 @@ BuildRequires: %{cross_deps}
 %define crossextraconfig --disable-libstdcxx-pch --with-arch=i686 --with-fpmatch=sse --with-gnu-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-gnu-ld=/opt/cross/bin/i486-meego-linux-gnu-ld --with-as=/opt/cross/bin/i486-meego-linux-gnu-as --with-ld=/opt/cross/bin/i486-meego-linux-gnu-ld
 %endif
 %if "%{crossarch}" == "x86_64"
-%define crossextraconfig --disable-libstdcxx-pch
+%define crossextraconfig --disable-libstdcxx-pch --with-gnu-as=/opt/cross/bin/x86_64-meego-linux-gnu-as --with-gnu-ld=/opt/cross/bin/x86_64-meego-linux-gnu-ld --with-as=/opt/cross/bin/x86_64-meego-linux-gnu-as --with-ld=/opt/cross/bin/x86_64-meego-linux-gnu-ld
 %endif
 %if "%{crossarch}" == "aarch64"
 %define crossextraconfig --with-arch=armv8-a
@@ -99,6 +94,18 @@ ExclusiveArch: %ix86 x86_64
 #
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 # end crossbuild / accelerator section
+%endif
+
+%if !%{crossbuild}
+%ifarch aarch64 x86_64
+%define _libdir %{_prefix}/lib64
+%define _lib lib64
+%endif
+%else
+%ifarch x86_64
+%define _libdir %{_prefix}/lib
+%define _lib lib64
+%endif
 %endif
 
 %global gcc_version 10.3.1
