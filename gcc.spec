@@ -39,8 +39,13 @@ AutoReq: false
 # cross_gcc_target_platform holds the target (for which the compiler is producing binaries)
 # prefix for cross compiler
 %define _prefix /opt/cross
+%global debug_package %{nil}
+%if %{bootstrap} == 0
+%define __strip %{_prefix}/bin/%{cross_gcc_target_platform}-strip
+%else
 # strip of 'foreign arch' symbols fails
 %define __strip /bin/true
+%endif
 # sysroot for cross-compiler
 %define crosssysroot %{_prefix}/%{cross_gcc_target_platform}/sys-root
 # flag
