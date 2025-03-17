@@ -1,3 +1,7 @@
+* Mon Mar 17 2025 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 10.3.1-2
+- Disable debug packages for cross packages. JB#63163
+- Disable AutoReq for libgcc. JB#49501
+
 * Thu Mar 7 2024 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 10.3.1
 - Upgrade to ARM gcc 10.3-2021.07. Fixes JB#60722
 
