@@ -253,7 +253,7 @@ Man and info pages for %{name}.
 %package -n libgcc
 Summary: GCC version 10.3 shared support library
 Obsoletes: libgcc < %{version}-%{release}
-Autoreq: false
+Autoreq: true
 %if "%{version}" != "%{gcc_version}"
 Provides: libgcc = %{gcc_provides}
 %endif
