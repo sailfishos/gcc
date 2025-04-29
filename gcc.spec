@@ -254,7 +254,7 @@ Summary: GCC version 10.3 shared support library
 Obsoletes: libgcc < %{version}-%{release}
 Autoreq: true
 %if "%{version}" != "%{gcc_version}"
-Provides: libgcc = %{gcc_provides}
+Provides: libgcc = %{gcc_version}
 %endif
 
 %description -n libgcc
