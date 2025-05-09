@@ -66,61 +66,117 @@
  				GDCFLAGS="$(GDCFLAGS) $${flags}" \
  				CXXFLAGS="$(CXXFLAGS) $${flags}" \
 --- libcpp/macro.cc.jj	2019-01-09 13:01:21.420552123 +0100
-+++ libcpp/macro.cc	2019-01-11 18:18:17.736876285 +0100
-@@ -3256,8 +3256,6 @@ static cpp_macro *
++++ libcpp/macro.cc	2024-11-30 13:16:41.163056391 +0100
+@@ -3680,8 +3680,6 @@ static cpp_macro *
  create_iso_definition (cpp_reader *pfile)
  {
    bool following_paste_op = false;
 -  const char *paste_op_error_msg =
--    N_("'##' cannot appear at either end of a macro expansion");
+-    N_("%<##%> cannot appear at either end of a macro expansion");
    unsigned int num_extra_tokens = 0;
    unsigned nparms = 0;
    cpp_hashnode **params = NULL;
-@@ -3382,7 +3380,9 @@ create_iso_definition (cpp_reader *pfile
+@@ -3809,7 +3807,9 @@ create_iso_definition (cpp_reader *pfile
  	     function-like macros, but not at the end.  */
  	  if (following_paste_op)
  	    {
 -	      cpp_error (pfile, CPP_DL_ERROR, paste_op_error_msg);
 +	      cpp_error (pfile, CPP_DL_ERROR,
-+			 "'##' cannot appear at either end of a macro "
++			 "%<##%> cannot appear at either end of a macro "
 +			 "expansion");
  	      goto out;
  	    }
  	  if (!vaopt_tracker.completed ())
-@@ -3397,7 +3397,9 @@ create_iso_definition (cpp_reader *pfile
+@@ -3824,7 +3824,9 @@ create_iso_definition (cpp_reader *pfile
  	     function-like macros, but not at the beginning.  */
  	  if (macro->count == 1)
  	    {
 -	      cpp_error (pfile, CPP_DL_ERROR, paste_op_error_msg);
 +	      cpp_error (pfile, CPP_DL_ERROR,
-+			 "'##' cannot appear at either end of a macro "
++			 "%<##%> cannot appear at either end of a macro "
 +			 "expansion");
  	      goto out;
  	    }
  
 --- libcpp/expr.cc.jj	2019-01-09 13:01:22.415535734 +0100
-+++ libcpp/expr.cc	2019-01-11 18:16:23.444726882 +0100
-@@ -803,16 +803,17 @@ cpp_classify_number (cpp_reader *pfile,
++++ libcpp/expr.cc	2024-11-30 13:14:52.468583689 +0100
+@@ -874,50 +874,54 @@ cpp_classify_number (cpp_reader *pfile,
        if ((result & CPP_N_WIDTH) == CPP_N_LARGE
  	  && CPP_OPTION (pfile, cpp_warn_long_long))
          {
--          const char *message = CPP_OPTION (pfile, cplusplus) 
+-          const char *message = CPP_OPTION (pfile, cplusplus)
 -				? N_("use of C++11 long long integer constant")
 -		                : N_("use of C99 long long integer constant");
 -
  	  if (CPP_OPTION (pfile, c99))
-             cpp_warning_with_line (pfile, CPP_W_LONG_LONG, virtual_location,
+-            cpp_warning_with_line (pfile, CPP_W_LONG_LONG, virtual_location,
 -				   0, message);
-+				   0, CPP_OPTION (pfile, cplusplus)
-+				      ? N_("use of C++11 long long integer constant")
-+				      : N_("use of C99 long long integer constant"));
++            cpp_warning_with_line (pfile, CPP_W_LONG_LONG, virtual_location, 0,
++				   CPP_OPTION (pfile, cplusplus)
++				   ? N_("use of C++11 long long integer "
++					"constant")
++				   : N_("use of C99 long long integer "
++					"constant"));
            else
              cpp_pedwarning_with_line (pfile, CPP_W_LONG_LONG,
 -				      virtual_location, 0, message);
 +				      virtual_location, 0,
 +				      CPP_OPTION (pfile, cplusplus)
-+				      ? N_("use of C++11 long long integer constant")
-+				      : N_("use of C99 long long integer constant"));
++				      ? N_("use of C++11 long long integer "
++					   "constant")
++				      : N_("use of C99 long long integer "
++					   "constant"));
          }
  
        if ((result & CPP_N_SIZE_T) == CPP_N_SIZE_T
+ 	  && !CPP_OPTION (pfile, size_t_literals))
+-       {
+-	  const char *message
+-	    = (result & CPP_N_UNSIGNED) == CPP_N_UNSIGNED
+-	      ? N_("use of C++23 %<size_t%> integer constant")
+-	      : N_("use of C++23 %<make_signed_t<size_t>%> integer constant");
+-	  cpp_warning_with_line (pfile, CPP_W_SIZE_T_LITERALS,
+-				 virtual_location, 0, message);
+-       }
++	cpp_warning_with_line (pfile, CPP_W_SIZE_T_LITERALS,
++			       virtual_location, 0,
++			       (result & CPP_N_UNSIGNED) == CPP_N_UNSIGNED
++				? N_("use of C++23 %<size_t%> integer "
++				     "constant")
++				: N_("use of C++23 %<make_signed_t<size_t>%> "
++				     "integer constant"));
+ 
+       if ((result & CPP_N_BITINT) != 0
+ 	  && CPP_OPTION (pfile, cpp_warn_c11_c23_compat) != 0)
+ 	{
+ 	  if (CPP_OPTION (pfile, cpp_warn_c11_c23_compat) > 0)
+ 	    {
+-	      const char *message = N_("ISO C does not support literal "
+-				       "%<wb%> suffixes before C23");
+ 	      if (CPP_PEDANTIC (pfile) && !CPP_OPTION (pfile, true_false))
+ 		cpp_pedwarning_with_line (pfile, CPP_W_C11_C23_COMPAT,
+-					  virtual_location, 0, message);
++					  virtual_location, 0,
++					  "ISO C does not support literal "
++					  "%<wb%> suffixes before C23");
+ 	      else
+ 		cpp_warning_with_line (pfile, CPP_W_C11_C23_COMPAT,
+-				       virtual_location, 0, message);
+-	    }
+-	  else if (!CPP_OPTION (pfile, true_false))
+-	    {
+-	      const char *message = N_("ISO C does not support literal "
++				       virtual_location, 0,
++				       "ISO C does not support literal "
+ 				       "%<wb%> suffixes before C23");
+-	      cpp_pedwarning_with_line (pfile, CPP_W_PEDANTIC,
+-					virtual_location, 0, message);
+ 	    }
++	  else if (!CPP_OPTION (pfile, true_false))
++	    cpp_pedwarning_with_line (pfile, CPP_W_PEDANTIC,
++				      virtual_location, 0,
++				      "ISO C does not support literal "
++				      "%<wb%> suffixes before C23");
+ 	}
+ 
+       result |= CPP_N_INTEGER;

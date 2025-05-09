@@ -4,7 +4,7 @@ Index: gcc/ada/gcc-interface/Makefile.in
 ===================================================================
 --- gcc/ada/gcc-interface/Makefile.in	(revision 268977)
 +++ gcc/ada/gcc-interface/Makefile.in	(working copy)
-@@ -624,6 +624,7 @@ $(RTSDIR)/s-oscons.ads: ../stamp-gnatlib
+@@ -642,6 +642,7 @@ $(RTSDIR)/s-oscons.ads: ../stamp-gnatlib
  	    $(OSCONS_CPP) ; \
  	    $(OSCONS_EXTRACT) ; \
  	    ../bldtools/oscons/xoscons s-oscons)
