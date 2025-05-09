@@ -87,7 +87,7 @@ ExclusiveArch: %ix86 x86_64
 # end crossbuild / accelerator section
 %endif
 
-%global gcc_version 14.3.0
+%global gcc_version 15.3.0
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
@@ -151,7 +151,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 Summary: Various compilers (C, C++, Objective-C, Java, ...)
-Version: 14.3.0
+Version: 15.3.0
 %if %{bootstrap}
 Release: 0.%{bootstrap}.%{gcc_release}
 %else
@@ -162,26 +162,24 @@ URL: https://github.com/sailfishos/gcc
 Source0: %{name}-%{version}.tar.xz
 Source1: isl-0.24.tar.bz2
 Source3: gcc-rpmlintrc
-Patch0: gcc14-hack.patch
-Patch2: gcc14-sparc-config-detection.patch
-Patch3: gcc14-libgomp-omp_h-multilib.patch
-Patch4: gcc14-libtool-no-rpath.patch
-Patch5: gcc14-isl-dl.patch
-Patch6: gcc14-isl-dl2.patch
-Patch7: gcc14-libstdc++-docs.patch
-Patch8: gcc14-no-add-needed.patch
-Patch9: gcc14-Wno-format-security.patch
-Patch10: gcc14-rh1574936.patch
-Patch11: gcc14-d-shared-libphobos.patch
-Patch12: gcc14-pr101523.patch
-Patch13: gcc14-reproducible-builds.patch
-Patch14: gcc14-reproducible-builds-buildid-for-checksum.patch
-Patch15: gcc14-backport-libsanitizer-Fix-build-with-glibc-2.42.patch
-Patch16: gcc14-backport-sanitizer_common-Remove-reference-to-obsolete-termio.patch
+Patch0: gcc15-hack.patch
+Patch2: gcc15-sparc-config-detection.patch
+Patch3: gcc15-libgomp-omp_h-multilib.patch
+Patch4: gcc15-libtool-no-rpath.patch
+Patch5: gcc15-isl-dl.patch
+Patch6: gcc15-isl-dl2.patch
+Patch7: gcc15-libstdc++-docs.patch
+Patch8: gcc15-no-add-needed.patch
+Patch9: gcc15-Wno-format-security.patch
+Patch10: gcc15-rh1574936.patch
+Patch11: gcc15-d-shared-libphobos.patch
+Patch12: gcc15-pr119006.patch
+Patch13: gcc15-reproducible-builds.patch
+Patch14: gcc15-reproducible-builds-buildid-for-checksum.patch
 Patch50: isl-rh2155127.patch
-Patch100: gcc14-fortran-fdec-duplicates.patch
+Patch100: gcc15-fortran-fdec-duplicates.patch
 
-BuildRequires: binutils >= 2.31
+BuildRequires: binutils >= 2.43
 BuildRequires: glibc-static
 BuildRequires: zlib-devel, gettext,  bison, flex
 BuildRequires: mpc-devel
@@ -202,7 +200,7 @@ Requires: cpp = %{version}-%{release}
 Requires: libgcc >= %{version}-%{release}
 Requires: libgomp = %{version}-%{release}
 Requires: glibc-devel
-Requires: binutils >= 2.31
+Requires: binutils >= 2.43
 %endif
 
 %if !%{crossbuild}
@@ -223,7 +221,7 @@ AutoReq: true
 %global gcc_target_platform %{_target_platform}
 
 %description
-The gcc package contains the GNU Compiler Collection version 14.
+The gcc package contains the GNU Compiler Collection version 15.
 You'll need this package in order to compile C code.
 
 %if !%{crossbuild}
@@ -237,7 +235,7 @@ Man and info pages for %{name}.
 %endif
 
 %package -n libgcc
-Summary: GCC version 14 shared support library
+Summary: GCC version 15 shared support library
 Obsoletes: libgcc < %{version}-%{release}
 Autoreq: true
 %if "%{version}" != "%{gcc_version}"
@@ -754,7 +752,9 @@ cp -a src/LICENSE*.txt libdruntime/LICENSE.txt ../rpm.doc/libphobos/)
 %if %{build_libquadmath}
 (cd libquadmath; for i in ChangeLog* COPYING.LIB; do
 	cp -p $i ../rpm.doc/libquadmath/$i.libquadmath
-done)
+done;
+sed -n '/==========/,/==========/{/==========/d;s/^ \* *//p}' math/cosq.c \
+  > ../rpm.doc/libquadmath/LICENSE.SunPro)
 %endif
 %if %{build_libitm}
 (cd libitm; for i in ChangeLog*; do
@@ -968,6 +968,10 @@ mkdir -p %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}
 mv -f %{buildroot}%{_prefix}/%{_lib}/libstdc++*gdb.py* \
       %{buildroot}%{_datadir}/gdb/auto-load/%{_prefix}/%{_lib}/
 
+sed -e 's,\.\./include/,../../../../include/,' \
+  %{buildroot}%{_prefix}/%{_lib}/libstdc++.modules.json \
+  > $FULLPATH/libstdc++.modules.json
+
 pushd $FULLPATH
 if [ "%{_lib}" = "lib" ]; then
 %if %{build_objc}
@@ -976,14 +980,14 @@ ln -sf ../../../libobjc.so.4 libobjc.so
 ln -sf ../../../libstdc++.so.6.*[0-9] libstdc++.so
 ln -sf ../../../libgomp.so.1.* libgomp.so
 %if %{build_go}
-ln -sf ../../../libgo.so.23.* libgo.so
+ln -sf ../../../libgo.so.24.* libgo.so
 %endif
 %if %{build_libquadmath}
 ln -sf ../../../libquadmath.so.0.* libquadmath.so
 %endif
 %if %{build_d}
-ln -sf ../../../libgdruntime.so.5.* libgdruntime.so
-ln -sf ../../../libgphobos.so.5.* libgphobos.so
+ln -sf ../../../libgdruntime.so.6.* libgdruntime.so
+ln -sf ../../../libgphobos.so.6.* libgphobos.so
 %endif
 %if %{build_libitm}
 ln -sf ../../../libitm.so.1.* libitm.so
@@ -1005,14 +1009,14 @@ ln -sf ../../../../%{_lib}/libobjc.so.4 libobjc.so
 ln -sf ../../../../%{_lib}/libstdc++.so.6.*[0-9] libstdc++.so
 ln -sf ../../../../%{_lib}/libgomp.so.1.* libgomp.so
 %if %{build_go}
-ln -sf ../../../../%{_lib}/libgo.so.23.* libgo.so
+ln -sf ../../../../%{_lib}/libgo.so.24.* libgo.so
 %endif
 %if %{build_libquadmath}
 ln -sf ../../../../%{_lib}/libquadmath.so.0.* libquadmath.so
 %endif
 %if %{build_d}
-ln -sf ../../../../%{_lib}/libgdruntime.so.5.* libgdruntime.so
-ln -sf ../../../../%{_lib}/libgphobos.so.5.* libgphobos.so
+ln -sf ../../../../%{_lib}/libgdruntime.so.6.* libgdruntime.so
+ln -sf ../../../../%{_lib}/libgphobos.so.6.* libgphobos.so
 %endif
 %if %{build_libitm}
 ln -sf ../../../../%{_lib}/libitm.so.1.* libitm.so
@@ -1028,7 +1032,7 @@ mv ../../../../%{_lib}/libasan_preinit.o libasan_preinit.o
 ln -sf ../../../../%{_lib}/libubsan.so.1.* libubsan.so
 %endif
 %if %{build_go}
-ln -sf ../../../../%{_lib}/libgo.so.23.* libgo.so
+ln -sf ../../../../%{_lib}/libgo.so.24.* libgo.so
 %endif
 %if %{build_libtsan}
 rm -f libtsan.so
@@ -1148,8 +1152,8 @@ chmod 755 %{buildroot}%{_prefix}/%{_lib}/libcc1.so.0.*
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libquadmath.so.0.*
 %endif
 %if %{build_d}
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgdruntime.so.5.*
-chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgphobos.so.5.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgdruntime.so.6.*
+chmod 755 %{buildroot}%{_prefix}/%{_lib}/libgphobos.so.6.*
 %endif
 %if %{build_libitm}
 chmod 755 %{buildroot}%{_prefix}/%{_lib}/libitm.so.1.*
@@ -1456,9 +1460,7 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/xsaveintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/xsaveoptintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512cdintrin.h
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512erintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512fintrin.h
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512pfintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/shaintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/mm_malloc.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/mm3dnow.h
@@ -1480,8 +1482,6 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/xsavesintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/clzerointrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/pkuintrin.h
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx5124fmapsintrin.h
-%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx5124vnniwintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx512vpopcntdqintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/sgxintrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/gfniintrin.h
@@ -1532,6 +1532,23 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/sm3intrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/sm4intrin.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/usermsrintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/amxavx512intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/amxfp8intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/amxmovrsintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/amxtf32intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/amxtransposeintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2-512bf16intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2-512convertintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2-512mediaintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2-512minmaxintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2-512satcvtintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2bf16intrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2convertintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2copyintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2mediaintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2minmaxintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/avx10_2satcvtintrin.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/movrsintrin.h
 %endif
 %ifarch %{arm}
 %dir %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include-fixed
@@ -1550,6 +1567,10 @@ end
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_fp16.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_bf16.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_sve.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_sme.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_neon_sve_bridge.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_private_fp8.h
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/arm_private_neon_types.h
 %endif
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/ssp.h
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/include/ssp/stdio.h
@@ -1764,6 +1785,7 @@ end
 %ifnarch  %{multilib_64_archs}
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.so
 %endif
+%{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++.modules.json
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++fs.a
 %{_prefix}/%{_lib}/gcc/%{gcc_target_platform}/%{gcc_version}/libstdc++exp.a
 
@@ -1945,7 +1967,7 @@ end
 %doc rpm.doc/go/*
 
 %files -n libgo
-%attr(755,root,root) %{_prefix}/%{_lib}/libgo.so.23*
+%attr(755,root,root) %{_prefix}/%{_lib}/libgo.so.24*
 %doc rpm.doc/libgo/*
 
 %files -n libgo-devel
