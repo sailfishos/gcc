@@ -696,16 +696,16 @@
  
  static void
 --- gcc/toplev.cc.jj	2017-02-19 13:02:31.000000000 +0100
-+++ gcc/toplev.cc	2017-02-19 16:50:25.536301350 +0100
-@@ -94,6 +94,7 @@ along with GCC; see the file COPYING3.
++++ gcc/toplev.cc	2024-11-30 13:22:34.175096117 +0100
+@@ -100,6 +100,7 @@ along with GCC; see the file COPYING3.
  
  #ifdef HAVE_isl
  #include <isl/version.h>
 +extern const char *get_isl_version (bool);
  #endif
  
- static void general_init (const char *, bool);
-@@ -683,7 +684,7 @@ print_version (FILE *file, const char *i
+ static void general_init (const char *, bool, unique_argv original_argv);
+@@ -652,7 +653,7 @@ print_version (FILE *file, const char *i
  #ifndef HAVE_isl
  	   "none"
  #else
