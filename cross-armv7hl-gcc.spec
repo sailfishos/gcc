@@ -107,7 +107,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 %global gcc_version 10.3.1
-%global gcc_release 2
+%global gcc_release 3
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
 %global build_ada 0
@@ -253,9 +253,9 @@ Man and info pages for %{name}.
 %package -n libgcc
 Summary: GCC version 10.3 shared support library
 Obsoletes: libgcc < %{version}-%{release}
-Autoreq: false
+Autoreq: true
 %if "%{version}" != "%{gcc_version}"
-Provides: libgcc = %{gcc_provides}
+Provides: libgcc = %{gcc_version}
 %endif
 
 %description -n libgcc
