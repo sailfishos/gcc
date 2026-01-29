@@ -175,6 +175,8 @@ Patch10: gcc13-rh1574936.patch
 Patch11: gcc13-d-shared-libphobos.patch
 Patch12: gcc13-reproducible-builds.patch
 Patch13: gcc13-reproducible-builds-buildid-for-checksum.patch
+Patch14: gcc13-backport-libsanitizer-Fix-build-with-glibc-2.42.patch
+Patch15: gcc13-backport-sanitizer_common-Remove-reference-to-obsolete-termio.patch
 Patch50: isl-rh2155127.patch
 Patch100: gcc13-fortran-fdec-duplicates.patch
 
