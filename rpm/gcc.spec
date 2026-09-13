@@ -86,7 +86,7 @@ ExclusiveArch: %ix86 x86_64
 # end crossbuild / accelerator section
 %endif
 
-%global gcc_version 13.4.0
+%global gcc_version 13.5.0
 %global gcc_release 1
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
@@ -150,7 +150,7 @@ ExclusiveArch: %ix86 x86_64
 %endif
 
 Summary: Various compilers (C, C++, Objective-C, Java, ...)
-Version: 13.4.0
+Version: 13.5.0
 %if %{bootstrap}
 Release: 0.%{bootstrap}.%{gcc_release}
 %else
@@ -174,8 +174,6 @@ Patch10: gcc13-rh1574936.patch
 Patch11: gcc13-d-shared-libphobos.patch
 Patch12: gcc13-reproducible-builds.patch
 Patch13: gcc13-reproducible-builds-buildid-for-checksum.patch
-Patch14: gcc13-backport-libsanitizer-Fix-build-with-glibc-2.42.patch
-Patch15: gcc13-backport-sanitizer_common-Remove-reference-to-obsolete-termio.patch
 Patch50: isl-rh2155127.patch
 Patch100: gcc13-fortran-fdec-duplicates.patch
 
